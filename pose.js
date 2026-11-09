@@ -347,13 +347,18 @@ function initTracking() {
   });
 }
 
-/* ---------------- game hub: 5 camera games for arms, legs and balance ---------------- */
+/* ---------------- game hub: 10 camera games for arms, legs, cardio and balance ---------------- */
 const GAMES = {
   bubble: { name: "Bubble Pop", part: "แขน", type: "game", color: "#5aaae6", how: "ใช้มือแตะฟองให้แตก ฟองทอง +3 ฟองน้ำตาล −2 ห้ามแตะ", icon: '<circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.5"/><circle cx="16" cy="6" r="2"/>' },
   bird: { name: "นกกระพือปีก", part: "แขน · ไหล่", type: "game", color: "#f6c55a", how: "ชูแขนขึ้นเหนือไหล่ แล้วกระพือลงข้างลำตัว นกจะบินสูงขึ้น เก็บดาว หลบก้อนน้ำตาล", icon: '<path d="M3 13c3-5 6-6 9-3 3-3 6-2 9 3-3-1-6 0-9 3-3-3-6-4-9-3z"/>' },
   kick: { name: "เตะดาว", part: "ขา", type: "game", color: "#7ee08a", how: "ยกเท้าหรือเข่าแตะดาวที่ลอยใกล้พื้นทั้งซ้ายและขวา ดาวทอง +2", icon: '<path d="M12 3l2.4 5 5.6.6-4.2 3.8 1.2 5.6L12 15.2 7 18l1.2-5.6L4 8.6l5.6-.6z"/>' },
   squat: { name: "สควอทเป่าลูกโป่ง", part: "ขา · สะโพก", type: "strength", color: "#f2a891", how: "ย่อเข่าแล้วยืนขึ้น 1 ครั้ง = สูบลม 1 ครั้ง ครบ 5 ครั้งลูกโป่งลอยขึ้นฟ้า", icon: '<ellipse cx="12" cy="9" rx="6" ry="7"/><path d="M12 16l-1.5 2h3zM12 18v4"/>' },
   balance: { name: "ยืนขาเดียวสู้ลม", part: "ทรงตัว", type: "balance", color: "#b18cff", how: "ยกเท้าข้างหนึ่งให้พ้นพื้น ยืนให้นานที่สุด สลับขาเมื่อได้ยินสัญญาณ ทุก 1 วินาที = 1 คะแนน", icon: '<circle cx="12" cy="4" r="2"/><path d="M12 6v8l-1 7M12 14l4 2M6 9h12"/>' },
+  jack: { name: "ดาวกระจาย", part: "แขน · ขา · หัวใจ", type: "game", color: "#ff8fb1", how: "ชูแขนเหนือศีรษะพร้อมกางขา แล้วหุบกลับ 1 ครั้ง = พลุ 1 ลูก (ระดับง่าย: ชูแขนอย่างเดียว)", icon: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/><circle cx="12" cy="12" r="2.5"/>' },
+  march: { name: "ย่ำเท้าเก็บผัก", part: "ขา · หัวใจ", type: "game", color: "#6fcf97", how: "ย่ำเท้ายกเข่าสลับซ้าย-ขวาอยู่กับที่ ยิ่งย่ำเร็ว รถเข็นยิ่งวิ่งเก็บผักได้มาก", icon: '<path d="M4 15h13l2-6H7"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M10 9c0-3 2-5 4-5"/>' },
+  punch: { name: "ชกขนมหวาน", part: "แขน · ไหล่", type: "game", color: "#f2994a", how: "เหยียดแขนชกขนมหวานที่ลอยมาให้กระเด็น! ระดับ 2–3 ระวังอย่าชกผัก", icon: '<path d="M6 10a4 4 0 0 1 4-4h5a3 3 0 0 1 3 3v4a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M9 6v4M12 6v4M15 7v3"/>' },
+  reach: { name: "เอื้อมเก็บผลไม้", part: "แขน · ยืดตัว", type: "game", color: "#56ccf2", how: "ยืดตัวเอื้อมมือขึ้นสูงเก็บผลไม้บนต้น ซ้ายบ้าง ขวาบ้าง ระวังลูกอมน้ำตาล", icon: '<path d="M12 21V11"/><circle cx="12" cy="7" r="5"/><circle cx="9" cy="8" r="1.5"/><circle cx="15" cy="6" r="1.5"/>' },
+  dodge: { name: "ตะกร้ารับผัก หลบน้ำตาล", part: "ขา · ทรงตัว", type: "game", color: "#bb6bd9", how: "ก้าวหรือเอนตัวซ้าย-ขวาให้ตะกร้ารับผักที่ตกลงมา หลบขนมหวาน", icon: '<path d="M4 11h16l-2 9H6z"/><path d="M8 11l3-6M16 11l-3-6"/>' },
 };
 const G = { id: "bubble", runner: null, running: false, score: 0, end: 0, last: 0, lastT: 0, objs: [], pops: [], bird: { y: 0.5, vy: 0 }, flapUp: false, stage: "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0 };
 const bests = () => App().store.get("bestScores", {});
@@ -375,7 +380,79 @@ const star = (ctx, x, y, r, col) => { ctx.beginPath(); for (let i = 0; i < 10; i
 const sugar = (ctx, x, y, s) => { ctx.fillStyle = "#fff"; ctx.strokeStyle = "#e05246"; ctx.lineWidth = 3; ctx.fillRect(x - s, y - s, s * 2, s * 2); ctx.strokeRect(x - s, y - s, s * 2, s * 2); ctx.fillStyle = "#e05246"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center"; ctx.fillText("น้ำตาล", x, y + 5); ctx.textAlign = "start"; };
 function popText(ctx, w, h, now) { G.pops = G.pops.filter((p) => now - p.t < 600); G.pops.forEach((p) => { ctx.fillStyle = p.v < 0 ? "#ff8a7a" : "#fff"; ctx.font = "bold 30px sans-serif"; ctx.fillText((p.v > 0 ? "+" : "") + p.v, p.x * w - 14, p.y * h - (now - p.t) / 10); }); }
 function addScore(v, x, y, now) { G.score = Math.max(0, G.score + v); G.pops.push({ x, y, v, t: now }); if (G.score >= G.milestone + 10) { G.milestone += 10; say(`${G.milestone} คะแนน เยี่ยมมาก`); } }
+const emo = (ctx, ch, x, y, size) => { ctx.save(); ctx.font = `${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ch, x, y); ctx.restore(); };
+const label = (ctx, text, x, y, bg = "rgba(0,0,0,.55)") => { ctx.save(); ctx.font = "bold 20px sans-serif"; const tw = ctx.measureText(text).width; ctx.fillStyle = bg; ctx.fillRect(x - 10, y - 28, tw + 20, 40); ctx.fillStyle = "#fff"; ctx.fillText(text, x, y); ctx.restore(); };
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const seen = (lms, ids, t = 0.4) => lms && ids.every((i) => lms[i] && lms[i].v > t);
 const GAME_FRAME = {
+  jack(lms, ctx, w, h, now, dt, lv) {
+    if (G.running && seen(lms, [0, 11, 12, 15, 16, 27, 28])) {
+      const sw = Math.abs(lms[11].x - lms[12].x), up = lms[15].y < lms[0].y && lms[16].y < lms[0].y;
+      const wide = Math.abs(lms[27].x - lms[28].x) > sw * [0, 1.0, 1.3, 1.6][lv];
+      if ((lv === 1 ? up : up && wide) && G.stage !== "out") G.stage = "out";
+      else if (G.stage === "out" && lms[15].y > lms[11].y && lms[16].y > lms[12].y) {
+        G.stage = "in"; G.score++; say(String(G.score), true);
+        const cx = 0.2 + Math.random() * 0.6, cy = 0.15 + Math.random() * 0.25, col = pick(["#ff8fb1", "#ffd45c", "#7ee08a", "#5aaae6", "#b18cff"]);
+        for (let k = 0; k < 18; k++) { const a = (k / 18) * Math.PI * 2; G.objs.push({ x: cx, y: cy, vx: Math.cos(a) * 0.35, vy: Math.sin(a) * 0.35, born: now, col }); }
+      }
+    }
+    G.objs = G.objs.filter((p) => now - p.born < 1100);
+    G.objs.forEach((p) => { const t = (now - p.born) / 1000; ctx.globalAlpha = 1 - t / 1.1; ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc((p.x + p.vx * t) * w, (p.y + p.vy * t + 0.15 * t * t) * h, 5, 0, 7); ctx.fill(); ctx.globalAlpha = 1; });
+    label(ctx, G.stage === "out" ? "หุบแขนลง!" : lv === 1 ? "ชูแขนเหนือศีรษะ" : "ชูแขน + กางขา", w * 0.36, 44);
+    label(ctx, `ดาวกระจาย ${G.score} ครั้ง`, 24, h - 26);
+  },
+  march(lms, ctx, w, h, now, dt, lv) {
+    G.speed = Math.max(0, (G.speed || 0) - dt * 0.6);
+    if (G.running && seen(lms, [23, 24, 25, 26], 0.35)) {
+      const lift = [0, 0.13, 0.10, 0.07][lv];
+      [["L", 23, 25], ["R", 24, 26]].forEach(([side, hip, knee]) => {
+        const rel = lms[knee].y - lms[hip].y, up = (G.legUp || (G.legUp = {}))[side];
+        if (!up && rel < lift) { G.legUp[side] = true; if (G.lastSide !== side) { G.lastSide = side; G.score++; G.speed = Math.min(1.6, G.speed + 0.35); if (G.score % 8 === 0) { G.objs.push({ e: pick(["🥬", "🥦", "🥕", "🍅", "🌽", "🍆"]), born: now }); say("เก็บผักได้แล้ว", false); } } }
+        else if (up && rel > lift + 0.06) G.legUp[side] = false;
+      });
+    }
+    G.dist = (G.dist || 0) + G.speed * dt;
+    const gy = h * 0.8; ctx.fillStyle = "rgba(160,120,80,.35)"; ctx.fillRect(0, gy, w, h - gy);
+    ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.lineWidth = 6; ctx.setLineDash([40, 30]); ctx.lineDashOffset = -G.dist * 400; ctx.beginPath(); ctx.moveTo(0, gy + 30); ctx.lineTo(w, gy + 30); ctx.stroke(); ctx.setLineDash([]);
+    emo(ctx, "🛒", w * 0.78, gy - 6 + Math.sin(now / 90) * (G.speed > 0.1 ? 3 : 0), 64);
+    G.objs = G.objs.filter((o) => now - o.born < 1200); G.objs.forEach((o) => { const t = (now - o.born) / 1200; emo(ctx, o.e, w * (0.95 - t * 0.17), gy - 70 - Math.sin(t * Math.PI) * 60, 44); });
+    label(ctx, `ย่ำแล้ว ${G.score} ก้าว · ผัก ${Math.floor(G.score / 8)} อย่าง`, 24, h - 26);
+    label(ctx, G.speed > 0.5 ? "เร็วมาก! 🔥" : "ยกเข่าสลับซ้าย-ขวา", w * 0.34, 44);
+  },
+  punch(lms, ctx, w, h, now, dt, lv) {
+    if (G.running && now - G.last > 1150 - lv * 200) { G.last = now; const veg = lv > 1 && Math.random() < 0.2;
+      G.objs.push({ x: 0.22 + Math.random() * 0.56, y: 0.2 + Math.random() * 0.32, e: veg ? pick(["🥦", "🥬", "🥕"]) : pick(["🍩", "🧋", "🍬", "🍰", "🥤", "🍫"]), veg, born: now, life: 3000 - lv * 450 }); }
+    const ext = [0, 115, 135, 150][lv], fists = [];
+    if (seen(lms, [11, 13, 15])) fists.push({ p: lms[15], ok: angle(lms[11], lms[13], lms[15]) > ext });
+    if (seen(lms, [12, 14, 16])) fists.push({ p: lms[16], ok: angle(lms[12], lms[14], lms[16]) > ext });
+    G.objs = G.objs.filter((o) => { if (o.hit) return now - o.hit < 400; if (now - o.born > o.life) return false;
+      if (G.running && fists.some((f) => f.ok && Math.hypot((f.p.x - o.x) * w, (f.p.y - o.y) * h) < 0.07 * w)) { o.hit = now; addScore(o.veg ? -2 : 1, o.x, o.y, now); if (o.veg) say("อย่าชกผักนะ", true); } return true; });
+    G.objs.forEach((o) => { if (o.hit) { const t = (now - o.hit) / 400; ctx.globalAlpha = 1 - t; emo(ctx, o.e, o.x * w + t * 120, o.y * h - t * 80, 54 + t * 20); emo(ctx, "💥", o.x * w, o.y * h, 60); ctx.globalAlpha = 1; } else emo(ctx, o.e, o.x * w, o.y * h + Math.sin((now - o.born) / 160) * 6, 56); });
+    fists.forEach((f) => emo(ctx, "🥊", f.p.x * w, f.p.y * h, f.ok ? 46 : 32));
+    label(ctx, "เหยียดแขนสุดแล้วชก!", w * 0.34, 44);
+  },
+  reach(lms, ctx, w, h, now, dt, lv) {
+    ctx.fillStyle = "rgba(76,160,80,.35)"; ctx.fillRect(0, 0, w, h * 0.12);
+    if (G.running && now - G.last > 1300 - lv * 220) { G.last = now; const bad = lv > 1 && Math.random() < 0.2, left = Math.random() < 0.5;
+      G.objs.push({ x: left ? 0.06 + Math.random() * 0.3 : 0.64 + Math.random() * 0.3, y: 0.05 + Math.random() * (lv === 1 ? 0.22 : 0.16), e: bad ? "🍬" : pick(["🍐", "🍏", "🍊", "🥭", "🍈"]), bad, born: now, life: 3600 - lv * 500 }); }
+    const hands = lms ? [15, 16, 19, 20].filter((i) => lms[i] && lms[i].v > 0.4).map((i) => lms[i]) : [];
+    G.objs = G.objs.filter((o) => { if (now - o.born > o.life) return false;
+      if (G.running && hands.some((p) => Math.hypot((p.x - o.x) * w, (p.y - o.y) * h) < 0.06 * w + 10)) { addScore(o.bad ? -2 : 1, o.x, o.y, now); return false; } return true; });
+    G.objs.forEach((o) => { ctx.strokeStyle = "rgba(90,60,30,.7)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(o.x * w, 0); ctx.lineTo(o.x * w, o.y * h - 22); ctx.stroke(); emo(ctx, o.e, o.x * w, o.y * h + Math.sin(now / 200 + o.x * 9) * 4, 52); });
+    label(ctx, "เอื้อมมือเก็บผลไม้บนต้น", w * 0.3, h - 26);
+  },
+  dodge(lms, ctx, w, h, now, dt, lv) {
+    let px = G.px ?? 0.5;
+    if (seen(lms, [11, 12], 0.4)) { const tx = seen(lms, [23, 24], 0.35) ? (lms[23].x + lms[24].x) / 2 : (lms[11].x + lms[12].x) / 2; px = G.px = px + (tx - px) * Math.min(1, dt * 10); }
+    if (G.running && now - G.last > 900 - lv * 150) { G.last = now; const bad = Math.random() < 0.3 + lv * 0.05;
+      G.objs.push({ x: 0.08 + Math.random() * 0.84, y: -0.05, e: bad ? pick(["🍬", "🧋", "🍩", "🥤"]) : pick(["🥦", "🥬", "🍐", "🥕", "🍅"]), bad }); }
+    const sp = (0.22 + lv * 0.07) * dt;
+    G.objs = G.objs.filter((o) => { if (G.running) o.y += sp; if (o.y > 1.05) return false;
+      if (G.running && o.y > 0.78 && o.y < 0.92 && Math.abs(o.x - px) < 0.11) { addScore(o.bad ? -2 : 1, o.x, o.y, now); return false; } return true; });
+    G.objs.forEach((o) => emo(ctx, o.e, o.x * w, o.y * h, 48));
+    emo(ctx, "🧺", px * w, h * 0.86, 84);
+    label(ctx, "เอนตัวซ้าย-ขวา รับผัก หลบขนม", w * 0.28, 44);
+  },
   bubble(lms, ctx, w, h, now, dt, lv) {
     if (G.running && now - G.last > 900 - lv * 180) { G.last = now; const r = Math.random(), kind = r < 0.12 ? "gold" : r < 0.12 + 0.08 * lv ? "sugar" : "blue";
       G.objs.push({ x: 0.12 + Math.random() * 0.76, y: lv === 1 ? 0.15 + Math.random() * 0.35 : 0.1 + Math.random() * 0.55, r: kind === "gold" ? 0.045 : 0.06, kind, born: now, life: 4200 - lv * 700 }); }
@@ -469,7 +546,7 @@ function initGame() {
   $("#gamePick").addEventListener("click", (e) => { const c = e.target.closest(".gcard"); if (c) selectGame(c.dataset.game); });
   $("#gStart").addEventListener("click", async () => {
     $("#gStart").disabled = true;
-    Object.assign(G, { objs: [], pops: [], score: 0, bird: { y: 0.5, vy: 0 }, flapUp: false, stage: "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0, lastT: 0, spoken: null, flaps: 0 });
+    Object.assign(G, { objs: [], pops: [], score: 0, bird: { y: 0.5, vy: 0 }, flapUp: false, stage: G.id === "jack" ? "in" : "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0, lastT: 0, spoken: null, flaps: 0, legUp: {}, lastSide: null, speed: 0, dist: 0, px: 0.5 });
     $("#gScore").textContent = 0;
     try {
       await G.runner.start(gameFrame);

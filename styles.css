@@ -1635,3 +1635,23 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 .fq-card:hover { box-shadow: 0 10px 20px -14px rgba(120, 70, 20, .6); } .fq-card:focus-visible { outline: 3px solid #5b8cff; outline-offset: 2px; }
 .fq-card-ico { font-size: 1.8rem; } .fq-card b { display: block; } .fq-card small { color: #7a5634; } .fq-card-go { margin-left: auto; font-weight: 700; white-space: nowrap; }
 @media (max-width: 560px) { .fq-choices.dish { grid-template-columns: 1fr; } }
+
+/* kitchen scene v2: cupboard + cooking smoke; text overlay narrower so the cupboard and stove show */
+.kitchen-hero::after { background: linear-gradient(90deg, rgba(251, 236, 212, .97) 0, rgba(251, 236, 212, .9) 34%, rgba(251, 236, 212, 0) 54%); }
+.kh-text { max-width: min(50%, 480px); }
+.kh-smoke circle { fill: #fff; opacity: 0; transform-box: fill-box; transform-origin: center; animation: khSmoke 3.6s ease-out infinite; }
+.kh-smoke .p2 { animation-delay: .9s; } .kh-smoke .p3 { animation-delay: 1.8s; } .kh-smoke .p4 { animation-delay: 2.7s; }
+@keyframes khSmoke { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 15% { opacity: .85; } 100% { opacity: 0; transform: translate(-10px, -90px) scale(2.2); } }
+.kh-fire { animation: khFire 1.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes khFire { from { opacity: .75; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .kh-smoke circle { animation: none; opacity: .5; } .kh-fire { animation: none; } }
+@media (max-width: 760px) { .kitchen-hero::after { background: linear-gradient(180deg, rgba(251, 236, 212, .97) 0, rgba(251, 236, 212, .92) 46%, rgba(251, 236, 212, 0) 66%); } .kh-text { max-width: none; } }
+
+/* quiz pictures: question art inside a cupboard window, dish choices as plates */
+.fq-pic { position: relative; display: grid; place-items: center; min-height: 128px; padding: 16px; border-radius: 18px;
+  background: repeating-linear-gradient(0deg, rgba(185, 146, 95, .35) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(185, 146, 95, .35) 0 1px, transparent 1px 7px), #f7e7cb;
+  box-shadow: inset 0 0 0 8px #a5693a, inset 0 0 0 11px #7d4a22, 0 8px 18px -12px rgba(90, 55, 20, .6); }
+.fq-pic::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 22px; height: 8px; border-radius: 3px; background: linear-gradient(180deg, #c48a4f, #9a6431); }
+.fq-pic span { position: relative; z-index: 1; font-size: clamp(2.2rem, 7vw, 3.2rem); line-height: 1.15; text-align: center; letter-spacing: 2px; filter: drop-shadow(0 3px 3px rgba(80, 50, 20, .25)); margin-bottom: 14px; }
+.fq-choices.dish .fq-c { display: grid; justify-items: center; gap: 8px; }
+.fq-plate { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 3rem; background: radial-gradient(circle at 50% 40%, #fff 0 58%, #e9ecf4 60%); box-shadow: 0 6px 12px rgba(80, 50, 20, .25); }
