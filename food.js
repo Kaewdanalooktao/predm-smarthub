@@ -294,5 +294,5 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && F.add) { F.add = null; F.ai = null; render(); } });
   window.addEventListener("predm:view", (e) => { if (e.detail === "food") render(); });
   if ($("#view-food") && !$("#view-food").hidden) render();
-  window.PreDMFood = { DB, dayTotals, targets };
+  window.PreDMFood = { DB, dayTotals, targets, add: (key, portion, meal) => { F.date = todayISO(); addEntry(key, portion, meal, false); render(); } };
 })();
