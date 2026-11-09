@@ -1530,3 +1530,59 @@ body.care-open { overflow: hidden; }
 .install-btn { white-space: nowrap; } .install-link { all: unset; cursor: pointer; } .install-link[hidden], .install-btn[hidden] { display: none !important; }
 .cloud-forgot { all: unset; cursor: pointer; justify-self: center; font-size: .84rem; font-weight: 600; color: #3f6fd8; } .cloud-forgot:hover { text-decoration: underline; } .cloud-forgot:focus-visible { outline: 3px solid #5b8cff; border-radius: 6px; }
 @media (max-width: 560px) { .parq li { grid-template-columns: 1fr; } .yn { justify-self: start; } }
+
+/* ================= ครัวอีสาน: พาข้าว (meal trays) + ตู้กับข้าว (food cupboard) ================= */
+.fd-meals { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; align-content: start; }
+.pa-wrap { display: grid; gap: 10px; justify-items: center; background: linear-gradient(180deg, #fff8ee, var(--card) 55%); }
+[data-theme="dark"] .pa-wrap { background: var(--card); }
+.pa-wrap .fd-meal-h { width: 100%; }
+.pa-wrap.s-good { border-color: #7cc79a; } .pa-wrap.s-ok { border-color: #e9c46a; } .pa-wrap.s-bad { border-color: #ef8c6a; }
+.pa { all: unset; box-sizing: border-box; cursor: pointer; position: relative; width: min(100%, 230px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 50% 46%, #f7e6c4 0 56%, transparent 57%),
+    repeating-conic-gradient(from 0deg, #c99a5f 0 6deg, #b98648 6deg 12deg);
+  box-shadow: inset 0 0 0 10px #a8733c, inset 0 0 0 14px #8b5a2b, 0 14px 22px -14px rgba(90, 55, 20, .7); transition: transform .2s; }
+.pa::after { content: ""; position: absolute; inset: 16%; border-radius: 50%; box-shadow: inset 0 2px 8px rgba(120, 80, 30, .25); pointer-events: none; }
+.pa:hover { transform: translateY(-2px) rotate(-1deg); } .pa:focus-visible { outline: 3px solid #5b8cff; outline-offset: 4px; }
+.s-good .pa { box-shadow: inset 0 0 0 10px #a8733c, inset 0 0 0 14px #8b5a2b, 0 0 0 4px #7cc79a, 0 14px 22px -14px rgba(90, 55, 20, .7); }
+.s-ok .pa { box-shadow: inset 0 0 0 10px #a8733c, inset 0 0 0 14px #8b5a2b, 0 0 0 4px #e9c46a, 0 14px 22px -14px rgba(90, 55, 20, .7); }
+.s-bad .pa { box-shadow: inset 0 0 0 10px #a8733c, inset 0 0 0 14px #8b5a2b, 0 0 0 4px #ef8c6a, 0 14px 22px -14px rgba(90, 55, 20, .7); }
+.pa-dish { position: absolute; z-index: 1; width: 26%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle at 50% 40%, #fff 0 58%, #eef0f6 60% 100%); box-shadow: 0 3px 6px rgba(80, 50, 20, .3); display: grid; place-items: center; animation: dishIn .3s ease-out; }
+.pa-dish i { font-style: normal; font-size: clamp(1.1rem, 2.6vw, 1.6rem); line-height: 1; }
+.pa-dish em { position: absolute; right: -4px; top: -4px; font-style: normal; font-size: .62rem; font-weight: 800; padding: 1px 5px; border-radius: 99px; background: #2f4aa0; color: #fff; }
+.pa-dish.katib { border-radius: 40% 40% 30% 30%; background: repeating-linear-gradient(45deg, #d9b26f 0 4px, #c49451 4px 8px), #d9b26f; box-shadow: inset 0 -6px 0 #a87a3c, 0 3px 6px rgba(80, 50, 20, .35); }
+@keyframes dishIn { from { transform: translate(-50%, -50%) scale(.4); opacity: 0; } }
+.pa-more { position: absolute; z-index: 1; right: 12%; bottom: 10%; font-weight: 800; font-size: .8rem; background: #fff; border-radius: 99px; padding: 2px 8px; color: #8b5a2b; }
+.pa-empty { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; font-size: .8rem; color: #8b6a43; line-height: 1.4; }
+.pa-empty b { color: #6d4b22; }
+.pa-add { justify-self: stretch; }
+.pa-own { margin: 0; width: 100%; display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 14px; background: color-mix(in srgb, #ff7d9f 10%, var(--card)); font-size: .82rem; line-height: 1.45; }
+.pa-av { width: 34px; height: 34px; flex: none; }
+.pa-wrap .fd-items { width: 100%; }
+.pa-wrap.snack .pa { width: min(100%, 170px); }
+/* cupboard */
+.kitchen .cup { position: relative; display: grid; gap: 8px; padding: 12px; border-radius: 18px; background: linear-gradient(180deg, #b07a43, #8f5c2c); box-shadow: inset 0 0 0 4px #7a4b22, 0 10px 24px -14px rgba(60, 35, 10, .7); overflow: hidden; }
+.kitchen .cup::before, .kitchen .cup::after { content: ""; position: absolute; top: 0; bottom: 0; width: 50%; z-index: 3; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .18) 0 1px, transparent 1px 5px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .18) 0 1px, transparent 1px 5px), #9c6a37;
+  box-shadow: inset 0 0 0 6px #7a4b22; animation: doorL .7s .1s ease-in forwards; }
+.kitchen .cup::before { left: 0; } .kitchen .cup::after { right: 0; animation-name: doorR; }
+@keyframes doorL { to { transform: translateX(-102%); } } @keyframes doorR { to { transform: translateX(102%); } }
+.cup-top { display: flex; gap: 10px; align-items: center; } .cup-name { color: #fff3dd; font-weight: 800; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); }
+.cup-top .fd-search { flex: 1; min-width: 0; }
+.kitchen .fd-cats button { background: rgba(255, 245, 225, .9); border-color: transparent; color: #5a3a17; }
+.kitchen .fd-cats button[aria-pressed="true"] { background: #fff; color: #2f4aa0; box-shadow: 0 0 0 2px #2f4aa0; }
+.cup-body { max-height: min(42vh, 360px); overflow: auto; display: grid; gap: 4px; padding: 6px; border-radius: 12px; background: #f5e3c3; box-shadow: inset 0 3px 10px rgba(90, 55, 20, .35); }
+[data-theme="dark"] .cup-body { background: #3a2a1b; }
+.shelf { position: relative; padding: 6px 4px 14px; }
+.shelf::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 9px; border-radius: 3px; background: linear-gradient(180deg, #c48a4f, #9a6431); box-shadow: 0 3px 4px rgba(80, 45, 15, .35); }
+.shelf-l { display: inline-block; margin: 0 0 4px 4px; padding: 1px 10px; border-radius: 99px; background: #fff7e8; color: #7a4b22; font-size: .74rem; }
+.shelf-row { position: relative; z-index: 1; display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; scroll-snap-type: x proximity; }
+.cup-dish { all: unset; box-sizing: border-box; cursor: pointer; scroll-snap-align: start; flex: none; width: 104px; display: grid; justify-items: center; gap: 2px; padding: 6px 4px 6px; border-radius: 14px; text-align: center; transition: transform .15s, background .15s; }
+.cup-dish:hover { transform: translateY(-3px); background: rgba(255, 255, 255, .55); }
+.cup-dish[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 3px #2f4aa0; }
+.cup-dish:focus-visible { outline: 3px solid #5b8cff; outline-offset: 1px; }
+.cup-plate { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-size: 1.7rem; background: radial-gradient(circle at 50% 40%, #fff 0 58%, #e9ecf4 60%); box-shadow: 0 3px 6px rgba(80, 50, 20, .3); }
+.cup-dish b { font-size: .74rem; line-height: 1.25; color: #3d2810; } [data-theme="dark"] .cup-dish b { color: #f3e6d0; }
+.cup-dish small { font-size: .66rem; color: #8b6a43; }
+.cup-flags { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; } .cup-flags .fd-flag { font-size: .6rem; }
+@media (prefers-reduced-motion: reduce) { .kitchen .cup::before, .kitchen .cup::after { display: none; } .pa-dish { animation: none; } }
+@media (max-width: 560px) { .fd-meals { grid-template-columns: 1fr; } .cup-dish { width: 92px; } }

@@ -121,9 +121,12 @@
     const T = targets(), t = dayTotals(F.date), isToday = F.date === todayISO();
     const meals = MEALS.map(([k, label, ic]) => {
       const items = t.items.filter((x) => x.meal === k), sc = mealScore(items), kc = items.reduce((a, x) => a + x.d.kcal * (x.portion || 1), 0);
-      return `<section class="fd-meal"><div class="fd-meal-h"><h3>${ic} ${label}</h3>${sc ? `<span class="fd-score ${sc[1]}" title="${esc(sc[2].join(" · "))}">${sc[0]}</span>` : ""}<small>${r0(kc)} kcal</small><button class="btn sm" type="button" data-add="${k}">+ เพิ่ม</button></div>
+      return `<section class="fd-meal pa-wrap ${sc ? "s-" + sc[1] : "empty"}${k === "s" ? " snack" : ""}"><div class="fd-meal-h"><h3>${ic} ${k === "s" ? "ถาดของว่าง" : "พาข้าว" + label}</h3>${sc ? `<span class="fd-score ${sc[1]}" title="${esc(sc[2].join(" · "))}">${sc[0]}</span>` : ""}<small>${r0(kc)} kcal</small></div>
+        <button type="button" class="pa" data-add="${k}" aria-label="หยิบกับข้าวจากตู้ใส่${k === "s" ? "ถาดของว่าง" : "พาข้าว" + label}">${trayDishes(items)}${items.length ? "" : `<span class="pa-empty">พายังว่าง<br><b>แตะเพื่อหยิบกับข้าว</b></span>`}</button>
+        <button class="btn sm pa-add" type="button" data-add="${k}">🗄️ หยิบจากตู้กับข้าว</button>
+        ${items.length ? ownLine(items, sc) : ""}
         ${items.length ? `<ul class="fd-items">${items.map((x) => `<li><span class="fd-e">${x.d.e || "🍽️"}</span><span class="fd-n"><b>${esc(x.d.n)}</b><small>${x.portion !== 1 ? `× ${x.portion} · ` : ""}${esc(x.d.unit || "")} · ${r0(x.d.kcal * x.portion)} kcal · คาร์บ ${r0(x.d.carb * x.portion)} ก.${x.ai ? " · 📷 AI" : ""}</small></span>${(x.d.flags || []).filter((f) => FLAG[f]).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}<button type="button" class="fd-del" data-del="${x.id}" aria-label="ลบ ${esc(x.d.n)}">✕</button></li>`).join("")}</ul>` : `<p class="fd-empty">ยังไม่ได้บันทึก</p>`}
-        ${sc && sc[2].length ? `<p class="fd-why">${sc[1] === "good" ? "👍" : "💡"} ${esc(sc[2].join(" · "))}</p>` : ""}</section>`;
+      </section>`;
     }).join("");
     root.innerHTML = `
       <div class="fd-top card">
@@ -149,6 +152,27 @@
       <p class="disclaimer">ค่าสารอาหารเป็นค่าประมาณต่อ 1 ที่เสิร์ฟทั่วไป ขึ้นกับสูตรและปริมาณจริง ใช้เพื่อติดตามพฤติกรรม ไม่ใช่ผลตรวจทางโภชนาการ</p>
       ${F.add ? addPanel() : ""}`;
     drawWeek();
+  }
+  // dishes laid out around the tray; sticky rice sits in a กระติบ
+  function trayDishes(items) {
+    const n = Math.min(items.length, 8);
+    return items.slice(0, 8).map((x, i) => {
+      const ang = (i / n) * Math.PI * 2 - Math.PI / 2, rad = n === 1 ? 0 : n <= 3 ? 24 : 30;
+      const left = 50 + rad * Math.cos(ang), top = 50 + rad * Math.sin(ang), sticky = x.key === "sticky" || x.key === "sticky-b";
+      return `<span class="pa-dish${sticky ? " katib" : ""}" style="left:${left.toFixed(1)}%;top:${top.toFixed(1)}%" title="${esc(x.d.n)}"><i>${x.d.e || "🍽️"}</i>${x.portion !== 1 ? `<em>×${x.portion}</em>` : ""}</span>`;
+    }).join("") + (items.length > 8 ? `<span class="pa-more">+${items.length - 8}</span>` : "");
+  }
+  function ownLine(items, sc) {
+    const sticky = items.filter((x) => x.key === "sticky" || x.key === "sticky-b").reduce((a, x) => a + (x.portion || 1), 0);
+    const why = sc ? sc[2] : [], msg = [];
+    if (why.includes("มีเมนูดิบ")) msg.push("มีเมนูดิบ ระวังพยาธิใบไม้ตับนะคะ ลองเลือกแบบสุกแทน");
+    if (sticky >= 2) msg.push(`ข้าวเหนียว ${+sticky.toFixed(1)} ปั้นแล้วน้า มื้อหน้าลดเหลือ 1 ปั้นนะคะ`);
+    else if (why.includes("ข้าว/แป้งมาก")) msg.push("ข้าวแป้งเยอะไปนิด ลองลดลงครึ่งหนึ่งนะคะ");
+    if (why.includes("เค็มมาก")) msg.push("เค็มไปหน่อย ลดน้ำปลา ปลาร้า และไม่ซดน้ำแกงนะคะ");
+    if (why.includes("หวานมาก")) msg.push("หวานไปหน่อย เครื่องดื่มเลือกหวานน้อยนะคะ");
+    if (why.includes("ผักน้อย")) msg.push("เพิ่มผักสักจานนะคะ 🥬");
+    if (!msg.length) msg.push(sc && sc[1] === "good" ? "พาข้าวนี้สมดุลดีมากค่ะ 👍" : "ดีแล้วค่ะ กินพอดี ๆ นะคะ");
+    return `<p class="pa-own"><span class="pa-av" aria-hidden="true">${window.PreDMMascot ? PreDMMascot.svg() : "💗"}</span><span><b>น้องอ่อนหวาน:</b> ${esc(msg.slice(0, 2).join(" · "))}</span></p>`;
   }
   function coach(t, T) {
     if (!t.items.length) return `<p class="lede">บันทึกอาหารมื้อแรกของวัน แล้วโค้ชจะช่วยวิเคราะห์และแนะนำการปรับให้เหมาะกับกลุ่มเสี่ยงเบาหวาน</p>`;
@@ -179,18 +203,20 @@
     const meal = MEALS.find((m) => m[0] === F.add);
     const q = F.q.trim(), list = DB.filter((d) => (F.cat === "ทั้งหมด" || d.cat === F.cat) && (!q || d.n.includes(q)));
     const pick = F.pick && byKey[F.pick];
-    return `<div class="fd-modal" role="dialog" aria-modal="true" aria-label="เพิ่มอาหาร${meal[1]}"><div class="fd-sheet card">
-      <div class="fd-sheet-h"><h2>${meal[2]} เพิ่ม${meal[1]}</h2><button type="button" class="icon-btn" data-close aria-label="ปิด">✕</button></div>
-      <div class="seg fd-mode" role="tablist"><button type="button" role="tab" aria-selected="${!F.ai}" data-mode="search">🔎 เลือกเมนูอีสาน</button><button type="button" role="tab" aria-selected="${!!F.ai}" data-mode="photo">📷 ถ่ายรูปให้ AI ช่วย</button></div>
+    return `<div class="fd-modal" role="dialog" aria-modal="true" aria-label="หยิบกับข้าวจากตู้ใส่${meal[1]}"><div class="fd-sheet card kitchen">
+      <div class="fd-sheet-h"><h2>${meal[2]} หยิบกับข้าวใส่${meal[0] === "s" ? "ถาดของว่าง" : "พาข้าว" + meal[1]}</h2><button type="button" class="icon-btn" data-close aria-label="ปิด">✕</button></div>
+      <div class="seg fd-mode" role="tablist"><button type="button" role="tab" aria-selected="${!F.ai}" data-mode="search">🗄️ หยิบจากตู้กับข้าว</button><button type="button" role="tab" aria-selected="${!!F.ai}" data-mode="photo">📷 ถ่ายรูปพาข้าว</button></div>
       ${F.ai ? photoPane() : `
-        <input class="fd-search" id="fdQ" placeholder="ค้นหา เช่น ตำ ลาบ ข้าวเหนียว แจ่ว" value="${esc(F.q)}" aria-label="ค้นหาเมนู">
-        <div class="fd-cats">${CATS.map((c) => `<button type="button" aria-pressed="${c === F.cat}" data-cat="${c}">${c}</button>`).join("")}</div>
-        <div class="fd-list">${list.map((d) => `<button type="button" class="fd-opt" aria-pressed="${d.key === F.pick}" data-pick="${d.key}"><span class="fd-e">${d.e}</span><span><b>${d.n}</b><small>${d.unit} · ${d.kcal} kcal</small></span>${d.flags.filter((f) => FLAG[f]).slice(0, 2).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}</button>`).join("") || `<p class="fd-empty">ไม่พบเมนู ลองคำอื่น</p>`}</div>
+        <div class="cup">
+          <div class="cup-top"><span class="cup-name">🗄️ ตู้กับข้าว</span><input class="fd-search" id="fdQ" placeholder="ค้นหา เช่น ตำ ลาบ ข้าวเหนียว แจ่ว" value="${esc(F.q)}" aria-label="ค้นหาเมนูในตู้กับข้าว"></div>
+          <div class="fd-cats">${CATS.map((c) => `<button type="button" aria-pressed="${c === F.cat}" data-cat="${c}">${c === "ทั้งหมด" ? "ทุกชั้น" : c}</button>`).join("")}</div>
+          <div class="cup-body">${CATS.slice(1).map((c) => { const row = list.filter((d) => d.cat === c); return row.length ? `<div class="shelf"><b class="shelf-l">${c}</b><div class="shelf-row">${row.map((d) => `<button type="button" class="fd-opt cup-dish" aria-pressed="${d.key === F.pick}" data-pick="${d.key}" aria-label="${esc(d.n)} ${d.kcal} กิโลแคลอรี"><span class="cup-plate">${d.e}</span><b>${d.n}</b><small>${d.kcal} kcal</small><span class="cup-flags">${d.flags.filter((f) => FLAG[f]).slice(0, 2).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}</span></button>`).join("")}</div></div>` : ""; }).join("") || `<p class="fd-empty">ไม่พบเมนูในตู้ ลองคำอื่น</p>`}</div>
+        </div>
         ${pick ? `<div class="fd-pick"><div><b>${pick.e} ${pick.n}</b><small>${pick.unit}</small></div>
           <div class="fd-por">${PORTIONS.map(([v, l]) => `<button type="button" aria-pressed="${v === F.portion}" data-por="${v}">${l}</button>`).join("")}</div>
           <div class="fd-nut"><span>${r0(pick.kcal * F.portion)} <small>kcal</small></span><span>คาร์บ ${r0(pick.carb * F.portion)} ก.</span><span>น้ำตาล ${r0(pick.sugar * F.portion)} ก.</span><span>โซเดียม ${r0(pick.na * F.portion)} มก.</span></div>
           ${pick.tip ? `<p class="fd-tip">💡 ${esc(pick.tip)}</p>` : ""}
-          <button class="btn primary" type="button" data-save>บันทึกลง${meal[1]}</button></div>` : ""}`}
+          <button class="btn primary" type="button" data-save>วางลง${meal[0] === "s" ? "ถาดของว่าง" : "พาข้าว" + meal[1]}</button></div>` : ""}`}
     </div></div>`;
   }
   function photoPane() {
