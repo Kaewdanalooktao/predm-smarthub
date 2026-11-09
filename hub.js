@@ -1,4 +1,4 @@
-/* Pre-DM Smart Hub — Tele-physio consult (WebRTC via PeerJS) + admin dashboard.
+/* Pre-DM Smart Hub — Tele-physio consult (WebRTC; signalling via our Supabase Realtime) + admin dashboard.
    Loaded after app.js; uses window.PreDM helpers. */
 (function () {
   "use strict";
@@ -136,11 +136,64 @@
     root.addEventListener("submit", (e) => { if (e.target.id === "csForm") bookSubmit(e); });
   }
 
-  /* ---------- video call (WebRTC peer-to-peer; PeerJS cloud is used only for signalling) ---------- */
+  /* ---------- video call: WebRTC peer-to-peer; our own Supabase (Realtime broadcast) is the only signalling server ----------
+     Picture, sound, chat and the health summary travel directly between the two devices (encrypted by WebRTC).
+     Supabase only relays the short connection set-up messages (offer / answer / network candidates) for the room. */
   const CALL = { active: false };
-  async function loadPeer() {
-    if (window.Peer) return;
-    await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "vendor/peerjs.min.js"; s.onload = res; s.onerror = () => rej(new Error("โหลดระบบวิดีโอคอลไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(s); });
+  let RT = null;
+  async function realtime() {
+    if (RT) return RT;
+    const cfg = window.PREDM_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("ยังไม่ได้ตั้งค่าฐานข้อมูล (Supabase) จึงยังใช้วิดีโอคอลไม่ได้");
+    if (!window.supabase?.createClient) await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "vendor/supabase.js"; sc.onload = res; sc.onerror = () => rej(new Error("โหลดระบบวิดีโอคอลไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(sc); });
+    RT = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: false, autoRefreshToken: false, storageKey: "predm.rtc" } });
+    return RT;
+  }
+  const rtcConfig = () => ({ iceServers: (window.PREDM_CONFIG || {}).iceServers || [] });
+  const sig = (t, data = {}) => CALL.ch?.send({ type: "broadcast", event: "sig", payload: { t, from: CALL.me, ...data } });
+  function newPC() {
+    try { CALL.pc?.close(); } catch { /* ignore */ }
+    const pc = new RTCPeerConnection(rtcConfig()); CALL.pc = pc; CALL.pendingIce = [];
+    CALL.local.getTracks().forEach((t) => pc.addTrack(t, CALL.local));
+    pc.onicecandidate = (e) => { if (e.candidate) sig("ice", { to: CALL.peerId, c: e.candidate.toJSON() }); };
+    pc.ontrack = (e) => onRemote(e.streams[0] || new MediaStream([e.track]));
+    pc.onconnectionstatechange = () => {
+      if (pc !== CALL.pc) return;
+      if (pc.connectionState === "failed") { $("#csWaitT") && ($("#csWaitT").textContent = "เชื่อมต่อไม่สำเร็จ กำลังลองใหม่…"); $("#csWait") && ($("#csWait").hidden = false); if (CALL.role === "pt") setTimeout(() => CALL.active && dial(), 1500); }
+      if (pc.connectionState === "disconnected") addChat("sys", "สัญญาณขาดช่วง กำลังเชื่อมต่อใหม่…");
+    };
+    return pc;
+  }
+  function bindDC(dc) {
+    CALL.dc = dc;
+    CALL.conn = { get open() { return dc.readyState === "open"; }, send: (m) => dc.send(JSON.stringify(m)) };
+    dc.onopen = () => { if (CALL.role === "patient") sendData({ type: "hello", appt: { areas: CALL.appt.areas, pain: CALL.appt.pain, detail: CALL.appt.detail }, rows: CALL.appt.share ? healthSummary() : null }); };
+    dc.onmessage = (e) => { try { onData(JSON.parse(e.data)); } catch { /* ignore bad message */ } };
+  }
+  async function dial() { // physiotherapist side: create the offer
+    if (!CALL.active || !CALL.peerId) return;
+    const pc = newPC(); bindDC(pc.createDataChannel("predm", { ordered: true }));
+    const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+    sig("offer", { to: CALL.peerId, sdp: pc.localDescription.toJSON() });
+  }
+  async function onSignal({ payload: m }) {
+    if (!m || m.from === CALL.me || (m.to && m.to !== CALL.me)) return;
+    if (m.t === "here" && CALL.role === "pt") { if (!CALL.peerId || CALL.peerId !== m.from || CALL.pc?.connectionState !== "connected") { CALL.peerId = m.from; clearInterval(CALL.retry); $("#csWaitT").textContent = "กำลังโทรหาผู้รับคำปรึกษา…"; dial(); } return; }
+    if (m.t === "knock" && CALL.role === "patient") { sig("here"); return; }
+    if (m.t === "offer" && CALL.role === "patient") {
+      CALL.peerId = m.from; const pc = newPC(); pc.ondatachannel = (e) => bindDC(e.channel);
+      await pc.setRemoteDescription(m.sdp); const ans = await pc.createAnswer(); await pc.setLocalDescription(ans);
+      sig("answer", { to: m.from, sdp: pc.localDescription.toJSON() }); flushIce(); return;
+    }
+    if (m.t === "answer" && CALL.role === "pt" && CALL.pc && CALL.pc.signalingState === "have-local-offer") { await CALL.pc.setRemoteDescription(m.sdp); flushIce(); return; }
+    if (m.t === "ice" && CALL.pc) { if (CALL.pc.remoteDescription) CALL.pc.addIceCandidate(m.c).catch(() => {}); else CALL.pendingIce.push(m.c); return; }
+    if (m.t === "bye") endCall(false, "อีกฝ่ายวางสายแล้ว");
+  }
+  function flushIce() { (CALL.pendingIce || []).forEach((c) => CALL.pc.addIceCandidate(c).catch(() => {})); CALL.pendingIce = []; }
+  function onRemote(stream) {
+    const v = $("#csRemote"); if (v && v.srcObject !== stream) { v.srcObject = stream; v.play?.().catch(() => {}); }
+    $("#csWait").hidden = true; $("#csLive").classList.add("on"); clearInterval(CALL.retry);
+    if (!CALL.t0) { CALL.t0 = Date.now(); CALL.tick = setInterval(() => { const s2 = Math.floor((Date.now() - CALL.t0) / 1000); const el = $("#csTimer"); if (el) el.textContent = `${String(Math.floor(s2 / 60)).padStart(2, "0")}:${String(s2 % 60).padStart(2, "0")}`; }, 1000); addChat("sys", "เชื่อมต่อแล้ว"); }
   }
   function placeholderStream(label) {
     const c = document.createElement("canvas"); c.width = 640; c.height = 480; const x = c.getContext("2d");
@@ -193,7 +246,7 @@
         <h3>แชท</h3>
         <div class="cs-chat" id="csChat" aria-live="polite"></div>
         <form class="cs-chatf" id="csChatF"><input id="csMsg" autocomplete="off" placeholder="พิมพ์ข้อความ…" aria-label="ข้อความแชท" maxlength="400"><button class="btn sm primary" type="submit">ส่ง</button></form>
-        <p class="cs-priv">🔒 ภาพและเสียงส่งตรงระหว่างสองเครื่อง (WebRTC เข้ารหัส) ไม่ผ่านหรือบันทึกที่เซิร์ฟเวอร์ของแอป</p>
+        <p class="cs-priv">🔒 ภาพ เสียง แชท และข้อมูลสุขภาพส่งตรงระหว่างสองเครื่อง (WebRTC เข้ารหัส) ไม่ผ่านและไม่ถูกบันทึกที่เซิร์ฟเวอร์ใด เซิร์ฟเวอร์ของโครงการใช้แค่ช่วยจับคู่ตอนเริ่มต่อสาย</p>
       </aside>
     </div>`;
     $("#csCopy")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText($("#csLink").value); A().toast("คัดลอกลิงก์แล้ว"); } catch { $("#csLink").select(); } });
@@ -223,20 +276,6 @@
     if (m.type === "summary" && CALL.role === "pt") { $("#csInfo").insertAdjacentHTML("beforeend", `<h4>สรุปข้อมูลสุขภาพ</h4>${summaryHTML(m.rows || [])}`); addChat("sys", "ได้รับสรุปข้อมูลสุขภาพแล้ว"); }
     if (m.type === "bye") endCall(false, "อีกฝ่ายวางสายแล้ว");
   }
-  function bindConn(conn) {
-    CALL.conn = conn;
-    conn.on("open", () => { if (CALL.role === "patient") sendData({ type: "hello", appt: { areas: CALL.appt.areas, pain: CALL.appt.pain, detail: CALL.appt.detail }, rows: CALL.appt.share ? healthSummary() : null }); });
-    conn.on("data", onData);
-  }
-  function bindCall(call) {
-    CALL.call = call;
-    call.on("stream", (s) => {
-      const v = $("#csRemote"); if (v && v.srcObject !== s) { v.srcObject = s; v.play?.().catch(() => {}); }
-      $("#csWait").hidden = true; $("#csLive").classList.add("on"); clearInterval(CALL.retry);
-      if (!CALL.t0) { CALL.t0 = Date.now(); CALL.tick = setInterval(() => { const s2 = Math.floor((Date.now() - CALL.t0) / 1000); const el = $("#csTimer"); if (el) el.textContent = `${String(Math.floor(s2 / 60)).padStart(2, "0")}:${String(s2 % 60).padStart(2, "0")}`; }, 1000); addChat("sys", "เชื่อมต่อแล้ว"); }
-    });
-    call.on("close", () => endCall(false, "การคอลสิ้นสุดแล้ว"));
-  }
   async function startCall(role, appt, room) {
     try {
       CALL.active = true; Object.assign(CALL, { role, appt, room: room || appt?.room, t0: 0, conn: null, call: null });
@@ -246,31 +285,26 @@
       $("#csLocal").srcObject = CALL.local;
       if (CALL.noCam) $("#ccCam").disabled = true; if (CALL.noMic) $("#ccMic").disabled = true;
       $("#csWaitT").textContent = "กำลังเชื่อมต่อระบบคอล…";
-      await loadPeer();
-      const pid = `predm-${CALL.room}-patient`;
-      if (role === "patient") {
-        CALL.peer = new window.Peer(pid);
-        CALL.peer.on("open", () => { $("#csWaitT").textContent = "รอนักกายภาพบำบัดเข้าห้อง…"; logEvent("consult:call"); });
-        CALL.peer.on("call", (c) => { c.answer(CALL.local); bindCall(c); });
-        CALL.peer.on("connection", bindConn);
-      } else {
-        CALL.peer = new window.Peer();
-        const dial = () => { if (CALL.t0 || !CALL.peer?.open) return; bindCall(CALL.peer.call(pid, CALL.local)); bindConn(CALL.peer.connect(pid, { reliable: true })); };
-        CALL.peer.on("open", () => { $("#csWaitT").textContent = "กำลังโทรหาผู้รับคำปรึกษา…"; dial(); CALL.retry = setInterval(dial, 6000); });
-      }
-      CALL.peer.on("error", (e) => {
-        if (e.type === "peer-unavailable") { $("#csWaitT").textContent = "ผู้รับคำปรึกษายังไม่อยู่ในห้อง ระบบจะลองโทรใหม่อัตโนมัติ…"; return; }
-        if (e.type === "unavailable-id") { $("#csWaitT").textContent = "ห้องนี้เปิดอยู่ในอีกแท็บหรืออีกเครื่องแล้ว ปิดแท็บนั้นก่อนแล้วลองใหม่"; return; }
-        if (e.type === "network" || e.type === "server-error" || e.type === "socket-error") $("#csWaitT").textContent = "เชื่อมต่อเซิร์ฟเวอร์คอลไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
+      if (!window.RTCPeerConnection) throw new Error("เบราว์เซอร์นี้ไม่รองรับวิดีโอคอล ลองใช้ Chrome หรือ Safari รุ่นล่าสุด");
+      const sb = await realtime();
+      CALL.me = Math.random().toString(36).slice(2, 10); CALL.peerId = null;
+      CALL.ch = sb.channel(`predm-call-${CALL.room}`, { config: { broadcast: { self: false, ack: false } } });
+      CALL.ch.on("broadcast", { event: "sig" }, (msg) => onSignal(msg).catch(() => {}));
+      CALL.ch.subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (role === "patient") { $("#csWaitT").textContent = "รอนักกายภาพบำบัดเข้าห้อง…"; sig("here"); logEvent("consult:call"); }
+          else { $("#csWaitT").textContent = "รอผู้รับคำปรึกษาเปิดห้อง… ระบบจะเชื่อมต่อให้อัตโนมัติ"; sig("knock"); CALL.retry = setInterval(() => sig("knock"), 3000); }
+        }
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") $("#csWaitT").textContent = "เชื่อมต่อระบบคอลไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
       });
     } catch (err) { $("#csWaitT") && ($("#csWaitT").textContent = err.message || String(err)); }
   }
   function endCall(byMe, msg) {
     if (!CALL.active) return;
-    if (byMe) sendData({ type: "bye" });
+    if (byMe) { sendData({ type: "bye" }); sig("bye"); }
     const dur = CALL.t0 ? Math.round((Date.now() - CALL.t0) / 1000) : 0;
     clearInterval(CALL.tick); clearInterval(CALL.retry); clearInterval(CALL.phTimer);
-    setTimeout(() => { try { CALL.call?.close(); CALL.peer?.destroy(); } catch { /* ignore */ } }, 300);
+    setTimeout(() => { try { CALL.dc?.close(); CALL.pc?.close(); if (CALL.ch) RT?.removeChannel(CALL.ch); } catch { /* ignore */ } CALL.pc = null; CALL.ch = null; CALL.conn = null; }, 300);
     CALL.local?.getTracks().forEach((t) => t.stop());
     if (CALL.role === "patient" && CALL.appt) {
       if (dur > 0) { saveAppts(appts().map((a) => (a.id === CALL.appt.id ? { ...a, status: "done", dur } : a))); logEvent("consult:done"); }
@@ -292,7 +326,7 @@
     if (m) { if (!CALL.active) ptJoinScreen(m[1]); return; }
     renderConsult();
   }
-  window.addEventListener("beforeunload", () => { if (CALL.active) sendData({ type: "bye" }); });
+  window.addEventListener("beforeunload", () => { if (CALL.active) { sendData({ type: "bye" }); sig("bye"); } });
 
   /* ---------- wiring ---------- */
   function onView(v) {
