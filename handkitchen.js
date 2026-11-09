@@ -15,6 +15,14 @@ const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; 
 const say = (t) => { const el = $("#hkSay"); if (el) el.textContent = t; };
 
 let landmarker = null;
+// MediaPipe Hand skeleton: each finger its own colour, the pointing fingertip highlighted
+const HAND_EDGES = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [0, 17], [17, 18], [18, 19], [19, 20]];
+const FINGER_COL = ["#ffffff", "#ffb84d", "#ffe14d", "#6fe39a", "#5ec8ff", "#c79bff"], fingerOf = (i) => (i === 0 ? 0 : Math.ceil(i / 4));
+function drawHand(ctx, P) {
+  ctx.lineCap = "round"; ctx.lineWidth = 5;
+  HAND_EDGES.forEach(([a, b]) => { ctx.strokeStyle = FINGER_COL[fingerOf(b)]; ctx.beginPath(); ctx.moveTo(P[a].x, P[a].y); ctx.lineTo(P[b].x, P[b].y); ctx.stroke(); });
+  P.forEach((q, i) => { ctx.beginPath(); ctx.arc(q.x, q.y, i === 8 ? 9 : i % 4 === 0 ? 6 : 4, 0, 7); ctx.fillStyle = FINGER_COL[fingerOf(i)]; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.stroke(); });
+}
 async function getLandmarker() {
   if (landmarker) return landmarker;
   const fs = await FilesetResolver.forVisionTasks(WASM);
@@ -80,7 +88,7 @@ function shell() {
       <div class="hk-hud">
         <button type="button" class="hk-x" data-hk="close" aria-label="ปิดเกม">✕</button>
         <span class="hk-masc" id="hkMasc" aria-hidden="true"></span><div class="hk-title"><b id="hkTitle">ครัวแตะมือ</b><span id="hkSay">ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก</span></div>
-        <button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="market">🧺 จ่ายตลาด</button><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
+        <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="market">🧺 จ่ายตลาด</button><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
       </div>
       <div class="hk-list" id="hkList" hidden></div>
       <div class="hk-fxl" id="hkFx" aria-hidden="true"></div>
@@ -138,7 +146,7 @@ function startNoCam() { G.cam = false; $("#hkStage").classList.remove("cam"); $(
 /* ------------------------------------------------------------------ rounds */
 function newRound() {
   if (!$("#hkModal").hidden) window.PreDMMusic?.start();
-  G.step = 0; G.picks = []; G.pound = null; G.busy = false;
+  G.step = 0; G.picks = []; G.pound = null; G.busy = false; G.spoke = null;
   document.querySelectorAll("#hkModal [data-hkmode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.hkmode === G.mode)));
   $("#hkBg").className = "hk-bg " + G.mode;
   G.mk = { phase: "menu", recipe: null, stall: 0, page: 0, menuPage: 0, cart: [], combo: 0, t0: 0 };
@@ -158,20 +166,21 @@ function layout() {
   const box = $("#hkCards"); let items = [];
   if (G.mode === "market") items = marketItems();
   else if (G.mode === "plate") {
-    if (G.step >= PLATE_STEPS.length) { items = [{ id: "serve", e: "🍽️", n: "เสิร์ฟพาข้าว!", big: true }, { id: "redo", e: "↺", n: "จัดใหม่" }]; $("#hkTitle").textContent = `${G.sc.ic} ${G.sc.t}`; say("แตะ “เสิร์ฟพาข้าว” เพื่อดูคะแนน"); }
+    if (G.step >= PLATE_STEPS.length) { items = [{ id: "serve", e: "🍽️", n: "เสิร์ฟพาข้าว!", big: true }, { id: "redo", e: "↺", n: "จัดใหม่" }]; $("#hkTitle").textContent = `${G.sc.ic} ${G.sc.t}`; say("แตะ “เสิร์ฟพาข้าว” เพื่อดูคะแนน");  if (G.spoke !== "serve") { G.spoke = "serve"; window.PreDMVoice?.say("pl_serve"); } }
     else {
       const st = PLATE_STEPS[G.step], have = G.picks.filter((p) => p.kind === st.kind).length;
       items = dishesOfKind(st.kind).filter((d) => !G.picks.some((p) => p.key === d.key)).map((d) => ({ id: d.key, e: d.e, key: d.key, n: d.n, sub: `${d.kcal} kcal` }));
       items.push({ id: "more", e: "🔄", n: "เมนูอื่น" }, { id: "skip", e: "⏭️", n: "ข้าม" });
       $("#hkTitle").textContent = `${G.sc.ic} ${G.sc.t} · ขั้น ${G.step + 1}/${PLATE_STEPS.length}`;
       say(`${st.t}${st.n > 1 ? ` (เลือกแล้ว ${have}/${st.n})` : ""} — ชี้นิ้วค้างไว้ที่การ์ด`);
+      if (G.spoke !== "pl" + G.step) { G.spoke = "pl" + G.step; window.PreDMVoice?.say({ rice: "pl_rice", pro: "pl_pro", veg: "pl_veg", drink: "pl_drink" }[st.kind]); }
     }
   } else if (G.pound) { items = []; $("#hkTitle").textContent = "🥗 ตำส้มตำด้วยมือ"; }
   else {
     const left = 6 - G.picks.length;
     items = SOMTAM.map((x, i) => ({ id: "s" + i, e: x[0], n: x[1] })).filter((c) => !G.picks.some((p) => p.id === c.id));
     if (G.picks.length) items.push({ id: "pound", e: "🪵", n: "เริ่มตำ!", big: true });
-    $("#hkTitle").textContent = "🥗 ตำส้มตำด้วยมือ";
+    $("#hkTitle").textContent = "🥗 ตำส้มตำด้วยมือ"; if (!G.picks.length && G.spoke !== "st") { G.spoke = "st"; window.PreDMVoice?.say("st_pick"); }
     say(left > 0 ? `เลือกเครื่องใส่ครก อีก ${left} อย่าง (แตะ “เริ่มตำ!” เมื่อพร้อม)` : "ครบแล้ว แตะ “เริ่มตำ!”");
     if (left <= 0) items = items.filter((c) => c.id === "pound");
   }
@@ -201,7 +210,7 @@ function choose(id, el) {
   if (G.mode === "market") return marketChoose(id, el);
   if (el && !["more", "skip", "redo", "serve", "pound"].includes(id)) fx(el, "✓", "good");
   if (G.mode === "plate") {
-    if (id === "serve") { const picks = G.picks.map((p) => p.key), sc = G.sc; close(); window.PreDMKitchenGames?.plateResultFor(picks, sc); return; }
+    if (id === "serve") { window.PreDMVoice?.say("cheer1"); const picks = G.picks.map((p) => p.key), sc = G.sc; close(); window.PreDMKitchenGames?.plateResultFor(picks, sc); return; }
     if (id === "redo") return newRound();
     if (id === "more") return layout();
     const st = PLATE_STEPS[G.step];
@@ -210,7 +219,7 @@ function choose(id, el) {
     if (id === "skip" || have >= st.n) G.step++;
     pop(); layout(); return;
   }
-  if (id === "pound") { window.PreDMMusic?.stop(); G.pound = { n: 0, goal: 15, dir: 0, ext: null }; say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
+  if (id === "pound") { window.PreDMMusic?.stop(); window.PreDMVoice?.say("st_pound"); G.pound = { n: 0, goal: 15, dir: 0, ext: null }; say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
   G.picks.push({ id }); pop(); layout();
 }
 function pop() { const t = $("#hkTray"); t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); }
@@ -220,9 +229,9 @@ function poundStep(ny) { // count one stroke each time the hand travels up then 
   if (P.ext == null) { P.ext = ny; return; }
   const TH = 0.1;
   if (P.dir >= 0 && ny < P.ext - TH) { P.dir = -1; P.ext = ny; }
-  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; window.PreDMMusic?.sfx("pok"); tray(); $("#hkBg").classList.remove("hit"); void $("#hkBg").offsetWidth; $("#hkBg").classList.add("hit"); } P.dir = 1; P.ext = ny; }
+  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; window.PreDMMusic?.sfx("pok"); if (P.n % 5 === 0 && P.n < P.goal) window.PreDMVoice?.say(String(P.n)); tray(); $("#hkBg").classList.remove("hit"); void $("#hkBg").offsetWidth; $("#hkBg").classList.add("hit"); } P.dir = 1; P.ext = ny; }
   else if ((P.dir === -1 && ny < P.ext) || (P.dir === 1 && ny > P.ext)) P.ext = ny;
-  if (P.n >= P.goal) { G.busy = true; window.PreDMMusic?.sfx("win"); setTimeout(somtamResult, 400); }
+  if (P.n >= P.goal) { G.busy = true; window.PreDMMusic?.sfx("win"); window.PreDMVoice?.say("st_done"); setTimeout(somtamResult, 400); }
 }
 function somtamResult() {
   const items = G.picks.map((p) => SOMTAM[+p.id.slice(1)]);
@@ -247,7 +256,7 @@ const spent = () => G.mk.cart.reduce((a, id) => a + ING[id].price, 0);
 function marketItems() {
   const M = G.mk;
   if (M.phase === "menu") {
-    $("#hkTitle").textContent = "🧺 ตลาดแตะมือ · เย็นนี้จะทำอะไรดี?";
+    $("#hkTitle").textContent = "🧺 ตลาดแตะมือ · เย็นนี้จะทำอะไรดี?"; if (!M.spokeMenu) { M.spokeMenu = true; window.PreDMVoice?.say("mk_menu"); }
     say("เลือกเมนูที่จะทำมื้อเย็นนี้ก่อน แล้วไปจ่ายตลาดตามรายการกัน");
     const list = RECIPES.slice(M.menuPage * PER_PAGE, M.menuPage * PER_PAGE + PER_PAGE);
     return [...list.map((r) => ({ id: "r" + RECIPES.indexOf(r), e: r.e, key: r.key, n: r.n, sub: `วัตถุดิบ ${r.need.length} อย่าง` })), { id: "menus", e: "🔄", n: "เมนูอื่น", sub: `หน้า ${M.menuPage + 1}/${Math.ceil(RECIPES.length / PER_PAGE)}` }];
@@ -282,20 +291,21 @@ function marketChoose(id, el) {
   if (id === "menus") { M.menuPage = (M.menuPage + 1) % Math.ceil(RECIPES.length / PER_PAGE); return layout(); }
   if (id[0] === "r" && M.phase === "menu") {
     M.recipe = RECIPES[+id.slice(1)]; M.phase = "shop"; M.stall = 0; M.page = 0; M.t0 = performance.now();
-    if (el) fx(el, "ไปตลาดกัน!", "good"); window.PreDMMusic?.sfx("ok"); return layout();
+    if (el) fx(el, "ไปตลาดกัน!", "good"); window.PreDMMusic?.sfx("ok"); window.PreDMVoice?.say("mk_go"); return layout();
   }
   const st = STALLS[M.stall], pages = Math.ceil(st.items.length / PER_PAGE);
   if (id === "next") { if (M.page < pages - 1) M.page++; else { M.stall++; M.page = 0; } return layout(); }
   if (id === "prev") { if (M.page > 0) M.page--; else { M.stall--; M.page = Math.ceil(STALLS[M.stall].items.length / PER_PAGE) - 1; } return layout(); }
-  if (id === "pay") { window.PreDMMusic?.sfx("win"); return marketResult(); }
+  if (id === "pay") { window.PreDMMusic?.sfx("win"); window.PreDMVoice?.say("mk_pay"); return marketResult(); }
   if (id.startsWith("i:")) {
     const g = ING[id.slice(2)], k = M.cart.indexOf(g.id);
     if (k >= 0) { M.cart.splice(k, 1); M.combo = 0; if (el) fx(el, "เอาออก", ""); return layout(); }
     if (M.cart.length >= MK_MAX) { say("ตะกร้าเต็มแล้ว ไปจ่ายเงินได้เลย"); window.PreDMMusic?.sfx("bad"); return shake(el); }
-    if (g.price > MK_BUDGET - spent()) { say(`เงินไม่พอค่ะ ${g.n} ราคา ${g.price} บาท`); window.PreDMMusic?.sfx("bad"); return shake(el); }
+    if (g.price > MK_BUDGET - spent()) { say(`เงินไม่พอค่ะ ${g.n} ราคา ${g.price} บาท`); window.PreDMMusic?.sfx("bad"); window.PreDMVoice?.say("mk_money"); return shake(el); }
     M.cart.push(g.id);
-    if (M.recipe.need.includes(g.id)) { M.combo++; G.score += 2; fx(el, M.combo >= 2 ? `คอมโบ ×${M.combo}! 🔥` : "+2 ตามรายการ", "good"); if (M.combo >= 2) window.PreDMMusic?.sfx("ok"); }
-    else if (g.hp < 0) { M.combo = 0; fx(el, "ระวัง!", "bad"); window.PreDMMusic?.sfx("bad"); setTimeout(() => say(`💡 ${TIPS_BAD[g.id] || "ของชิ้นนี้ไม่ค่อยดีต่อสุขภาพ"}`), 50); }
+    if (M.recipe.need.includes(g.id)) { M.combo++; G.score += 2; fx(el, M.combo >= 2 ? `คอมโบ ×${M.combo}! 🔥` : "+2 ตามรายการ", "good"); if (M.combo >= 2) window.PreDMMusic?.sfx("ok");
+      if (M.recipe.need.every((id) => M.cart.includes(id))) window.PreDMVoice?.say("mk_done"); else if (M.combo === 3 || M.combo === 6) window.PreDMVoice?.say("combo"); }
+    else if (g.hp < 0) { M.combo = 0; fx(el, "ระวัง!", "bad"); window.PreDMMusic?.sfx("bad"); window.PreDMVoice?.say("mk_bad"); setTimeout(() => say(`💡 ${TIPS_BAD[g.id] || "ของชิ้นนี้ไม่ค่อยดีต่อสุขภาพ"}`), 50); }
     else { fx(el, g.hp > 0 ? "+1 ดีต่อสุขภาพ" : "✓", "good"); }
     pop(); return layout();
   }
@@ -318,6 +328,7 @@ function marketResult() {
   pts = Math.max(0, pts); const ratio = pts / max, st = ratio >= 0.85 ? 3 : ratio >= 0.65 ? 2 : ratio >= 0.4 ? 1 : 0;
   const secs = Math.round((performance.now() - M.t0) / 1000), best = Math.max(pts, window.PreDM?.store.get("vrMarketBest", 0) || 0); window.PreDM?.store.set("vrMarketBest", best);
   if (st >= 2) confetti();
+  window.PreDMVoice?.say(["retry", "cheer2", "cheer1", "cheer3"][st]);
   $("#hkList").hidden = true;
   $("#hkCards").innerHTML = `<div class="hk-result"><span class="hk-rmasc">${window.PreDMMascot ? PreDMMascot.svg() : "💗"}</span><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div>
     <h2>${["ลองจ่ายตลาดใหม่นะคะ", "ใช้ได้ค่ะ ปรับอีกนิด", "เก่งมาก! ตะกร้าสุขภาพ", "สุดยอดแม่ครัวสุขภาพ! 🧺"][st]}</h2>
@@ -365,7 +376,7 @@ function loop() {
           G.lm = lm.map((q) => ({ x: ox + (1 - q.x) * dw, y: oy + q.y * dh })); ny = lm[9].y; G.seenAt = now;
         } else if (now - (G.seenAt || 0) > 400) G.lm = null; // keep the last hand for a moment when tracking flickers
       }
-      if (G.lm) { ctx.fillStyle = "rgba(255,255,255,.75)"; G.lm.forEach((m) => { ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, 7); ctx.fill(); }); raw = G.lm[8]; }
+      if (G.lm) { drawHand(ctx, G.lm); raw = G.lm[8]; }
     } else if (G.ptr) { raw = G.ptr; ny = G.ptr.ny; }
     // smooth the fingertip so small shakes do not move the pointer off a card
     if (raw) { const A = G.cam ? 0.3 : 1; G.sm = G.sm ? { x: G.sm.x + (raw.x - G.sm.x) * A, y: G.sm.y + (raw.y - G.sm.y) * A } : { x: raw.x, y: raw.y }; } else G.sm = null;

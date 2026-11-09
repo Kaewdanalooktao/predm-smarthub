@@ -39,7 +39,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font: .9375rem/1.6 var(--body); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
 h1 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
 h2 { font-size: 1.12rem; font-weight: 600; }
@@ -1853,3 +1853,21 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 .ar-res b { font-size: 1.8rem; } .ar-res small { font-size: .88rem; font-weight: 500; max-width: 420px; text-align: center; }
 .ar-msg { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 6; margin: 0; max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 16px; background: rgba(255, 255, 255, .95); color: #17191b; font-size: .88rem; text-align: center; }
 @media (max-width: 760px) { .ar-live { top: auto; bottom: 16px; right: 12px; left: 12px; max-width: none; grid-template-columns: auto 1fr; align-items: center; } .ar-count { min-width: 110px; padding: 8px 12px; } .ar-count b { font-size: 2.4rem; } .ar-res { transform: translateY(-34vh); } }
+
+/* ---------- large-text mode (a11y.js) ---------- */
+html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
+.fs-ic { font-weight: 800; font-size: 1.15rem; line-height: 1; letter-spacing: -.02em; } .fs-ic small { font-size: .65em; }
+.fs-btn[data-lv="1"] .fs-ic, .fs-btn[data-lv="2"] .fs-ic { color: var(--blue, #2f4aa0); } .fs-btn[data-lv="2"] .fs-ic { font-size: 1.35rem; }
+.nav-btn.fs-btn .fs-ic { width: 22px; display: inline-grid; place-items: center; }
+.fs-float { position: fixed; left: 14px; bottom: 14px; z-index: 50; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: pointer; }
+html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
+
+/* ---------- voice studio ---------- */
+.vs-box { max-width: 640px; } .vs-intro { font-size: .86rem; line-height: 1.6; color: var(--muted); margin: 0 0 10px; } .vs-intro code { font-size: .8rem; }
+.vs-bar { display: grid; gap: 4px; margin-bottom: 8px; font-size: .88rem; } .vs-bar i { height: 8px; border-radius: 9px; background: var(--sub, #eee); overflow: hidden; } .vs-bar em { display: block; height: 100%; background: linear-gradient(90deg, #3fbf6a, #7b5cff); }
+.vs-list { max-height: min(52vh, 460px); overflow: auto; padding-right: 4px; } .vs-list h3 { font-size: .86rem; margin: 12px 0 4px; color: var(--muted); }
+.vs-row { display: grid; grid-template-columns: 1fr auto auto auto; grid-template-rows: auto auto; column-gap: 6px; align-items: center; padding: 8px 10px; border-radius: 14px; background: var(--card, #fff); border: 1.5px solid var(--line, #eee); margin-bottom: 6px; }
+.vs-row .vs-t { font-weight: 700; grid-column: 1; } .vs-row small { grid-column: 1; grid-row: 2; font-size: .74rem; color: var(--muted); } .vs-row .vs-b { grid-row: 1 / 3; }
+.vs-row.has { border-color: #7cc79a; background: color-mix(in srgb, #7cc79a 10%, var(--card, #fff)); } .vs-row.rec { border-color: #ef5350; animation: vsRec 1s infinite; } @keyframes vsRec { 50% { box-shadow: 0 0 0 4px rgba(239, 83, 80, .25); } }
+.vs-b { all: unset; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--sub, #f2f2f2); font-size: 1rem; } .vs-b.rec { background: #ffe1df; color: #c62828; } .vs-b:focus-visible { outline: 3px solid #5b8cff; }
+.vs-open { margin-top: 6px; }

@@ -722,9 +722,10 @@
     const now = Date.now();
     if (!opts.force && ((text === VOICE.last && now - VOICE.at < 4000) || now - VOICE.at < 1500)) return;
     VOICE.last = text; VOICE.at = now;
+    if (window.PreDMVoice?.play(text)) return; // a real human recording of this phrase exists (voice.js)
     if (!opts.queue) speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = "th-TH"; u.rate = opts.rate || 1;
-    const v = speechSynthesis.getVoices().find((x) => x.lang && x.lang.toLowerCase().startsWith("th")); if (v) u.voice = v;
+    const u = new SpeechSynthesisUtterance(text); u.lang = "th-TH"; u.rate = opts.rate || 0.95; u.pitch = 1.05;
+    const v = window.PreDMVoice?.bestVoice() || speechSynthesis.getVoices().find((x) => x.lang && x.lang.toLowerCase().startsWith("th")); if (v) u.voice = v;
     speechSynthesis.speak(u);
   }
   function speakTrack(r) { if (r.rep) speak(String(r.count), { force: true }); else if (r.state === "bad") speak(r.msg); }

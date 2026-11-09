@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
+<script src="a11y.js?v=1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2f4aa0">
@@ -25,7 +26,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.65 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font: 1rem/1.65 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 ::selection { background: rgba(91,140,255,.35); }
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 10px; }
@@ -240,6 +241,9 @@ footer { padding-block: 100px 40px; border-top: 1px solid var(--line); backgroun
 .own-av { order: -1; } /* first in a row-reverse row = right edge */
 .own-bubble { border-radius: 20px 20px 6px 20px; }
 @media (max-width: 640px) { .own { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); } }
+html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
+.fs-float { position: fixed; left: 14px; bottom: 14px; z-index: 50; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; color: #2a2e8a; box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: pointer; font: 700 1.3rem/1 var(--body); }
+.fs-float .fs-ic small { font-size: .62em; } .fs-float[data-lv="1"], .fs-float[data-lv="2"] { background: #2a2e8a; color: #fff; }
 </style>
 </head>
 <body>

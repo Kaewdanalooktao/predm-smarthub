@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
+<script src="a11y.js?v=1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</title>
 <meta name="description" content="Know Your Risk. Shape Your Future. — Smart Screening · Body Composition · AI Exercise · AI Body Transformation">
@@ -16,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=115">
+<link rel="stylesheet" href="styles.css?v=117">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -237,6 +238,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
             <select id="gLevel"><option value="1">เริ่มต้น (นั่งเล่นได้)</option><option value="2" selected>ปานกลาง</option><option value="3">ท้าทาย</option></select>
           </label>
           <label class="switch"><input type="checkbox" id="gVoice" checked><span></span>เสียงเชียร์</label>
+          <label class="switch"><input type="checkbox" id="gHands" checked><span></span>🖐️ MediaPipe Hand (แตะเป้าด้วยปลายนิ้ว)</label>
+          <button type="button" class="btn sm vs-open" data-voicestudio>🎙️ อัดเสียงพากย์ด้วยเสียงคนจริง</button>
           <button class="btn primary" id="gStart">เริ่มเกมส์</button>
           <h3>เหรียญรางวัล</h3>
           <div id="badges" class="badges"></div>
@@ -618,12 +621,13 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="guide.js?v=3"></script>
 <script src="care.js?v=1"></script>
 <script src="chatkb.js?v=7"></script>
-<script src="app.js?v=102"></script>
+<script src="app.js?v=103"></script>
 <script src="config.js?v=5"></script>
 <script src="db.js?v=9"></script>
 <script src="hub.js?v=8"></script>
 <script src="tree.js?v=2"></script>
 <script src="music.js?v=1"></script>
+<script src="voice.js?v=1"></script>
 <script src="foodimg.js?v=4"></script>
 <script src="food.js?v=9"></script>
 <script src="foodquiz.js?v=7"></script>
@@ -631,8 +635,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="fitai.js?v=1"></script>
 <script src="cert.js?v=11"></script>
 <script src="profile.js?v=6"></script>
-<script type="module" src="pose.js?v=66"></script>
-<script type="module" src="handkitchen.js?v=8"></script>
-<script src="arfit.js?v=4"></script>
+<script type="module" src="pose.js?v=67"></script>
+<script type="module" src="handkitchen.js?v=9"></script>
+<script src="arfit.js?v=5"></script>
 </body>
 </html>

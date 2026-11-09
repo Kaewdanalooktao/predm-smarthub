@@ -43,7 +43,7 @@
           <button type="button" class="hk-x" data-ar="close" aria-label="ปิด AR">✕</button>
           <span class="hk-masc" id="arMasc" aria-hidden="true"></span>
           <div class="hk-title"><b id="arTitle">AR ออกกำลังกาย</b><span id="arSay">กำลังเปิดกล้อง…</span></div>
-          <button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button>
+          <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button>
         </div>
         <div class="ar-live" id="arLive" hidden>
           <div class="ar-count"><b id="arN">0</b><small id="arUnit">ครั้ง</small><i><em id="arBar"></em></i><span id="arGoal"></span></div>
@@ -62,7 +62,7 @@
   }
 
   const say = (t) => { $("#arSay").textContent = t; };
-  function speak(t) { try { A()?.speak?.(t, { force: true }); } catch { /* voice optional */ } }
+  function speak(t) { try { window.PreDMVoice ? window.PreDMVoice.say(t) : A()?.speak?.(t, { force: true }); } catch { /* voice optional */ } }
 
   async function open() {
     shell(); $("#arModal").hidden = false; document.body.classList.add("care-open");
@@ -120,6 +120,7 @@
       return `<div class="hk-card ar-card${c.big ? " big" : ""}" data-id="${esc(c.id)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"><span class="hk-ring"></span><span class="hk-pic">${ic(c.ic)}</span><b>${esc(c.n)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</div>`;
     }).join("");
     S.cards = [...box.children]; S.hover = null; S.acc = 0;
+    if (S.spoke !== S.phase && { mode: 1, ex: 1, target: 1 }[S.phase]) { S.spoke = S.phase; speak({ mode: "ar_mode", ex: "ar_ex", target: "ar_target" }[S.phase]); }
     if (S.phase === "mode") say(S.cam ? "ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก (หรือแตะด้วยเมาส์/นิ้วบนจอ)" : "แตะการ์ดเพื่อเลือกโหมด");
   }
 
@@ -144,11 +145,11 @@
     S.runner.setHands(S.ex === "fist"); // hands only when the exercise needs them (faster)
     $("#arTitle").textContent = `${e[0]} · เป้าหมาย ${S.target} ${e[2]}`; say(e[5]);
     $("#arUnit").textContent = e[2]; $("#arGoal").textContent = `เป้าหมาย ${S.target}`; $("#arN").textContent = 0; $("#arBar").style.width = "0%"; $("#arFb").textContent = "เตรียมตัว";
-    let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak(`${e[0]} เตรียมตัว`);
+    let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak("ready");
     clearInterval(S.cd);
     S.cd = setInterval(() => {
       n--; if (n > 0) { big.textContent = n; M()?.sfx("hover"); speak(String(n)); return; }
-      clearInterval(S.cd); big.textContent = "เริ่ม!"; speak("เริ่ม"); M()?.sfx("ok"); setTimeout(() => (big.hidden = true), 700);
+      clearInterval(S.cd); big.textContent = "เริ่ม!"; speak("go"); M()?.sfx("ok"); setTimeout(() => (big.hidden = true), 700);
       S.evalFn = T.makeEval(S.ex); S.phase = "train"; S.t0 = performance.now(); $("#arLive").hidden = false; M()?.start();
       $("#arCards").innerHTML = `<div class="hk-card ar-card ar-stop" data-id="stop" style="left:12%;top:24%"><span class="hk-ring"></span><span class="hk-pic">${ic("stop_sign")}</span><b>หยุด</b><small>ชี้ค้าง 2 วินาที</small></div>`;
       S.cards = [...$("#arCards").children]; S.hover = null; S.acc = 0; S.lock = false; // stop card is far from the old cards and needs a long hold
@@ -164,7 +165,7 @@
     const best = A()?.store.get("arBest", {}) || {}; if (n > (best[S.ex] || 0)) { best[S.ex] = n; A()?.store.set("arBest", best); }
     const big = $("#arBig"); big.hidden = false;
     big.innerHTML = `<div class="ar-res"><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div><b>${n} / ${S.target} ${esc(e[2])}</b><small>${["ลองใหม่นะคะ ค่อย ๆ ทำ", "ดีค่ะ ทำต่อเนื่องนะคะ", "เก่งมากค่ะ!", "ครบเป้าหมาย สุดยอด! 🎉"][st]} · ดีที่สุด ${best[S.ex] || n}${n > 0 ? " · บันทึกลงสมุดแล้ว" : ""}</small></div>`;
-    speak(st === 3 ? "ครบเป้าหมาย เก่งมากค่ะ" : `ทำได้ ${n} ${e[2]}`);
+    speak(st === 3 ? "goal" : early && n === 0 ? "ar_stop" : ["retry", "cheer2", "cheer1"][st]);
     layout(); say("ชี้นิ้วค้างไว้ที่การ์ด เพื่อเล่นต่อหรือเลือกท่าอื่น");
   }
 
@@ -174,11 +175,12 @@
       const T = window.PreDMTrack, r = S.evalFn(lms, now, hands), col = T.COLORS[r.state];
       if (lms) T.drawSkeleton(ctx, lms, w, h, col);
       if (hands && S.ex === "fist") T.drawHands(ctx, hands, w, h, col);
-      if (r.count !== S.reps) { S.reps = r.count; M()?.sfx("pok"); bump(); if (S.reps % 5 === 0 && S.reps < S.target) speak(String(S.reps)); }
+      if (r.count !== S.reps) { S.reps = r.count; M()?.sfx("pok"); bump(); if (S.reps % 5 === 0 && S.reps < S.target) speak(String(S.reps)); else if (S.reps === S.target - 2) speak("cheer4"); }
+      if (!lms && now - (S.bodyTalk || 0) > 12000 && now - S.t0 > 4000) { S.bodyTalk = now; speak("ar_body"); }
       S.last = r; $("#arN").textContent = r.count; $("#arBar").style.width = `${Math.min(100, (r.count / S.target) * 100)}%`;
       const fb = $("#arFb"); fb.textContent = r.msg || "—"; fb.dataset.state = r.state;
       if (r.count >= S.target) finish(false);
-    } else if (hands && hands.length) T_drawLight(ctx, hands, w, h);
+    } else if (hands && hands.length) window.PreDMTrack.drawHands(ctx, hands, w, h);
     pointerStep(fingertip(lms, hands, w, h));
   }
   function T_drawLight(ctx, hands, w, h) { ctx.fillStyle = "rgba(255,255,255,.8)"; hands.forEach((hd) => hd.pts.forEach((q) => { ctx.beginPath(); ctx.arc(q.x * w, q.y * h, 3.5, 0, 7); ctx.fill(); })); }

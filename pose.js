@@ -363,6 +363,8 @@ const GAMES = {
 };
 const G = { id: "bubble", runner: null, running: false, score: 0, end: 0, last: 0, lastT: 0, objs: [], pops: [], bird: { y: 0.5, vy: 0 }, flapUp: false, stage: "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0 };
 const bests = () => App().store.get("bestScores", {});
+// touch points for the reaching games: wrists + pose finger points, plus thumb/index/middle fingertips from MediaPipe Hand
+const touchPts = (lms) => { const p = lms ? [15, 16, 19, 20].filter((i) => lms[i] && lms[i].v > 0.4).map((i) => lms[i]) : []; (G.hands || []).forEach((hd) => [4, 8, 12].forEach((i) => p.push(hd.pts[i]))); return p; };
 const say = (t, f) => { if ($("#gVoice")?.checked) App().speak?.(t, { force: f }); };
 function selectGame(id) {
   if (G.running) return;
@@ -436,7 +438,7 @@ const GAME_FRAME = {
     ctx.fillStyle = "rgba(76,160,80,.35)"; ctx.fillRect(0, 0, w, h * 0.12);
     if (G.running && now - G.last > 1300 - lv * 220) { G.last = now; const bad = lv > 1 && Math.random() < 0.2, left = Math.random() < 0.5;
       G.objs.push({ x: left ? 0.06 + Math.random() * 0.3 : 0.64 + Math.random() * 0.3, y: 0.05 + Math.random() * (lv === 1 ? 0.22 : 0.16), e: bad ? "🍬" : pick(["🍐", "🍏", "🍊", "🥭", "🍈"]), bad, born: now, life: 3600 - lv * 500 }); }
-    const hands = lms ? [15, 16, 19, 20].filter((i) => lms[i] && lms[i].v > 0.4).map((i) => lms[i]) : [];
+    const hands = touchPts(lms);
     G.objs = G.objs.filter((o) => { if (now - o.born > o.life) return false;
       if (G.running && hands.some((p) => Math.hypot((p.x - o.x) * w, (p.y - o.y) * h) < 0.06 * w + 10)) { addScore(o.bad ? -2 : 1, o.x, o.y, now); return false; } return true; });
     G.objs.forEach((o) => { ctx.strokeStyle = "rgba(90,60,30,.7)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(o.x * w, 0); ctx.lineTo(o.x * w, o.y * h - 22); ctx.stroke(); emo(ctx, o.e, o.x * w, o.y * h + Math.sin(now / 200 + o.x * 9) * 4, 52); });
@@ -457,7 +459,7 @@ const GAME_FRAME = {
   bubble(lms, ctx, w, h, now, dt, lv) {
     if (G.running && now - G.last > 900 - lv * 180) { G.last = now; const r = Math.random(), kind = r < 0.12 ? "gold" : r < 0.12 + 0.08 * lv ? "sugar" : "blue";
       G.objs.push({ x: 0.12 + Math.random() * 0.76, y: lv === 1 ? 0.15 + Math.random() * 0.35 : 0.1 + Math.random() * 0.55, r: kind === "gold" ? 0.045 : 0.06, kind, born: now, life: 4200 - lv * 700 }); }
-    const hands = lms ? [15, 16, 19, 20].filter((i) => lms[i].v > 0.4).map((i) => lms[i]) : [];
+    const hands = touchPts(lms);
     G.objs = G.objs.filter((b) => { if (now - b.born > b.life) return false;
       if (G.running && hands.some((p) => Math.hypot((p.x - b.x) * w, (p.y - b.y) * h) < b.r * w + 14)) { addScore(b.kind === "gold" ? 3 : b.kind === "sugar" ? -2 : 1, b.x, b.y, now); return false; } return true; });
     G.objs.forEach((b) => { const age = (now - b.born) / b.life, col = b.kind === "gold" ? "240,180,64" : b.kind === "sugar" ? "224,82,70" : "90,170,230";
@@ -523,10 +525,12 @@ const GAME_FRAME = {
     G.pops.filter((p) => p.text && now - p.t < 1500).forEach((p) => { ctx.fillStyle = "#ffd45c"; ctx.font = "bold 40px sans-serif"; ctx.fillText(p.text, w * 0.35, h * 0.3); });
   },
 };
-function gameFrame(lms, ctx, w, h, now) {
+function gameFrame(lms, ctx, w, h, now, hands) {
   const dt = G.lastT ? Math.min(0.05, (now - G.lastT) / 1000) : 0; G.lastT = now;
   const lv = +$("#gLevel").value;
+  G.hands = hands || null;
   if (lms) drawSkeleton(ctx, lms, w, h, "rgba(63,191,133,.7)");
+  if (hands) drawHands(ctx, hands, w, h);
   GAME_FRAME[G.id](lms, ctx, w, h, now, dt, lv);
   if (G.id !== "balance") popText(ctx, w, h, now);
   if (G.running) { const left = Math.max(0, Math.ceil((G.end - now) / 1000)); $("#gTime").textContent = left; $("#gScore").textContent = G.score; if (left <= 3 && left > 0 && left !== G.spoken) { G.spoken = left; say(String(left), true); } if (left === 0) finishGame(); }
@@ -547,6 +551,7 @@ function initGame() {
   $("#gamePick").addEventListener("click", (e) => { const c = e.target.closest(".gcard"); if (c) selectGame(c.dataset.game); });
   $("#gStart").addEventListener("click", async () => {
     $("#gStart").disabled = true;
+    G.runner.hands = !!$("#gHands")?.checked; // MediaPipe Hand: draw the fingers and let fingertips touch targets
     Object.assign(G, { objs: [], pops: [], score: 0, bird: { y: 0.5, vy: 0 }, flapUp: false, stage: G.id === "jack" ? "in" : "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0, lastT: 0, spoken: null, flaps: 0, legUp: {}, lastSide: null, speed: 0, dist: 0, px: 0.5 });
     $("#gScore").textContent = 0;
     try {
