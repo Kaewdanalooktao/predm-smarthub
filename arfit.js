@@ -1,0 +1,241 @@
+/* Pre-DM Smart Hub — "AR ออกกำลังกาย": a full-screen camera page where the user picks the exercise themselves by touching
+   floating cards with a finger (VR style), then trains with live AI pose counting.
+   Flow: เลือกโหมด (เสริมแรง / แอโรบิก / ทรงตัว / ยืดเหยียด-มือ / เกม AR) → เลือกท่า → เลือกเป้าหมาย → นับถอยหลัง → ฝึก → สรุปผล
+   Uses the pose engine from pose.js (window.PreDMTrack). Camera images are processed on this device only. Mouse / touch also works. */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const ic = (n) => `<img class="ar-ic" src="vendor/fit3d/${n}.webp" alt="" draggable="false">`;
+  const A = () => window.PreDM, M = () => window.PreDMMusic;
+  const DWELL = 1000, STOP_DWELL = 2200;
+
+  // exercises tracked inside this page: [mode, name, icon, unit, targets, type, tip]
+  const EX = {
+    squat: ["สควอท", "person_lifting_weights", "ครั้ง", [8, 12, 20], "strength", "ยืนกางเท้าเท่าไหล่ ย่อจนเข่างอประมาณ 90° แล้วยืดตรง หันข้างหรือหน้าเข้ากล้องให้เห็นทั้งตัว"],
+    arm: ["ยกแขนเหนือศีรษะ", "raising_hands", "ครั้ง", [10, 15, 20], "strength", "หันหน้าเข้ากล้อง ยกแขนสองข้างขึ้นเหนือศีรษะจนสุด แล้วลดลงข้างลำตัว"],
+    march: ["ย่ำเท้ายกเข่า", "person_walking", "ก้าว", [30, 60, 100], "aerobic", "ยกเข่าสลับซ้าย-ขวาให้สูงใกล้ระดับสะโพก ให้กล้องเห็นตั้งแต่สะโพกถึงเข่า"],
+    balance: ["ยืนขาเดียว", "flamingo", "วินาที", [10, 20, 30], "balance", "ยืนข้างเก้าอี้ไว้จับกันล้ม ยกเท้าหนึ่งข้างให้พ้นพื้น นับเวลาเฉพาะตอนยืนขาเดียว"],
+    fist: ["กำ-แบมือ", "raised_fist", "ครั้ง", [10, 20, 30], "flex", "ยกมือขึ้นระดับอก หันฝ่ามือเข้ากล้อง แบมือกางนิ้วให้สุด แล้วกำให้แน่น"],
+  };
+  const GAME_IC = { bubble: "bubbles", bird: "bird", kick: "glowing_star", squat: "balloon", balance: "wind_face", jack: "fireworks", march: "basket", punch: "boxing_glove", reach: "person_cartwheeling", dodge: "basket" };
+  const MODES = [
+    { id: "strength", n: "เสริมแรง", ic: "flexed_biceps", sub: "กล้ามเนื้อขา แขน", items: ["ex:squat", "ex:arm", "g:squat"] },
+    { id: "aerobic", n: "แอโรบิก", ic: "red_heart", sub: "หัวใจ เผาผลาญน้ำตาล", items: ["ex:march", "g:jack", "g:march", "g:punch", "g:dodge"] },
+    { id: "balance", n: "ทรงตัว", ic: "flamingo", sub: "ป้องกันการหกล้ม", items: ["ex:balance", "g:balance", "g:kick"] },
+    { id: "flex", n: "ยืดเหยียด · มือ", ic: "person_in_lotus_position", sub: "ข้อต่อ นิ้วมือ", items: ["ex:fist", "ex:arm", "g:reach", "g:bird"] },
+    { id: "game", n: "เกม AR", ic: "video_game", sub: "10 เกม เกมละ 60 วินาที", items: ["g:bubble", "g:bird", "g:kick", "g:squat", "g:balance", "g:jack", "g:march", "g:punch", "g:reach", "g:dodge"] },
+  ];
+
+  const S = { phase: "mode", mode: null, ex: null, target: 0, page: 0, cards: [], hover: null, acc: 0, lock: false, slip: 0, sm: null, ptr: null, runner: null, cam: false, evalFn: null, last: null, t0: 0, lastF: 0, reps: 0 };
+
+  function shell() {
+    if ($("#arModal")) return;
+    document.body.insertAdjacentHTML("beforeend", `
+    <div class="ar-modal hk-modal" id="arModal" role="dialog" aria-modal="true" aria-label="AR ออกกำลังกาย" hidden>
+      <div class="hk-stage ar-stage" id="arStage">
+        <video id="arVideo" playsinline muted hidden></video>
+        <div class="hk-bg ar-bg" aria-hidden="true"></div>
+        <canvas id="arCanvas" width="640" height="480"></canvas>
+        <div class="hk-cards" id="arCards"></div>
+        <div class="hk-fxl" id="arFx" aria-hidden="true"></div>
+        <div class="hk-cursor" id="arCursor" hidden><i></i></div>
+        <div class="hk-hud">
+          <button type="button" class="hk-x" data-ar="close" aria-label="ปิด AR">✕</button>
+          <span class="hk-masc" id="arMasc" aria-hidden="true"></span>
+          <div class="hk-title"><b id="arTitle">AR ออกกำลังกาย</b><span id="arSay">กำลังเปิดกล้อง…</span></div>
+          <button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button>
+        </div>
+        <div class="ar-live" id="arLive" hidden>
+          <div class="ar-count"><b id="arN">0</b><small id="arUnit">ครั้ง</small><i><em id="arBar"></em></i><span id="arGoal"></span></div>
+          <p class="ar-fb" id="arFb">—</p>
+        </div>
+        <div class="ar-big" id="arBig" hidden></div>
+        <p class="ar-msg" id="arMsg" hidden></p>
+      </div>
+    </div>`);
+    $("#arModal").addEventListener("click", onClick);
+    const st = $("#arStage");
+    st.addEventListener("pointermove", (e) => { const r = st.getBoundingClientRect(); S.ptr = { x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }; });
+    st.addEventListener("pointerleave", () => (S.ptr = null));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#arModal").hidden) close(); });
+    if (window.PreDMMascot) $("#arMasc").innerHTML = PreDMMascot.svg();
+  }
+
+  const say = (t) => { $("#arSay").textContent = t; };
+  function speak(t) { try { A()?.speak?.(t, { force: true }); } catch { /* voice optional */ } }
+
+  async function open() {
+    shell(); $("#arModal").hidden = false; document.body.classList.add("care-open");
+    S.phase = "mode"; S.page = 0; layout();
+    await startCam();
+  }
+  function close() {
+    stopCam(); $("#arModal").hidden = true; document.body.classList.remove("care-open"); M()?.stop();
+    $("#arLive").hidden = true; $("#arBig").hidden = true;
+  }
+  async function ready() { if (window.PreDMTrack?.Runner) return; await new Promise((res) => { window.addEventListener("predm:track-ready", res, { once: true }); setTimeout(res, 15000); }); }
+  async function startCam() {
+    try {
+      await ready(); const T = window.PreDMTrack; if (!T?.Runner) throw new Error("ระบบ AI ยังโหลดไม่เสร็จ ลองใหม่อีกครั้ง");
+      if (!S.runner) S.runner = new T.Runner($("#arVideo"), $("#arCanvas"), $("#arMsg"));
+      S.runner.hands = true; $("#arMsg").hidden = false; $("#arMsg").textContent = "กำลังโหลด AI จับท่าทางและมือ…";
+      await S.runner.start(onFrame); S.cam = true; $("#arStage").classList.add("cam");
+      say(S.phase === "mode" ? "ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก (หรือแตะด้วยเมาส์/นิ้วบนจอ)" : $("#arSay").textContent);
+    } catch (err) {
+      S.cam = false; $("#arMsg").hidden = false;
+      $("#arMsg").textContent = `เปิดกล้องไม่ได้ (${err.name === "NotAllowedError" ? "ไม่ได้อนุญาตกล้อง" : err.message || err}) · เลือกท่าด้วยการแตะได้ แต่การนับท่าต้องใช้กล้อง`;
+      say("แตะการ์ดเพื่อเลือกโหมด"); idleLoop();
+    }
+  }
+  function stopCam() { try { S.runner?.stop(); } catch { /* ignore */ } S.cam = false; cancelAnimationFrame(S.idle); }
+  function idleLoop() { cancelAnimationFrame(S.idle); const f = () => { S.idle = requestAnimationFrame(f); if (!S.cam) pointerStep(null); }; f(); }
+
+  /* ------------------------------------------------------------ cards */
+  function items() {
+    const T = window.PreDMTrack || {}, G = T.games || {};
+    if (S.phase === "mode") {
+      $("#arTitle").textContent = "🕶️ AR ออกกำลังกาย · เลือกโหมด";
+      return MODES.map((m) => ({ id: "m:" + m.id, ic: m.ic, n: m.n, sub: m.sub }));
+    }
+    if (S.phase === "ex") {
+      const m = MODES.find((x) => x.id === S.mode); $("#arTitle").textContent = `${m.n} · เลือกท่าที่จะฝึก`;
+      say("ชี้นิ้วค้างไว้ที่ท่าที่อยากฝึก");
+      const list = m.items.map((k) => { const [t, id] = k.split(":"); if (t === "ex") { const e = EX[id]; return { id: k, ic: e[1], n: e[0], sub: `AI นับ${e[2]}` }; } const g = G[id]; return g ? { id: k, ic: GAME_IC[id] || "video_game", n: g.name, sub: `เกม 60 วิ · ${g.part}` } : null; }).filter(Boolean);
+      const per = 7, pages = Math.ceil(list.length / per), view = list.slice(S.page * per, S.page * per + per);
+      return [{ id: "back", ic: "left_arrow", n: "ย้อนกลับ" }, ...view, ...(pages > 1 ? [{ id: "page", ic: "glowing_star", n: "ท่าอื่น ๆ", sub: `หน้า ${S.page + 1}/${pages}` }] : [])];
+    }
+    if (S.phase === "target") {
+      const e = EX[S.ex]; $("#arTitle").textContent = `${e[0]} · ตั้งเป้าหมาย`; say(e[5]);
+      return [{ id: "back", ic: "left_arrow", n: "ย้อนกลับ" }, ...e[3].map((n, i) => ({ id: "t:" + n, ic: ["bullseye", "stopwatch", "trophy"][i], n: `${n} ${e[2]}`, sub: ["เริ่มต้น", "ปานกลาง", "ท้าทาย"][i], big: i === 1 }))];
+    }
+    if (S.phase === "done") return [{ id: "again", ic: "fireworks", n: "ฝึกท่าเดิมอีกครั้ง", big: true }, { id: "menu", ic: "glowing_star", n: "เลือกท่าอื่น" }, { id: "close", ic: "stop_sign", n: "ปิด AR" }];
+    return [];
+  }
+  function layout() {
+    const box = $("#arCards"), list = items(), n = list.length, narrow = ($("#arStage").clientWidth || innerWidth) < 760;
+    box.innerHTML = list.map((c, i) => {
+      let x, y;
+      if (narrow) { const cols = n <= 4 ? 2 : 3, rows = Math.ceil(n / cols), r = Math.floor(i / cols), inRow = Math.min(cols, n - r * cols), col = i - r * cols; x = 50 + (col - (inRow - 1) / 2) * (cols === 2 ? 42 : 32); y = rows === 1 ? 50 : 30 + (r * 46) / (rows - 1); }
+      else { const t = n === 1 ? 0.5 : i / (n - 1), ang = Math.PI * (1.05 - 1.1 * t); x = 50 + Math.cos(ang) * 41; y = 68 - Math.sin(ang) * 48; }
+      return `<div class="hk-card ar-card${c.big ? " big" : ""}" data-id="${esc(c.id)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"><span class="hk-ring"></span><span class="hk-pic">${ic(c.ic)}</span><b>${esc(c.n)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</div>`;
+    }).join("");
+    S.cards = [...box.children]; S.hover = null; S.acc = 0;
+    if (S.phase === "mode") say(S.cam ? "ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก (หรือแตะด้วยเมาส์/นิ้วบนจอ)" : "แตะการ์ดเพื่อเลือกโหมด");
+  }
+
+  function choose(id, el) {
+    M()?.sfx("pick"); if (el) fx(el); $("#arBig").hidden = true;
+    if (id === "close") return close();
+    if (id === "back") { S.phase = S.phase === "target" ? "ex" : "mode"; S.page = 0; return layout(); }
+    if (id === "page") { const m = MODES.find((x) => x.id === S.mode); S.page = (S.page + 1) % Math.ceil(m.items.length / 7); return layout(); }
+    if (id === "menu") { S.phase = "mode"; return layout(); }
+    if (id === "again") return begin();
+    if (id.startsWith("m:")) { S.mode = id.slice(2); S.phase = "ex"; S.page = 0; return layout(); }
+    if (id.startsWith("g:")) { const g = id.slice(2); close(); window.PreDMTrack?.startGame(g); return; }
+    if (id.startsWith("ex:")) { S.ex = id.slice(3); S.phase = "target"; return layout(); }
+    if (id.startsWith("t:")) { S.target = +id.slice(2); return begin(); }
+  }
+
+  /* ------------------------------------------------------------ training */
+  function begin() {
+    if (!S.cam) { say("ต้องเปิดกล้องก่อนจึงจะนับท่าได้"); $("#arMsg").hidden = false; $("#arMsg").textContent = "การนับท่าต้องใช้กล้อง กด ✕ แล้วเปิดใหม่ และอนุญาตให้ใช้กล้อง"; return; }
+    const e = EX[S.ex], T = window.PreDMTrack;
+    S.phase = "count"; layout(); S.last = null; S.reps = 0;
+    S.runner.setHands(S.ex === "fist"); // hands only when the exercise needs them (faster)
+    $("#arTitle").textContent = `${e[0]} · เป้าหมาย ${S.target} ${e[2]}`; say(e[5]);
+    $("#arUnit").textContent = e[2]; $("#arGoal").textContent = `เป้าหมาย ${S.target}`; $("#arN").textContent = 0; $("#arBar").style.width = "0%"; $("#arFb").textContent = "เตรียมตัว";
+    let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak(`${e[0]} เตรียมตัว`);
+    clearInterval(S.cd);
+    S.cd = setInterval(() => {
+      n--; if (n > 0) { big.textContent = n; M()?.sfx("hover"); speak(String(n)); return; }
+      clearInterval(S.cd); big.textContent = "เริ่ม!"; speak("เริ่ม"); M()?.sfx("ok"); setTimeout(() => (big.hidden = true), 700);
+      S.evalFn = T.makeEval(S.ex); S.phase = "train"; S.t0 = performance.now(); $("#arLive").hidden = false; M()?.start();
+      $("#arCards").innerHTML = `<div class="hk-card ar-card ar-stop" data-id="stop" style="left:12%;top:24%"><span class="hk-ring"></span><span class="hk-pic">${ic("stop_sign")}</span><b>หยุด</b><small>ชี้ค้าง 2 วินาที</small></div>`;
+      S.cards = [...$("#arCards").children]; S.hover = null; S.acc = 0; S.lock = false; // stop card is far from the old cards and needs a long hold
+    }, 1000);
+  }
+  function finish(early) {
+    const e = EX[S.ex], n = S.last?.count || 0, mins = Math.max(1, Math.round((performance.now() - S.t0) / 60000));
+    S.phase = "done"; S.evalFn = null; $("#arLive").hidden = true; M()?.stop();
+    S.runner.setHands(true);
+    if (n > 0) A()?.addLog?.({ type: e[4], name: `${e[0]} (AR)`, minutes: mins, reps: n });
+    const ratio = n / S.target, st = ratio >= 1 ? 3 : ratio >= 0.6 ? 2 : ratio >= 0.3 ? 1 : 0;
+    if (st >= 2) { confetti(); M()?.sfx("win"); }
+    const best = A()?.store.get("arBest", {}) || {}; if (n > (best[S.ex] || 0)) { best[S.ex] = n; A()?.store.set("arBest", best); }
+    const big = $("#arBig"); big.hidden = false;
+    big.innerHTML = `<div class="ar-res"><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div><b>${n} / ${S.target} ${esc(e[2])}</b><small>${["ลองใหม่นะคะ ค่อย ๆ ทำ", "ดีค่ะ ทำต่อเนื่องนะคะ", "เก่งมากค่ะ!", "ครบเป้าหมาย สุดยอด! 🎉"][st]} · ดีที่สุด ${best[S.ex] || n}${n > 0 ? " · บันทึกลงสมุดแล้ว" : ""}</small></div>`;
+    speak(st === 3 ? "ครบเป้าหมาย เก่งมากค่ะ" : `ทำได้ ${n} ${e[2]}`);
+    layout(); say("ชี้นิ้วค้างไว้ที่การ์ด เพื่อเล่นต่อหรือเลือกท่าอื่น");
+  }
+
+  /* ------------------------------------------------------------ per-frame */
+  function onFrame(lms, ctx, w, h, now, hands) {
+    if (S.phase === "train" && S.evalFn) {
+      const T = window.PreDMTrack, r = S.evalFn(lms, now, hands), col = T.COLORS[r.state];
+      if (lms) T.drawSkeleton(ctx, lms, w, h, col);
+      if (hands && S.ex === "fist") T.drawHands(ctx, hands, w, h, col);
+      if (r.count !== S.reps) { S.reps = r.count; M()?.sfx("pok"); bump(); if (S.reps % 5 === 0 && S.reps < S.target) speak(String(S.reps)); }
+      S.last = r; $("#arN").textContent = r.count; $("#arBar").style.width = `${Math.min(100, (r.count / S.target) * 100)}%`;
+      const fb = $("#arFb"); fb.textContent = r.msg || "—"; fb.dataset.state = r.state;
+      if (r.count >= S.target) finish(false);
+    } else if (hands && hands.length) T_drawLight(ctx, hands, w, h);
+    pointerStep(fingertip(lms, hands, w, h));
+  }
+  function T_drawLight(ctx, hands, w, h) { ctx.fillStyle = "rgba(255,255,255,.8)"; hands.forEach((hd) => hd.pts.forEach((q) => { ctx.beginPath(); ctx.arc(q.x * w, q.y * h, 3.5, 0, 7); ctx.fill(); })); }
+  // map a normalised point on the camera canvas to screen pixels (canvas is shown with object-fit: cover)
+  function toScreen(q) {
+    const c = $("#arCanvas"), st = $("#arStage"), W = st.clientWidth, H = st.clientHeight, vw = c.width, vh = c.height, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s;
+    return { x: (W - dw) / 2 + q.x * dw, y: (H - dh) / 2 + q.y * dh };
+  }
+  function fingertip(lms, hands, w, h) {
+    if (hands && hands.length) { const hd = hands.reduce((a, b) => (b.pts[8].y < a.pts[8].y ? b : a)); return toScreen(hd.pts[8]); } // the higher hand points
+    if (lms && S.phase === "train") { const L = lms[19], R = lms[20], q = (L?.v ?? 0) > (R?.v ?? 0) ? L : R; if (q && q.v > 0.5) return toScreen(q); } // during training: pose finger landmark
+    return null;
+  }
+  function pointerStep(raw) {
+    const now = performance.now(), dt = Math.min(300, now - (S.lastF || now)); S.lastF = now;
+    if (!raw && S.ptr && now - S.ptr.t < 4000) raw = S.ptr; // mouse / touch when no hand is seen
+    if (raw) S.sm = S.sm ? { x: S.sm.x + (raw.x - S.sm.x) * 0.35, y: S.sm.y + (raw.y - S.sm.y) * 0.35 } : { x: raw.x, y: raw.y }; else S.sm = null;
+    const p = S.sm, cur = $("#arCursor"); cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
+    let hit = null, paused = false;
+    if (p && S.cards.length && S.phase !== "count") {
+      const sr = $("#arStage").getBoundingClientRect();
+      const inside = (c, pad) => { const r = c.getBoundingClientRect(); return p.x >= r.left - sr.left - pad && p.x <= r.right - sr.left + pad && p.y >= r.top - sr.top - pad && p.y <= r.bottom - sr.top + pad; };
+      if (S.hover && S.hover.isConnected && inside(S.hover, 40)) hit = S.hover;
+      else for (const c of S.cards) if (inside(c, 14)) { hit = c; break; }
+    }
+    if (S.lock) { if (hit) hit = null; else if (p) S.lock = false; }
+    if (!hit && S.hover && S.hover.isConnected && !S.lock) { S.slip = S.slip || now; if (now - S.slip < 450) { hit = S.hover; paused = true; } } else S.slip = 0;
+    if (hit !== S.hover) { S.hover?.classList.remove("hot"); S.hover?.style.setProperty("--p", 0); S.hover = hit; S.acc = 0; if (hit) { hit.classList.add("hot"); M()?.sfx("hover"); } }
+    if (hit) {
+      if (!paused) S.acc += dt;
+      const need = hit.dataset.id === "stop" ? STOP_DWELL : DWELL, k = Math.min(1, S.acc / need);
+      hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
+      if (k >= 1) { const id = hit.dataset.id; S.hover = null; S.acc = 0; S.lock = true; if (id === "stop") finish(true); else choose(id, hit); }
+    } else cur.style.setProperty("--p", 0);
+  }
+
+  /* ------------------------------------------------------------ effects */
+  function bump() { const b = $("#arN"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); const m = $("#arMasc"); m.classList.remove("cheer"); void m.offsetWidth; m.classList.add("cheer"); }
+  function fx(el) {
+    const layer = $("#arFx"), sr = $("#arStage").getBoundingClientRect(), r = el.getBoundingClientRect(), x = r.left + r.width / 2 - sr.left, y = r.top + r.height / 2 - sr.top, cs = ["#ffd23f", "#3fbf6a", "#7b5cff", "#ff6fa5", "#5bc0ff"];
+    const wrap = document.createElement("div");
+    wrap.innerHTML = Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2, d = 60 + Math.random() * 50; return `<i class="hk-spark" style="left:${x}px;top:${y}px;--dx:${(Math.cos(a) * d).toFixed(0)}px;--dy:${(Math.sin(a) * d).toFixed(0)}px;background:${cs[i % cs.length]}"></i>`; }).join("");
+    layer.appendChild(wrap); setTimeout(() => wrap.remove(), 900);
+  }
+  function confetti() {
+    const layer = $("#arFx"), wrap = document.createElement("div"), cs = ["#ffd23f", "#3fbf6a", "#7b5cff", "#ff6fa5", "#5bc0ff", "#ff9f43"];
+    wrap.innerHTML = Array.from({ length: 70 }, (_, i) => `<i class="hk-conf" style="left:${Math.random() * 100}%;background:${cs[i % cs.length]};animation-delay:${(Math.random() * 0.6).toFixed(2)}s;--rot:${Math.round(Math.random() * 720)}deg"></i>`).join("");
+    layer.appendChild(wrap); setTimeout(() => wrap.remove(), 3200);
+  }
+
+  function onClick(e) {
+    const b = e.target.closest("[data-ar]"); if (b && b.dataset.ar === "close") return close();
+    const c = e.target.closest(".hk-card"); if (!c) return;
+    S.lock = true; if (c.dataset.id === "stop") return finish(true);
+    choose(c.dataset.id, c);
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest("[data-arfit]")) { e.preventDefault(); open(); } });
+  window.addEventListener("predm:view", () => { if ($("#arModal") && !$("#arModal").hidden) close(); });
+  window.PreDMAR = { open, close };
+})();

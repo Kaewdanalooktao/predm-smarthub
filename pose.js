@@ -564,6 +564,10 @@ window.addEventListener("predm:view", (e) => {
 });
 
 initTracking(); initGame();
+// shared with the AR exercise picker (arfit.js)
+Object.assign(window.PreDMTrack, { Runner, makeEval, drawSkeleton, drawHands, COLORS, modes: MODES, games: GAMES,
+  startGame(id) { location.hash = "game"; setTimeout(() => { selectGame(id); $("#gStart").click(); }, 350); } });
+window.dispatchEvent(new Event("predm:track-ready"));
 
 /* ---------------- still-photo pose detection (AI Body Transformation) ---------------- */
 const MODEL_FULL = new URL("vendor/models/pose_landmarker_full.task", location.href).href;

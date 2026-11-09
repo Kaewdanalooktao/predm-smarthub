@@ -1827,3 +1827,29 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 @media (max-width: 760px) { .hk-list { left: 8px; right: 8px; transform: none; border-radius: 16px; bottom: 80px; } }
 
 @media (max-width: 760px) { .hk-list { bottom: 112px; } .hk-masc { width: 40px; height: 40px; } .hk-tray { padding: 6px 10px; gap: 6px; } }
+
+/* ---------- AR ออกกำลังกาย ---------- */
+.ar-cta { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 14px; width: 100%; margin: 4px 0 18px; padding: 14px 18px; border-radius: 22px; color: #fff; background: linear-gradient(120deg, #2f4aa0, #7b5cff 60%, #ff6fa5); box-shadow: 0 10px 24px rgba(91, 74, 214, .3); transition: transform .15s; }
+.ar-cta:hover { transform: translateY(-2px); } .ar-cta:focus-visible { outline: 3px solid #ffd23f; }
+.ar-cta-ic { width: 64px; height: 64px; flex: none; display: grid; place-items: center; border-radius: 18px; background: rgba(255, 255, 255, .18); } .ar-cta-ic img { width: 52px; height: 52px; }
+.ar-cta b { display: block; font-size: 1.05rem; } .ar-cta small { display: block; opacity: .9; font-size: .82rem; line-height: 1.45; margin-top: 2px; }
+.ar-cta .fq-card-go { margin-left: auto; flex: none; background: rgba(255, 255, 255, .22); color: #fff; padding: 8px 14px; border-radius: 99px; font-weight: 700; }
+@media (max-width: 560px) { .ar-cta .fq-card-go { display: none; } }
+.ar-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.ar-stage.cam canvas { opacity: 1; }
+.ar-bg { background: radial-gradient(120% 90% at 50% 100%, #3b4bb0 0, #1f2560 50%, #0d1030 100%); }
+.ar-stage.cam .ar-bg { background: linear-gradient(180deg, rgba(10, 12, 40, .4), transparent 30%, transparent 70%, rgba(10, 12, 40, .5)); z-index: 2; pointer-events: none; }
+.ar-ic { width: clamp(76px, 9vw, 112px); height: clamp(76px, 9vw, 112px); object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .3)); }
+@media (max-width: 760px) { .ar-ic { width: 64px; height: 64px; } }
+.ar-card.ar-stop { width: 112px; background: rgba(255, 235, 230, .95); } .ar-card.ar-stop .ar-ic { width: 58px; height: 58px; }
+.ar-live { position: absolute; right: 16px; top: 90px; z-index: 5; display: grid; gap: 8px; justify-items: end; max-width: min(360px, 60%); }
+.ar-count { background: rgba(255, 250, 240, .95); color: #2a1e46; border-radius: 24px; padding: 10px 18px; text-align: center; min-width: 150px; box-shadow: 0 10px 24px rgba(0, 0, 0, .35); display: grid; gap: 2px; }
+.ar-count b { font-size: 3.4rem; line-height: 1; color: #5b4ad6; } .ar-count b.bump { animation: arBump .35s ease-out; } @keyframes arBump { 40% { transform: scale(1.35); color: #2f8a4a; } }
+.ar-count small { font-weight: 700; } .ar-count i { height: 10px; border-radius: 9px; background: #e6e0f5; overflow: hidden; } .ar-count em { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3fbf6a, #7b5cff); transition: width .25s; } .ar-count span { font-size: .78rem; opacity: .75; }
+.ar-fb { margin: 0; padding: 10px 16px; border-radius: 18px; background: rgba(255, 255, 255, .95); color: #17191b; font-weight: 700; font-size: 1rem; text-align: center; box-shadow: 0 6px 16px rgba(0, 0, 0, .3); }
+.ar-fb[data-state="ok"] { background: #dff6e7; color: #1f6b3a; } .ar-fb[data-state="bad"] { background: #ffe1da; color: #a3321b; }
+.ar-big { position: absolute; inset: 0; display: grid; place-items: center; z-index: 5; pointer-events: none; font-size: clamp(5rem, 18vw, 11rem); font-weight: 800; color: #fff; text-shadow: 0 6px 30px rgba(0, 0, 0, .55); }
+.ar-res { background: rgba(255, 250, 240, .96); color: #2a1e46; border-radius: 26px; padding: 14px 24px; display: grid; gap: 4px; justify-items: center; font-size: 1rem; text-shadow: none; box-shadow: 0 14px 34px rgba(0, 0, 0, .45); transform: translateY(-30vh); }
+.ar-res b { font-size: 1.8rem; } .ar-res small { font-size: .88rem; font-weight: 500; max-width: 420px; text-align: center; }
+.ar-msg { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 6; margin: 0; max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 16px; background: rgba(255, 255, 255, .95); color: #17191b; font-size: .88rem; text-align: center; }
+@media (max-width: 760px) { .ar-live { top: auto; bottom: 16px; right: 12px; left: 12px; max-width: none; grid-template-columns: auto 1fr; align-items: center; } .ar-count { min-width: 110px; padding: 8px 12px; } .ar-count b { font-size: 2.4rem; } .ar-res { transform: translateY(-34vh); } }

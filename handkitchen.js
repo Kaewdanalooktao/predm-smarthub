@@ -354,7 +354,7 @@ function loop() {
     const W = st.clientWidth, H = st.clientHeight;
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, W, H);
-    const now = performance.now(), dt = Math.min(100, now - (G.lastF || now)); G.lastF = now;
+    const now = performance.now(), dt = Math.min(300, now - (G.lastF || now)); G.lastF = now;
     let raw = null, ny = null;
     if (G.cam) {
       if (landmarker && v.readyState >= 2 && v.currentTime !== lastT) {
