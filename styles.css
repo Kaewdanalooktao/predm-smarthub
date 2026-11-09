@@ -1905,3 +1905,10 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 @media (prefers-reduced-motion: reduce) { .hk-plate, .hk-ing.drop, .hk-splash img { animation: none; } }
 .hk-mix { top: 15%; height: 22%; } .hk-ing { width: 22%; transform: translate(-10%, -22%) rotate(var(--r, 0deg)); }
 .hk-mortar { bottom: 124px; } @media (max-width: 760px) { .hk-mortar { bottom: 132px; } }
+/* phones: keep the basket/mortar strip to one compact row so it never covers the game */
+@media (max-width: 760px) {
+  .hk-tray { flex-wrap: nowrap; overflow-x: auto; max-width: calc(100% - 16px); padding: 6px 10px; gap: 6px; scrollbar-width: none; }
+  .hk-tray .hk-chip small { display: none; } .hk-tray .hk-chip .fi { width: 30px; height: 30px; }
+  .hk-tray-l { white-space: nowrap; font-size: .78rem; }
+  .hk-pound { min-width: 96px; flex: none; } .hk-pound b { font-size: 1.05rem; }
+}
