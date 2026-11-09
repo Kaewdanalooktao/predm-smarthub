@@ -1586,3 +1586,52 @@ body.care-open { overflow: hidden; }
 .cup-flags { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; } .cup-flags .fd-flag { font-size: .6rem; }
 @media (prefers-reduced-motion: reduce) { .kitchen .cup::before, .kitchen .cup::after { display: none; } .pa-dish { animation: none; } }
 @media (max-width: 560px) { .fd-meals { grid-template-columns: 1fr; } .cup-dish { width: 92px; } }
+
+/* ================= cozy Isan kitchen mood (food page) ================= */
+body.in-kitchen { --k-cream: #fff7ec; --k-card: #fffaf3; --k-line: #ecd6b8; --k-ink: #4a2f17; --k-accent: #c4602f; }
+body.in-kitchen { background: radial-gradient(1200px 600px at 85% -10%, rgba(255, 196, 120, .35), transparent 60%), repeating-linear-gradient(90deg, rgba(196, 140, 80, .05) 0 2px, transparent 2px 120px), #fbf1e2; }
+[data-theme="dark"] body.in-kitchen, [data-theme="dark"].in-kitchen { background: radial-gradient(1200px 600px at 85% -10%, rgba(255, 170, 90, .14), transparent 60%), #241a13; }
+body.in-kitchen #view-food .card, body.in-kitchen #view-food .fd-meal { background: var(--k-card); border-color: var(--k-line); box-shadow: 0 10px 24px -18px rgba(120, 70, 20, .45); }
+[data-theme="dark"] body.in-kitchen #view-food .card, [data-theme="dark"] body.in-kitchen #view-food .fd-meal { background: #2f241a; border-color: #4a3826; }
+body.in-kitchen #view-food .btn.primary { background: var(--k-accent); border-color: var(--k-accent); color: #fff; }
+body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
+.kitchen-hero { position: relative; max-width: none; overflow: hidden; min-height: 230px; padding: 24px 26px; border-radius: 28px; background: #f8e6cc; border: 1px solid #ecd2ad; box-shadow: 0 18px 40px -26px rgba(120, 70, 20, .6); isolation: isolate; }
+.kh-scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.kitchen-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(251, 236, 212, .97) 0, rgba(251, 236, 212, .9) 38%, rgba(251, 236, 212, 0) 66%); }
+.kh-text { position: relative; max-width: min(56%, 520px); display: grid; gap: 6px; }
+.kitchen-hero h1 { color: #4a2f17; } .kitchen-hero .lede { color: #6b4a2a; }
+.kitchen-hero .eyebrow { background: linear-gradient(120deg, #ffd6a0, #ffb98a); color: #4a2f17; }
+.kh-quiz { justify-self: start; margin-top: 6px; background: #4a2f17; color: #fff; border-color: #4a2f17; display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 10px 18px; border-radius: 18px; }
+.kh-quiz small { font-size: .7rem; font-weight: 500; opacity: .8; }
+.kh-quiz:hover { background: #6b4422; }
+.kh-chef { position: absolute; right: 18px; bottom: 6px; width: 104px; height: 128px; }
+.kh-chef #khMascot { position: absolute; left: 0; bottom: 0; width: 104px; height: 104px; }
+.kh-hat { position: absolute; z-index: 1; left: 30px; top: 0; width: 46px; transform: rotate(-8deg); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .15)); }
+.kh-steam { animation: khSteam 3s ease-in-out infinite; } .kh-steam.s2 { animation-delay: 1.4s; }
+@keyframes khSteam { 0% { opacity: 0; transform: translateY(6px); } 40% { opacity: .85; } 100% { opacity: 0; transform: translateY(-10px); } }
+@media (prefers-reduced-motion: reduce) { .kh-steam { animation: none; } }
+@media (max-width: 760px) { .kitchen-hero { padding: 18px 16px 150px; } .kitchen-hero::after { background: linear-gradient(180deg, rgba(251, 236, 212, .97) 0, rgba(251, 236, 212, .92) 50%, rgba(251, 236, 212, 0) 72%); } .kh-text { max-width: none; } .kh-chef { width: 84px; height: 104px; } .kh-chef #khMascot { width: 84px; height: 84px; } .kh-hat { left: 24px; width: 38px; } }
+/* ================= food quiz ================= */
+.fq-modal { position: fixed; inset: 0; z-index: 90; background: rgba(40, 24, 10, .55); display: grid; place-items: center; padding: 16px; }
+.fq-modal[hidden] { display: none; }
+.fq-box { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: #fffaf3; color: #3d2810; border-radius: 26px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 70px -20px rgba(40, 20, 0, .55); border: 1px solid #ecd6b8; }
+[data-theme="dark"] .fq-box { background: #2f241a; color: #f3e6d0; border-color: #4a3826; }
+.fq-head { display: flex; gap: 10px; align-items: center; } .fq-head h2 { margin: 0; font-size: 1.15rem; } .fq-head small { color: #8b6a43; }
+.fq-av { width: 52px; height: 52px; flex: none; }
+.fq-prog { height: 8px; border-radius: 99px; background: #f0dcc0; overflow: hidden; } .fq-prog i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f2a65a, #c4602f); transition: width .3s; }
+.fq-q { margin: 2px 0 0; font-size: 1.08rem; font-weight: 700; line-height: 1.5; }
+.fq-choices { display: grid; gap: 8px; } .fq-choices.dish { grid-template-columns: 1fr 1fr; }
+.fq-c { all: unset; box-sizing: border-box; cursor: pointer; padding: 12px 14px; border-radius: 16px; background: #fff; border: 2px solid #ecd6b8; font-weight: 600; line-height: 1.4; transition: transform .15s, border-color .15s; }
+[data-theme="dark"] .fq-c { background: #3a2c20; border-color: #574330; }
+.fq-choices.dish .fq-c { text-align: center; font-size: .95rem; padding: 16px 10px; }
+.fq-c:hover:not(:disabled) { transform: translateY(-2px); border-color: #e0a066; } .fq-c:focus-visible { outline: 3px solid #5b8cff; outline-offset: 2px; }
+.fq-c:disabled { cursor: default; opacity: .65; }
+.fq-c.ok { border-color: #22a06b; background: #e3f6ec; color: #145c3c; opacity: 1; } .fq-c.no { border-color: #d4553a; background: #fde8e2; color: #8a2a16; opacity: 1; }
+.fq-why { padding: 12px 14px; border-radius: 16px; font-size: .9rem; line-height: 1.55; } .fq-why.ok { background: #e3f6ec; color: #145c3c; } .fq-why.no { background: #fff1dc; color: #6b4a1a; }
+.fq-result { display: grid; justify-items: center; gap: 6px; text-align: center; padding: 6px 0; }
+.fq-stars { font-size: 2.4rem; letter-spacing: 6px; color: #e6d3b8; } .fq-stars .on { color: #f5b622; text-shadow: 0 2px 6px rgba(200, 140, 0, .35); }
+.fq-score { font: 800 2rem "Outfit", sans-serif; } .fq-result p { margin: 0; } .fq-result small { color: #8b6a43; }
+.fq-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin: 4px 0 14px; border-radius: 20px; background: linear-gradient(120deg, #fff1dc, #ffe0c2); border: 1px solid #ecd2ad; color: #4a2f17; text-decoration: none; }
+.fq-card:hover { box-shadow: 0 10px 20px -14px rgba(120, 70, 20, .6); } .fq-card:focus-visible { outline: 3px solid #5b8cff; outline-offset: 2px; }
+.fq-card-ico { font-size: 1.8rem; } .fq-card b { display: block; } .fq-card small { color: #7a5634; } .fq-card-go { margin-left: auto; font-weight: 700; white-space: nowrap; }
+@media (max-width: 560px) { .fq-choices.dish { grid-template-columns: 1fr; } }
