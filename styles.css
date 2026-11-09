@@ -1759,3 +1759,9 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 .hk-start-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 8px; } .hk-start small { display: block; margin-top: 10px; color: #b2402a; }
 @media (max-width: 640px) { .hk-card { width: 84px; padding: 7px 5px; border-radius: 18px; } .hk-card .hk-pic .fi { width: 46px; height: 46px; } .hk-card b { font-size: .7rem; } .hk-modes { order: 3; width: 100%; } }
 .mk-row { flex-wrap: wrap; overflow: visible; justify-content: center; }
+
+/* music toggle */
+.fq-mu { margin-left: auto; margin-right: 4px; font-size: 1rem; } .fq-mu + .care-x { margin-left: 0; }
+.hk-mu { flex: none; }
+.pl-shelf { flex-wrap: wrap; justify-content: center; max-height: min(34vh, 300px); overflow-y: auto; overflow-x: hidden; }
+.pl-cats { flex-wrap: wrap; }

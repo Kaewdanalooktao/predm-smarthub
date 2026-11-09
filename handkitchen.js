@@ -7,7 +7,7 @@ import { HandLandmarker, FilesetResolver } from "./vendor/mediapipe/vision_bundl
 
 const WASM = new URL("vendor/mediapipe/wasm", location.href).href;
 const MODEL = new URL("vendor/models/hand_landmarker.task", location.href).href;
-const DWELL = 900; // ms of hovering to choose a card
+const DWELL = 1000; // ms of hovering to choose a card
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const img = (e, key) => (window.FI ? window.FI(e, key) : e);
@@ -51,7 +51,7 @@ function shell() {
       <div class="hk-hud">
         <button type="button" class="hk-x" data-hk="close" aria-label="ปิดเกม">✕</button>
         <div class="hk-title"><b id="hkTitle">ครัวแตะมือ</b><span id="hkSay">ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก</span></div>
-        <div class="hk-modes" role="tablist"><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
+        <button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
       </div>
       <div class="hk-tray" id="hkTray"></div>
       <div class="hk-start" id="hkStart">
@@ -76,7 +76,7 @@ function shell() {
 
 function open(mode) {
   shell(); G.mode = mode || G.mode;
-  $("#hkModal").hidden = false; document.body.classList.add("care-open");
+  $("#hkModal").hidden = false; document.body.classList.add("care-open"); window.PreDMMusic?.start();
   $("#hkStart").hidden = false; $("#hkMsg").textContent = "";
   newRound();
 }
@@ -84,7 +84,7 @@ function close() {
   cancelAnimationFrame(G.raf); G.raf = 0;
   G.stream?.getTracks().forEach((t) => t.stop()); G.stream = null; G.cam = false;
   const v = $("#hkVideo"); if (v) v.srcObject = null;
-  $("#hkModal").hidden = true; document.body.classList.remove("care-open");
+  $("#hkModal").hidden = true; document.body.classList.remove("care-open"); window.PreDMMusic?.stop();
 }
 
 async function startCam() {
@@ -104,6 +104,7 @@ function startNoCam() { G.cam = false; $("#hkStage").classList.remove("cam"); $(
 
 /* ------------------------------------------------------------------ rounds */
 function newRound() {
+  if (!$("#hkModal").hidden) window.PreDMMusic?.start();
   G.step = 0; G.picks = []; G.pound = null; G.busy = false;
   document.querySelectorAll("#hkModal [data-hkmode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.hkmode === G.mode)));
   $("#hkBg").className = "hk-bg " + G.mode;
@@ -125,7 +126,7 @@ function layout() {
     else {
       const st = PLATE_STEPS[G.step], have = G.picks.filter((p) => p.kind === st.kind).length;
       items = dishesOfKind(st.kind).filter((d) => !G.picks.some((p) => p.key === d.key)).map((d) => ({ id: d.key, e: d.e, key: d.key, n: d.n, sub: `${d.kcal} kcal` }));
-      items.push({ id: "skip", e: "⏭️", n: "ข้าม" });
+      items.push({ id: "more", e: "🔄", n: "เมนูอื่น" }, { id: "skip", e: "⏭️", n: "ข้าม" });
       $("#hkTitle").textContent = `${G.sc.ic} ${G.sc.t} · ขั้น ${G.step + 1}/${PLATE_STEPS.length}`;
       say(`${st.t}${st.n > 1 ? ` (เลือกแล้ว ${have}/${st.n})` : ""} — ชี้นิ้วค้างไว้ที่การ์ด`);
     }
@@ -161,13 +162,14 @@ function choose(id) {
   if (G.mode === "plate") {
     if (id === "serve") { const picks = G.picks.map((p) => p.key), sc = G.sc; close(); window.PreDMKitchenGames?.plateResultFor(picks, sc); return; }
     if (id === "redo") return newRound();
+    if (id === "more") return layout();
     const st = PLATE_STEPS[G.step];
     if (id !== "skip") G.picks.push({ key: id, kind: st.kind });
     const have = G.picks.filter((p) => p.kind === st.kind).length;
     if (id === "skip" || have >= st.n) G.step++;
     pop(); layout(); return;
   }
-  if (id === "pound") { G.pound = { n: 0, goal: 15, dir: 0, ext: null }; say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
+  if (id === "pound") { window.PreDMMusic?.stop(); G.pound = { n: 0, goal: 15, dir: 0, ext: null }; say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
   G.picks.push({ id }); pop(); layout();
 }
 function pop() { const t = $("#hkTray"); t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); }
@@ -177,9 +179,9 @@ function poundStep(ny) { // count one stroke each time the hand travels up then 
   if (P.ext == null) { P.ext = ny; return; }
   const TH = 0.1;
   if (P.dir >= 0 && ny < P.ext - TH) { P.dir = -1; P.ext = ny; }
-  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; tray(); $("#hkBg").classList.remove("hit"); void $("#hkBg").offsetWidth; $("#hkBg").classList.add("hit"); } P.dir = 1; P.ext = ny; }
+  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; window.PreDMMusic?.sfx("pok"); tray(); $("#hkBg").classList.remove("hit"); void $("#hkBg").offsetWidth; $("#hkBg").classList.add("hit"); } P.dir = 1; P.ext = ny; }
   else if ((P.dir === -1 && ny < P.ext) || (P.dir === 1 && ny > P.ext)) P.ext = ny;
-  if (P.n >= P.goal) { G.busy = true; setTimeout(somtamResult, 400); }
+  if (P.n >= P.goal) { G.busy = true; window.PreDMMusic?.sfx("win"); setTimeout(somtamResult, 400); }
 }
 function somtamResult() {
   const items = G.picks.map((p) => SOMTAM[+p.id.slice(1)]);
@@ -207,27 +209,40 @@ function loop() {
     const W = st.clientWidth, H = st.clientHeight;
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, W, H);
-    let p = null, ny = null;
-    if (G.cam && landmarker && v.readyState >= 2 && v.currentTime !== lastT) {
-      lastT = v.currentTime;
-      const res = landmarker.detectForVideo(v, performance.now()), lm = res.landmarks?.[0];
-      if (lm) {
-        const vw = v.videoWidth, vh = v.videoHeight, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s, ox = (W - dw) / 2, oy = (H - dh) / 2;
-        const map = (q) => ({ x: ox + (1 - q.x) * dw, y: oy + q.y * dh });
-        ctx.fillStyle = "rgba(255,255,255,.75)";
-        lm.forEach((q) => { const m = map(q); ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, 7); ctx.fill(); });
-        p = map(lm[8]); ny = lm[9].y; G.ptr = p;
-      } else G.ptr = null;
-    } else if (G.cam) p = G.ptr;
-    if (!G.cam && G.ptr) { p = G.ptr; ny = G.ptr.ny; }
-    if (G.pound && G.cam && !G.busy) poundStep(ny);
+    const now = performance.now(), dt = Math.min(100, now - (G.lastF || now)); G.lastF = now;
+    let raw = null, ny = null;
+    if (G.cam) {
+      if (landmarker && v.readyState >= 2 && v.currentTime !== lastT) {
+        lastT = v.currentTime;
+        const lm = landmarker.detectForVideo(v, now).landmarks?.[0];
+        if (lm) {
+          const vw = v.videoWidth, vh = v.videoHeight, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s, ox = (W - dw) / 2, oy = (H - dh) / 2;
+          G.lm = lm.map((q) => ({ x: ox + (1 - q.x) * dw, y: oy + q.y * dh })); ny = lm[9].y; G.seenAt = now;
+        } else if (now - (G.seenAt || 0) > 400) G.lm = null; // keep the last hand for a moment when tracking flickers
+      }
+      if (G.lm) { ctx.fillStyle = "rgba(255,255,255,.75)"; G.lm.forEach((m) => { ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, 7); ctx.fill(); }); raw = G.lm[8]; }
+    } else if (G.ptr) { raw = G.ptr; ny = G.ptr.ny; }
+    // smooth the fingertip so small shakes do not move the pointer off a card
+    if (raw) { const A = G.cam ? 0.3 : 1; G.sm = G.sm ? { x: G.sm.x + (raw.x - G.sm.x) * A, y: G.sm.y + (raw.y - G.sm.y) * A } : { x: raw.x, y: raw.y }; } else G.sm = null;
+    const p = G.sm;
+    if (G.pound && G.cam && !G.busy && ny != null) poundStep(ny);
     cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
-    // hover + dwell
-    let hit = null;
-    if (p && !G.pound && !G.busy) { const sr = st.getBoundingClientRect(); G.lockHit = false; for (const c of G.cards) { const r = c.getBoundingClientRect(); if (p.x >= r.left - sr.left && p.x <= r.right - sr.left && p.y >= r.top - sr.top && p.y <= r.bottom - sr.top) { if (G.lock) G.lockHit = true; hit = c; break; } } }
-    if (G.lock) { if (hit) hit = null; else if (!G.lockHit) G.lock = false; }
-    if (hit !== G.hover) { G.hover?.classList.remove("hot"); G.hover?.style.setProperty("--p", 0); G.hover = hit; G.hoverT = performance.now(); hit?.classList.add("hot"); }
-    if (hit) { const k = Math.min(1, (performance.now() - G.hoverT) / DWELL); hit.style.setProperty("--p", k); cur.style.setProperty("--p", k); if (k >= 1) { const id = hit.dataset.id; G.hover = null; G.lock = true; G.lockHit = true; choose(id); } }
+    // hover + dwell: bigger target, sticky once hovered, short grace when the hand slips, progress pauses instead of resetting
+    let hit = null, paused = false;
+    if (p && !G.pound && !G.busy) {
+      const sr = st.getBoundingClientRect();
+      const inside = (c, pad) => { const r = c.getBoundingClientRect(); return p.x >= r.left - sr.left - pad && p.x <= r.right - sr.left + pad && p.y >= r.top - sr.top - pad && p.y <= r.bottom - sr.top + pad; };
+      if (G.hover && G.hover.isConnected && inside(G.hover, 44)) hit = G.hover;
+      else { let best = null, bd = 1e9; for (const c of G.cards) if (inside(c, 16)) { const r = c.getBoundingClientRect(), d = Math.hypot(p.x - (r.left + r.width / 2 - sr.left), p.y - (r.top + r.height / 2 - sr.top)); if (d < bd) { bd = d; best = c; } } hit = best; }
+    }
+    if (G.lock) { if (hit) hit = null; else if (p) G.lock = false; }
+    if (!hit && G.hover && G.hover.isConnected && !G.lock && !G.busy && !G.pound) { G.slip = G.slip || now; if (now - G.slip < 450) { hit = G.hover; paused = true; } } else G.slip = 0;
+    if (hit !== G.hover) { G.hover?.classList.remove("hot"); G.hover?.style.setProperty("--p", 0); G.hover = hit; G.acc = 0; if (hit) { hit.classList.add("hot"); window.PreDMMusic?.sfx("hover"); } }
+    if (hit) {
+      if (!paused) G.acc += dt;
+      const k = Math.min(1, G.acc / DWELL); hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
+      if (k >= 1) { const id = hit.dataset.id; hit.classList.remove("hot"); G.hover = null; G.acc = 0; G.lock = true; window.PreDMMusic?.sfx("pick"); choose(id); }
+    }
     else cur.style.setProperty("--p", 0);
   };
   frame();
@@ -243,7 +258,7 @@ function onClick(e) {
     if (a === "nocam") return startNoCam();
     if (a === "again") return newRound();
   }
-  const c = t(".hk-card"); if (c && !G.cam) choose(c.dataset.id); // tap also works without camera
+  const c = t(".hk-card"); if (c && !G.cam) { window.PreDMMusic?.sfx("pick"); G.lock = true; choose(c.dataset.id); } // tap also works without camera
 }
 
 document.addEventListener("click", (e) => { const g = e.target.closest("[data-handgame]"); if (!g) return; e.preventDefault(); open(g.dataset.handgame === "somtam" ? "somtam" : "plate"); });

@@ -58,14 +58,14 @@
       document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#fqModal").hidden) close(); });
       $("#fqModal").addEventListener("click", onClick);
     }
-    $("#fqModal").hidden = false; document.body.classList.add("care-open");
+    $("#fqModal").hidden = false; document.body.classList.add("care-open"); window.PreDMMusic?.start();
   }
-  function close() { $("#fqModal").hidden = true; document.body.classList.remove("care-open"); }
+  function close() { $("#fqModal").hidden = true; document.body.classList.remove("care-open"); window.PreDMMusic?.stop(); }
   function draw() {
     const box = $("#fqBox");
     if (Q.i >= Q.list.length) return result();
     const it = Q.list[Q.i], answered = Q.picked != null, right = answered && Q.picked === it.ok;
-    box.innerHTML = `<div class="fq-head"><span class="fq-av">${mascot()}</span><div><h2 id="fqTitle">เกมตู้กับข้าวทายใจ</h2><small>ข้อ ${Q.i + 1} / ${Q.list.length} · ถูก ${Q.score} ข้อ</small></div><button type="button" class="care-x" data-fq="close" aria-label="ปิดเกม">✕</button></div>
+    box.innerHTML = `<div class="fq-head"><span class="fq-av">${mascot()}</span><div><h2 id="fqTitle">เกมตู้กับข้าวทายใจ</h2><small>ข้อ ${Q.i + 1} / ${Q.list.length} · ถูก ${Q.score} ข้อ</small></div><button type="button" class="care-x fq-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><button type="button" class="care-x" data-fq="close" aria-label="ปิดเกม">✕</button></div>
       <div class="fq-prog" aria-hidden="true"><i style="width:${(Q.i / Q.list.length) * 100}%"></i></div>
       ${it.dish ? "" : `<div class="fq-pic" role="img" aria-label="ภาพประกอบคำถาม"><span>${esc(it.pic || "🍽️")}</span></div>`}
       <p class="fq-q">${esc(it.q)}</p>
@@ -86,7 +86,7 @@
     if (stars === 3) A()?.toast("ได้ 3 ดาว! เชฟสุขภาพตัวจริง 🌟");
   }
   function onClick(e) {
-    const c = e.target.closest("[data-fqc]"); if (c && Q.picked == null) { Q.picked = +c.dataset.fqc; if (Q.picked === Q.list[Q.i].ok) Q.score++; return draw(); }
+    const c = e.target.closest("[data-fqc]"); if (c && Q.picked == null) { Q.picked = +c.dataset.fqc; if (Q.picked === Q.list[Q.i].ok) { Q.score++; window.PreDMMusic?.sfx("ok"); } else window.PreDMMusic?.sfx("bad"); return draw(); }
     const b = e.target.closest("[data-fq]"); if (!b) return;
     if (b.dataset.fq === "close") return close();
     if (b.dataset.fq === "next") { Q.i++; Q.picked = null; return draw(); }

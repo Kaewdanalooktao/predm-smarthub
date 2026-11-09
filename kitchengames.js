@@ -18,10 +18,10 @@
       document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#kgModal").hidden) close(); });
       $("#kgModal").addEventListener("click", onClick);
     }
-    $("#kgModal").hidden = false; document.body.classList.add("care-open");
+    $("#kgModal").hidden = false; document.body.classList.add("care-open"); window.PreDMMusic?.start();
   }
-  function close() { $("#kgModal").hidden = true; document.body.classList.remove("care-open"); }
-  const head = (title, sub) => `<div class="fq-head"><span class="fq-av">${mascot()}</span><div><h2 id="kgTitle">${title}</h2><small>${sub}</small></div><button type="button" class="care-x" data-kg="close" aria-label="ปิดเกม">✕</button></div>`;
+  function close() { $("#kgModal").hidden = true; document.body.classList.remove("care-open"); window.PreDMMusic?.stop(); }
+  const head = (title, sub) => `<div class="fq-head"><span class="fq-av">${mascot()}</span><div><h2 id="kgTitle">${title}</h2><small>${sub}</small></div><button type="button" class="care-x fq-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><button type="button" class="care-x" data-kg="close" aria-label="ปิดเกม">✕</button></div>`;
   const stars = (n) => `<div class="fq-stars" aria-label="ได้ ${n} ดาว">${[0, 1, 2].map((k) => `<span class="${k < n ? "on" : ""}">★</span>`).join("")}</div>`;
   function best(key, v) { const b = Math.max(v, A()?.store.get(key, 0) || 0); A()?.store.set(key, b); return b; }
 
@@ -143,18 +143,18 @@
   /* ---------- events ---------- */
   function onClick(e) {
     const t = (s) => e.target.closest(s);
-    if (t("[data-kgbuy]")) { const id = +t("[data-kgbuy]").dataset.kgbuy; const left = MK.budget - MK.cart.reduce((a, i) => a + GOODS[i].price, 0); if (GOODS[id].price <= left && MK.cart.length < MK.max) MK.cart.push(id); return marketDraw(); }
+    if (t("[data-kgbuy]")) { const id = +t("[data-kgbuy]").dataset.kgbuy; const left = MK.budget - MK.cart.reduce((a, i) => a + GOODS[i].price, 0); if (GOODS[id].price <= left && MK.cart.length < MK.max) { MK.cart.push(id); window.PreDMMusic?.sfx("pick"); } return marketDraw(); }
     if (t("[data-kgstall]")) { MK.stall = t("[data-kgstall]").dataset.kgstall; return marketDraw(); }
     if (t("[data-kgout]")) { MK.cart.splice(+t("[data-kgout]").dataset.kgout, 1); return marketDraw(); }
-    if (t("[data-kgadd]")) { PL.picks.push(t("[data-kgadd]").dataset.kgadd); return plateDraw(); }
+    if (t("[data-kgadd]")) { PL.picks.push(t("[data-kgadd]").dataset.kgadd); window.PreDMMusic?.sfx("pick"); return plateDraw(); }
     if (t("[data-kgdel]")) { PL.picks.splice(+t("[data-kgdel]").dataset.kgdel, 1); return plateDraw(); }
     if (t("[data-kgcat]")) { PL.cat = t("[data-kgcat]").dataset.kgcat; return plateDraw(); }
     const b = t("[data-kg]"); if (!b) return;
     const a = b.dataset.kg;
     if (a === "close") return close();
-    if (a === "pay") return marketResult();
+    if (a === "pay") { window.PreDMMusic?.sfx("win"); return marketResult(); }
     if (a === "market") return marketStart();
-    if (a === "serve") return plateResult();
+    if (a === "serve") { window.PreDMMusic?.sfx("win"); return plateResult(); }
     if (a === "plate") return plateStart();
     if (a === "save") { PL.picks.forEach((k) => window.PreDMFood.add(k, 1, PL.sc.meal)); A()?.toast(`วางสำรับลงพาข้าวแล้ว ${PL.picks.length} จาน`); close(); if (location.hash !== "#food") location.hash = "food"; }
   }
