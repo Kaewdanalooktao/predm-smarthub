@@ -40,6 +40,7 @@
         <div class="hk-cards" id="arCards"></div>
         <div class="hk-fxl" id="arFx" aria-hidden="true"></div>
         <div class="hk-cursor" id="arCursor" hidden><i></i></div>
+        <div class="hk-cursor alt" id="arCursor2" hidden><i></i></div>
         <div class="hk-hud">
           <button type="button" class="hk-x" data-ar="close" aria-label="ปิด AR">✕</button>
           <span class="hk-masc" id="arMasc" aria-hidden="true"></span>
@@ -91,7 +92,7 @@
     }
   }
   function stopCam() { try { S.runner?.stop(); } catch { /* ignore */ } S.cam = false; cancelAnimationFrame(S.idle); }
-  function idleLoop() { cancelAnimationFrame(S.idle); const f = () => { S.idle = requestAnimationFrame(f); if (!S.cam) pointerStep(null); }; f(); }
+  function idleLoop() { cancelAnimationFrame(S.idle); const f = () => { S.idle = requestAnimationFrame(f); if (!S.cam) pointerStep([]); }; f(); }
 
   /* ------------------------------------------------------------ cards */
   function items() {
@@ -126,7 +127,7 @@
       else { const t = n === 1 ? 0.5 : i / (n - 1), ang = Math.PI * (1.05 - 1.1 * t); x = 50 + Math.cos(ang) * 41; y = 68 - Math.sin(ang) * 48; }
       return `<div class="hk-card ar-card${c.big ? " big" : ""}" data-id="${esc(c.id)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"><span class="hk-ring"></span><span class="hk-pic">${ic(c.ic)}</span><b>${esc(c.n)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</div>`;
     }).join("");
-    S.cards = [...box.children]; S.hover = null; S.acc = 0;
+    S.cards = [...box.children]; Object.values(PTR).forEach((q) => { q.hover = null; q.acc = 0; });
     if (S.spoke !== S.phase && { mode: 1, ex: 1, target: 1, gtarget: 1 }[S.phase]) { S.spoke = S.phase; speak({ mode: "ar_mode", ex: "ar_ex", target: "ar_target", gtarget: "ar_target" }[S.phase]); }
     if (S.phase === "mode") say(S.cam ? "ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก (หรือแตะด้วยเมาส์/นิ้วบนจอ)" : "แตะการ์ดเพื่อเลือกโหมด");
   }
@@ -150,7 +151,7 @@
   function stopCard() {
     $("#arStopBtn").hidden = false;
     $("#arCards").innerHTML = `<div class="hk-card ar-card ar-stop" data-id="stop" style="left:10%;top:24%"><span class="hk-ring"></span><span class="hk-pic">${ic("stop_sign")}</span><b>หยุด</b><small>ชี้ค้าง 2 วินาที</small></div>`;
-    S.cards = [...$("#arCards").children]; S.hover = null; S.acc = 0; S.lock = false; // stop card is far from the old cards and needs a long hold
+    S.cards = [...$("#arCards").children]; Object.values(PTR).forEach((q) => { q.hover = null; q.acc = 0; q.lock = false; }); // stop card is far from the old cards and needs a long hold
   }
   function countdown(go) {
     let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak("ready"); $("#arStopBtn").hidden = false;
@@ -221,7 +222,7 @@
         if (!r.running) finishGame();
       }
     } else if (hands && hands.length) window.PreDMTrack.drawHands(ctx, hands, w, h);
-    pointerStep(fingertip(lms, hands, w, h));
+    pointerStep(fingertips(lms, hands));
   }
   function T_drawLight(ctx, hands, w, h) { ctx.fillStyle = "rgba(255,255,255,.8)"; hands.forEach((hd) => hd.pts.forEach((q) => { ctx.beginPath(); ctx.arc(q.x * w, q.y * h, 3.5, 0, 7); ctx.fill(); })); }
   // map a normalised point on the camera canvas to screen pixels (canvas is shown with object-fit: cover)
@@ -229,31 +230,45 @@
     const c = $("#arCanvas"), st = $("#arStage"), W = st.clientWidth, H = st.clientHeight, vw = c.width, vh = c.height, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s;
     return { x: (W - dw) / 2 + q.x * dw, y: (H - dh) / 2 + q.y * dh };
   }
-  function fingertip(lms, hands, w, h) {
-    if (hands && hands.length) { const hd = hands.reduce((a, b) => (b.pts[8].y < a.pts[8].y ? b : a)); return toScreen(hd.pts[8]); } // the higher hand points
-    if (lms && S.phase === "train") { const L = lms[19], R = lms[20], q = (L?.v ?? 0) > (R?.v ?? 0) ? L : R; if (q && q.v > 0.5) return toScreen(q); } // during training: pose finger landmark
-    return null;
+  // every visible hand points (both hands work); during training the pose's finger points stand in for hands
+  function fingertips(lms, hands) {
+    if (hands && hands.length) {
+      const out = hands.slice(0, 2).map((hd) => ({ key: hd.side || "L", p: toScreen(hd.pts[8]) }));
+      if (out.length === 2 && out[0].key === out[1].key) out[1].key = out[0].key === "L" ? "R" : "L";
+      return out;
+    }
+    if (lms && S.phase !== "mode" && S.phase !== "ex") return [[19, "L"], [20, "R"]].filter(([i]) => lms[i] && lms[i].v > 0.5).map(([i, key]) => ({ key, p: toScreen(lms[i]) }));
+    return [];
   }
-  function pointerStep(raw) {
+  /* each hand (and the mouse) has its own cursor, smoothing and dwell timer */
+  const PTR = {}; const ptr = (k) => (PTR[k] = PTR[k] || { sm: null, hover: null, acc: 0, slip: 0, lock: false });
+  function lockAll() { Object.values(PTR).forEach((q) => { q.lock = true; q.hover?.classList.remove("hot"); q.hover = null; q.acc = 0; }); }
+  function pointerStep(list) {
     const now = performance.now(), dt = Math.min(300, now - (S.lastF || now)); S.lastF = now;
-    if (!raw && S.ptr && now - S.ptr.t < 4000) raw = S.ptr; // mouse / touch when no hand is seen
-    if (raw) S.sm = S.sm ? { x: S.sm.x + (raw.x - S.sm.x) * 0.35, y: S.sm.y + (raw.y - S.sm.y) * 0.35 } : { x: raw.x, y: raw.y }; else S.sm = null;
-    const p = S.sm, cur = $("#arCursor"); cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
+    if (!list.length && S.ptr && now - S.ptr.t < 4000) list = [{ key: "m", p: S.ptr }]; // mouse / touch when no hand is seen
+    const live = new Set(list.map((r) => r.key)), curs = [$("#arCursor"), $("#arCursor2")]; let ci = 0;
+    Object.entries(PTR).forEach(([k, q]) => { if (!live.has(k)) q.sm = null; });
+    list.slice(0, 2).forEach(({ key, p: raw }) => { const q = ptr(key); q.sm = q.sm ? { x: q.sm.x + (raw.x - q.sm.x) * 0.35, y: q.sm.y + (raw.y - q.sm.y) * 0.35 } : { x: raw.x, y: raw.y }; stepOne(q, q.sm, dt, now, curs[ci++]); });
+    Object.entries(PTR).forEach(([k, q]) => { if (!live.has(k) && q.hover) stepOne(q, null, dt, now, curs[Math.min(ci, 1)]); }); // grace period for a hand that just dropped out
+    for (; ci < 2; ci++) curs[ci].hidden = true;
+  }
+  function stepOne(q, p, dt, now, cur) {
+    cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
     let hit = null, paused = false;
     if (p && S.cards.length && S.phase !== "count") {
       const sr = $("#arStage").getBoundingClientRect();
       const inside = (c, pad) => { const r = c.getBoundingClientRect(); return p.x >= r.left - sr.left - pad && p.x <= r.right - sr.left + pad && p.y >= r.top - sr.top - pad && p.y <= r.bottom - sr.top + pad; };
-      if (S.hover && S.hover.isConnected && inside(S.hover, 40)) hit = S.hover;
+      if (q.hover && q.hover.isConnected && inside(q.hover, 40)) hit = q.hover;
       else for (const c of S.cards) if (inside(c, 14)) { hit = c; break; }
     }
-    if (S.lock) { if (hit) hit = null; else if (p) S.lock = false; }
-    if (!hit && S.hover && S.hover.isConnected && !S.lock) { S.slip = S.slip || now; if (now - S.slip < 450) { hit = S.hover; paused = true; } } else S.slip = 0;
-    if (hit !== S.hover) { S.hover?.classList.remove("hot"); S.hover?.style.setProperty("--p", 0); S.hover = hit; S.acc = 0; if (hit) { hit.classList.add("hot"); M()?.sfx("hover"); } }
+    if (q.lock) { if (hit) hit = null; else if (p) q.lock = false; }
+    if (!hit && q.hover && q.hover.isConnected && !q.lock) { q.slip = q.slip || now; if (now - q.slip < 450) { hit = q.hover; paused = true; } } else q.slip = 0;
+    if (hit !== q.hover) { q.hover?.classList.remove("hot"); q.hover?.style.setProperty("--p", 0); q.hover = hit; q.acc = 0; if (hit) { hit.classList.add("hot"); M()?.sfx("hover"); } }
     if (hit) {
-      if (!paused) S.acc += dt;
-      const need = hit.dataset.id === "stop" ? STOP_DWELL : DWELL, k = Math.min(1, S.acc / need);
+      if (!paused) q.acc += dt;
+      const need = hit.dataset.id === "stop" ? STOP_DWELL : DWELL, k = Math.min(1, q.acc / need);
       hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
-      if (k >= 1) { const id = hit.dataset.id; S.hover = null; S.acc = 0; S.lock = true; if (id === "stop") stopNow(); else choose(id, hit); }
+      if (k >= 1) { const id = hit.dataset.id; hit.classList.remove("hot"); lockAll(); if (id === "stop") stopNow(); else choose(id, hit); }
     } else cur.style.setProperty("--p", 0);
   }
 
@@ -280,7 +295,7 @@
     const b = e.target.closest("[data-ar]"); if (b && b.dataset.ar === "close") return close();
     if (b && b.dataset.ar === "stop") return stopNow();
     const c = e.target.closest(".hk-card"); if (!c) return;
-    S.lock = true; if (c.dataset.id === "stop") return stopNow();
+    lockAll(); if (c.dataset.id === "stop") return stopNow();
     choose(c.dataset.id, c);
   }
   document.addEventListener("click", (e) => { if (e.target.closest("[data-arfit]")) { e.preventDefault(); open(); } });

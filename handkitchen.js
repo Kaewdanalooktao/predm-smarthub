@@ -26,7 +26,7 @@ function drawHand(ctx, P) {
 async function getLandmarker() {
   if (landmarker) return landmarker;
   const fs = await FilesetResolver.forVisionTasks(WASM);
-  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numHands: 1, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
   try { landmarker = await HandLandmarker.createFromOptions(fs, opts("GPU")); } catch { landmarker = await HandLandmarker.createFromOptions(fs, opts("CPU")); }
   return landmarker;
 }
@@ -85,6 +85,7 @@ function shell() {
       <canvas id="hkCanvas"></canvas>
       <div class="hk-cards" id="hkCards"></div>
       <div class="hk-cursor" id="hkCursor" hidden><i></i></div>
+      <div class="hk-cursor alt" id="hkCursor2" hidden><i></i></div>
       <div class="hk-hud">
         <button type="button" class="hk-x" data-hk="close" aria-label="ปิดเกม">✕</button>
         <span class="hk-masc" id="hkMasc" aria-hidden="true"></span><div class="hk-title"><b id="hkTitle">ครัวแตะมือ</b><span id="hkSay">ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก</span></div>
@@ -193,7 +194,7 @@ function layout() {
     else { const t = n === 1 ? 0.5 : i / (n - 1), ang = Math.PI * (lifted ? 1 - t : 1.05 - 1.1 * t); x = 50 + Math.cos(ang) * 41; y = (lifted ? 60 : 66) - Math.sin(ang) * (lifted ? 40 : 46); }
     return `<div class="hk-card${c.big ? " big" : ""}${c.cls ? " " + c.cls : ""}" data-id="${esc(c.id)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"><span class="hk-ring"></span>${c.badge ? `<em class="hk-badge">${c.badge}</em>` : ""}<span class="hk-pic">${img(c.e, c.key)}</span><b>${esc(c.n)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</div>`;
   }).join("");
-  G.cards = [...box.children]; G.hover = null;
+  G.cards = [...box.children]; Object.values(PTR).forEach((q) => { q.hover = null; q.acc = 0; });
   tray();
 }
 function tray() {
@@ -356,9 +357,32 @@ function confetti() {
 }
 
 /* ------------------------------------------------------------------ main loop */
+/* ---------- pointers: each hand (and the mouse) has its own cursor, smoothing and dwell timer; either hand can pick ---------- */
+const PTR = {}; // key "L" | "R" | "m" -> { sm, hover, acc, slip, lock, seen }
+const ptr = (k) => (PTR[k] = PTR[k] || { sm: null, hover: null, acc: 0, slip: 0, lock: false });
+function lockAll() { Object.values(PTR).forEach((q) => { q.lock = true; q.hover?.classList.remove("hot"); q.hover = null; q.acc = 0; }); }
+function stepPointer(q, p, dt, now, cur) {
+  const st = $("#hkStage");
+  cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
+  let hit = null, paused = false;
+  if (p && !G.pound && !G.busy) {
+    const sr = st.getBoundingClientRect();
+    const inside = (c, pad) => { const r = c.getBoundingClientRect(); return p.x >= r.left - sr.left - pad && p.x <= r.right - sr.left + pad && p.y >= r.top - sr.top - pad && p.y <= r.bottom - sr.top + pad; };
+    if (q.hover && q.hover.isConnected && inside(q.hover, 44)) hit = q.hover;
+    else { let best = null, bd = 1e9; for (const c of G.cards) if (inside(c, 16)) { const r = c.getBoundingClientRect(), d = Math.hypot(p.x - (r.left + r.width / 2 - sr.left), p.y - (r.top + r.height / 2 - sr.top)); if (d < bd) { bd = d; best = c; } } hit = best; }
+  }
+  if (q.lock) { if (hit) hit = null; else if (p) q.lock = false; }
+  if (!hit && q.hover && q.hover.isConnected && !q.lock && !G.busy && !G.pound) { q.slip = q.slip || now; if (now - q.slip < 450) { hit = q.hover; paused = true; } } else q.slip = 0;
+  if (hit !== q.hover) { q.hover?.classList.remove("hot"); q.hover?.style.setProperty("--p", 0); q.hover = hit; q.acc = 0; if (hit) { hit.classList.add("hot"); window.PreDMMusic?.sfx("hover"); } }
+  if (hit) {
+    if (!paused) q.acc += dt;
+    const k = Math.min(1, q.acc / DWELL); hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
+    if (k >= 1) { const id = hit.dataset.id; hit.classList.remove("hot"); lockAll(); window.PreDMMusic?.sfx("pick"); choose(id, hit); }
+  } else cur.style.setProperty("--p", 0);
+}
 function loop() {
   cancelAnimationFrame(G.raf);
-  const v = $("#hkVideo"), cv = $("#hkCanvas"), st = $("#hkStage"), cur = $("#hkCursor");
+  const v = $("#hkVideo"), cv = $("#hkCanvas"), st = $("#hkStage"), curs = [$("#hkCursor"), $("#hkCursor2")];
   let lastT = -1;
   const frame = () => {
     G.raf = requestAnimationFrame(frame);
@@ -366,40 +390,30 @@ function loop() {
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, W, H);
     const now = performance.now(), dt = Math.min(300, now - (G.lastF || now)); G.lastF = now;
-    let raw = null, ny = null;
+    let ny = null; const raws = []; // [{key, p}]
     if (G.cam) {
       if (landmarker && v.readyState >= 2 && v.currentTime !== lastT) {
         lastT = v.currentTime;
-        const lm = landmarker.detectForVideo(v, now).landmarks?.[0];
-        if (lm) {
+        const res = landmarker.detectForVideo(v, now), all = res.landmarks || [], hd = res.handedness || res.handednesses || [];
+        if (all.length) {
           const vw = v.videoWidth, vh = v.videoHeight, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s, ox = (W - dw) / 2, oy = (H - dh) / 2;
-          G.lm = lm.map((q) => ({ x: ox + (1 - q.x) * dw, y: oy + q.y * dh })); ny = lm[9].y; G.seenAt = now;
-        } else if (now - (G.seenAt || 0) > 400) G.lm = null; // keep the last hand for a moment when tracking flickers
+          // the camera picture is mirrored on screen, so MediaPipe's "Left" is the player's right hand
+          G.hands = all.map((lm, i) => ({ key: hd[i]?.[0]?.categoryName === "Left" ? "R" : "L", pts: lm.map((q) => ({ x: ox + (1 - q.x) * dw, y: oy + q.y * dh })), ny: lm[9].y }));
+          if (G.hands.length === 2 && G.hands[0].key === G.hands[1].key) G.hands[1].key = G.hands[0].key === "L" ? "R" : "L";
+          G.seenAt = now; ny = Math.min(...G.hands.map((h) => h.ny)); // pounding: the higher hand leads
+        } else if (now - (G.seenAt || 0) > 400) G.hands = null; // keep the last hands for a moment when tracking flickers
       }
-      if (G.lm) { drawHand(ctx, G.lm); raw = G.lm[8]; }
-    } else if (G.ptr) { raw = G.ptr; ny = G.ptr.ny; }
-    // smooth the fingertip so small shakes do not move the pointer off a card
-    if (raw) { const A = G.cam ? 0.3 : 1; G.sm = G.sm ? { x: G.sm.x + (raw.x - G.sm.x) * A, y: G.sm.y + (raw.y - G.sm.y) * A } : { x: raw.x, y: raw.y }; } else G.sm = null;
-    const p = G.sm;
+      (G.hands || []).forEach((h) => { drawHand(ctx, h.pts); raws.push({ key: h.key, p: h.pts[8] }); });
+    } else if (G.ptr) { raws.push({ key: "m", p: G.ptr }); ny = G.ptr.ny; }
     if (G.pound && G.cam && !G.busy && ny != null) poundStep(ny);
-    cur.hidden = !p; if (p) cur.style.transform = `translate(${p.x}px,${p.y}px)`;
-    // hover + dwell: bigger target, sticky once hovered, short grace when the hand slips, progress pauses instead of resetting
-    let hit = null, paused = false;
-    if (p && !G.pound && !G.busy) {
-      const sr = st.getBoundingClientRect();
-      const inside = (c, pad) => { const r = c.getBoundingClientRect(); return p.x >= r.left - sr.left - pad && p.x <= r.right - sr.left + pad && p.y >= r.top - sr.top - pad && p.y <= r.bottom - sr.top + pad; };
-      if (G.hover && G.hover.isConnected && inside(G.hover, 44)) hit = G.hover;
-      else { let best = null, bd = 1e9; for (const c of G.cards) if (inside(c, 16)) { const r = c.getBoundingClientRect(), d = Math.hypot(p.x - (r.left + r.width / 2 - sr.left), p.y - (r.top + r.height / 2 - sr.top)); if (d < bd) { bd = d; best = c; } } hit = best; }
-    }
-    if (G.lock) { if (hit) hit = null; else if (p) G.lock = false; }
-    if (!hit && G.hover && G.hover.isConnected && !G.lock && !G.busy && !G.pound) { G.slip = G.slip || now; if (now - G.slip < 450) { hit = G.hover; paused = true; } } else G.slip = 0;
-    if (hit !== G.hover) { G.hover?.classList.remove("hot"); G.hover?.style.setProperty("--p", 0); G.hover = hit; G.acc = 0; if (hit) { hit.classList.add("hot"); window.PreDMMusic?.sfx("hover"); } }
-    if (hit) {
-      if (!paused) G.acc += dt;
-      const k = Math.min(1, G.acc / DWELL); hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
-      if (k >= 1) { const id = hit.dataset.id; hit.classList.remove("hot"); G.hover = null; G.acc = 0; G.lock = true; window.PreDMMusic?.sfx("pick"); choose(id, hit); }
-    }
-    else cur.style.setProperty("--p", 0);
+    // smooth each fingertip so small shakes do not move its pointer off a card
+    const A = G.cam ? 0.3 : 1, live = new Set(raws.map((r) => r.key));
+    Object.entries(PTR).forEach(([k, q]) => { if (!live.has(k)) { q.sm = null; } });
+    let ci = 0;
+    raws.slice(0, 2).forEach(({ key, p: raw }) => { const q = ptr(key); q.sm = q.sm ? { x: q.sm.x + (raw.x - q.sm.x) * A, y: q.sm.y + (raw.y - q.sm.y) * A } : { x: raw.x, y: raw.y }; stepPointer(q, q.sm, dt, now, curs[ci++]); });
+    // pointers that vanished still get their grace period; hide unused cursors
+    Object.entries(PTR).forEach(([k, q]) => { if (!live.has(k) && q.hover) stepPointer(q, null, dt, now, curs[Math.min(ci, 1)]); });
+    for (; ci < 2; ci++) curs[ci].hidden = true;
   };
   frame();
 }
@@ -415,7 +429,7 @@ function onClick(e) {
     if (a === "again") return newRound();
     if (a === "cook") { const r = G.mk.recipe; if (r && window.PreDMFood?.add && window.PreDMFood.DB.some((d) => d.key === r.key)) { window.PreDMFood.add(r.key, 1, "d"); window.PreDM?.toast(`วาง “${r.n}” ลงพาข้าวมื้อเย็นวันนี้แล้ว`); } close(); if (location.hash !== "#food") location.hash = "food"; return; }
   }
-  const c = t(".hk-card"); if (c && !G.cam) { window.PreDMMusic?.sfx("pick"); G.lock = true; choose(c.dataset.id, c); } // tap also works without camera
+  const c = t(".hk-card"); if (c && !G.cam) { window.PreDMMusic?.sfx("pick"); lockAll(); choose(c.dataset.id, c); } // tap also works without camera
 }
 
 document.addEventListener("click", (e) => { const g = e.target.closest("[data-handgame]"); if (!g) return; e.preventDefault(); open(["somtam", "market"].includes(g.dataset.handgame) ? g.dataset.handgame : "plate"); });

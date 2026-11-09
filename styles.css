@@ -1875,3 +1875,5 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 /* AR stop button: always tappable while counting down / training / playing */
 .ar-stopbtn { all: unset; cursor: pointer; flex: none; padding: 10px 18px; border-radius: 99px; background: #e53935; color: #fff; font-weight: 800; font-size: 1rem; box-shadow: 0 6px 16px rgba(229, 57, 53, .45); }
 .ar-stopbtn:hover { background: #c62828; } .ar-stopbtn:focus-visible { outline: 3px solid #ffd23f; outline-offset: 2px; }
+/* second hand's cursor: blue ring so the two hands are easy to tell apart */
+.hk-cursor.alt i { border-color: #8fd3ff; background: conic-gradient(rgba(91, 192, 255, .95) calc(var(--p) * 360deg), rgba(255, 255, 255, .25) 0); box-shadow: 0 0 0 3px rgba(0, 0, 0, .25), 0 0 18px rgba(91, 192, 255, .7); }
