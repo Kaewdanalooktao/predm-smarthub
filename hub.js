@@ -140,7 +140,7 @@
   const CALL = { active: false };
   async function loadPeer() {
     if (window.Peer) return;
-    await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"; s.onload = res; s.onerror = () => rej(new Error("โหลดระบบวิดีโอคอลไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(s); });
+    await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "vendor/peerjs.min.js"; s.onload = res; s.onerror = () => rej(new Error("โหลดระบบวิดีโอคอลไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(s); });
   }
   function placeholderStream(label) {
     const c = document.createElement("canvas"); c.width = 640; c.height = 480; const x = c.getContext("2d");

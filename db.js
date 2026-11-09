@@ -20,6 +20,7 @@
   // AI calls: signed-in real accounts go through the Edge Function "ai" (server-side Gemini key + daily quota);
   // demo/local users call Gemini directly with their own key. Returns { ok, status, json, code, limit, cloud }.
   async function aiCall(task, model, request, key) {
+    if (CFG.externalAI === false) return { ok: false, status: 0, json: {}, code: "off" }; // privacy mode: nothing leaves the device
     if (D.user && D.sb) {
       const { data, error } = await D.sb.functions.invoke("ai", { body: { task, model, request } });
       if (!error) return { ok: true, status: 200, json: data, cloud: true };
@@ -32,13 +33,13 @@
       return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
     } catch { return { ok: false, status: 0, json: {}, code: "network" }; }
   }
-  const CLOUD_AI_MSG = { quota: (r) => `วันนี้ใช้ AI ครบ ${r.limit || ""} ครั้งแล้ว ลองใหม่พรุ่งนี้`, config: () => "ระบบยังไม่ได้ตั้งค่า AI (ผู้ดูแลต้องตั้ง GEMINI_API_KEY ใน Supabase)", missing: () => "ยังไม่ได้ติดตั้งบริการ AI บนเซิร์ฟเวอร์ (Edge Function \"ai\")", auth: () => "กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่", network: () => "เชื่อมต่อบริการ AI ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่", upstream: (r) => `Gemini ตอบกลับข้อผิดพลาด: ${r.json?.error?.message || ""}`, bad: (r) => `คำขอไม่ถูกต้อง: ${r.json?.error?.message || ""}` };
+  const CLOUD_AI_MSG = { off: () => "ปิดการส่งรูปไปยังบริการ AI ภายนอกไว้เพื่อความเป็นส่วนตัว", quota: (r) => `วันนี้ใช้ AI ครบ ${r.limit || ""} ครั้งแล้ว ลองใหม่พรุ่งนี้`, config: () => "ระบบยังไม่ได้ตั้งค่า AI (ผู้ดูแลต้องตั้ง GEMINI_API_KEY ใน Supabase)", missing: () => "ยังไม่ได้ติดตั้งบริการ AI บนเซิร์ฟเวอร์ (Edge Function \"ai\")", auth: () => "กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่", network: () => "เชื่อมต่อบริการ AI ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่", upstream: (r) => `Gemini ตอบกลับข้อผิดพลาด: ${r.json?.error?.message || ""}`, bad: (r) => `คำขอไม่ถูกต้อง: ${r.json?.error?.message || ""}` };
   window.PreDMAI = { call: aiCall, get cloud() { return !!D.user; }, cloudError: (r) => (CLOUD_AI_MSG[r.code] ? CLOUD_AI_MSG[r.code](r) : null) };
   if (!CFG.supabaseUrl || !CFG.supabaseAnonKey) { setStatus("local"); window.PreDMDB = { enabled: false }; return; }
 
   function loadLib() {
     if (window.supabase?.createClient) return Promise.resolve();
-    return new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"; s.onload = res; s.onerror = () => rej(new Error("load")); document.head.appendChild(s); });
+    return new Promise((res, rej) => { const s = document.createElement("script"); s.src = "vendor/supabase.js"; s.onload = res; s.onerror = () => rej(new Error("load")); document.head.appendChild(s); });
   }
 
   /* ---------- push (debounced, retried) ---------- */

@@ -1,29 +1,30 @@
 // MediaPipe Pose + Hand: AI exercise tracking + camera games. Runs fully in the browser.
-import { PoseLandmarker, HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+import { PoseLandmarker, HandLandmarker, FilesetResolver } from "./vendor/mediapipe/vision_bundle.mjs";
 
 const $ = (s) => document.querySelector(s);
 const App = () => window.PreDM;
 const VER = "0.10.14";
-const MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+const MODEL = new URL("vendor/models/pose_landmarker_lite.task", location.href).href; // self-hosted: no request leaves our site
+const WASM = new URL("vendor/mediapipe/wasm", location.href).href;
 
 let landmarker = null;
 async function getLandmarker(msgEl) {
   if (landmarker) return landmarker;
   msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Pose…";
-  const fs = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VER}/wasm`);
+  const fs = await FilesetResolver.forVisionTasks(WASM);
   const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numPoses: 1 });
   try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU")); }
   catch { landmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU")); }
   return landmarker;
 }
 // MediaPipe Hand Landmarker (21 points per hand, up to 2 hands) — loaded only when a hand mode / overlay is used
-const HAND_MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+const HAND_MODEL = new URL("vendor/models/hand_landmarker.task", location.href).href;
 let handLm = null, handLoading = null;
 async function getHandLandmarker(msgEl) {
   if (handLm) return handLm;
   if (!handLoading) handLoading = (async () => {
     if (msgEl) msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Hand…";
-    const fs = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VER}/wasm`);
+    const fs = await FilesetResolver.forVisionTasks(WASM);
     const opts = (delegate) => ({ baseOptions: { modelAssetPath: HAND_MODEL, delegate }, runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
     try { handLm = await HandLandmarker.createFromOptions(fs, opts("GPU")); }
     catch { handLm = await HandLandmarker.createFromOptions(fs, opts("CPU")); }
@@ -565,11 +566,11 @@ window.addEventListener("predm:view", (e) => {
 initTracking(); initGame();
 
 /* ---------------- still-photo pose detection (AI Body Transformation) ---------------- */
-const MODEL_FULL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task";
+const MODEL_FULL = new URL("vendor/models/pose_landmarker_full.task", location.href).href;
 let imageLandmarker = null;
 async function getImageLandmarker() {
   if (imageLandmarker) return imageLandmarker;
-  const fs = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VER}/wasm`);
+  const fs = await FilesetResolver.forVisionTasks(WASM);
   const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL_FULL, delegate }, runningMode: "IMAGE", numPoses: 1 });
   try { imageLandmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU")); }
   catch { imageLandmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU")); }

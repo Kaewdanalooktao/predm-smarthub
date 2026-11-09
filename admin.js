@@ -204,7 +204,7 @@
   const CL = { sb: null, on: !!(CFG.supabaseUrl && CFG.supabaseAnonKey), patients: null, rx: {}, dash: null, at: null, loadingD: false, loadingP: false };
   async function cloud() {
     if (!CL.on) return null; if (CL.sb) return CL.sb;
-    if (!window.supabase?.createClient) await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"; sc.onload = res; sc.onerror = () => rej(new Error("โหลดตัวเชื่อมฐานข้อมูลไม่สำเร็จ")); document.head.appendChild(sc); });
+    if (!window.supabase?.createClient) await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "vendor/supabase.js"; sc.onload = res; sc.onerror = () => rej(new Error("โหลดตัวเชื่อมฐานข้อมูลไม่สำเร็จ")); document.head.appendChild(sc); });
     CL.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "predm.admin.auth" } });
     return CL.sb;
   }

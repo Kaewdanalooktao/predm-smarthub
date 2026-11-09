@@ -698,7 +698,7 @@
   function videoCard(v) {
     if (v.music) return `<section class="vcard music" aria-label="เพลงประกอบการออกกำลังกาย">
       <div class="vframe" id="vframe"><button type="button" class="vthumb" data-yt="${v.id}" aria-label="เปิดเพลง ${esc(v.title)}">
-        <img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"><span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlen">🎵 หมอลำ</span></button></div>
+        <span class="vthumb-ph" aria-hidden="true">${v.music ? "🎶" : "🎬"}<small>กดเล่นแล้วจึงเชื่อมต่อ YouTube</small></span><span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlen">🎵 หมอลำ</span></button></div>
       <div class="vinfo"><small class="k">🎶 เพลงประกอบการออกกำลังกาย</small><h3>${esc(v.title)}</h3>
         <p>เปิดเพลงหมอลำจังหวะสนุก แล้วทำท่าตามการ์ดด้านล่างไปทีละท่า ทุก 4 จังหวะเปลี่ยนท่า ครบชุด 7 ท่าประมาณ 10–15 นาที ทำซ้ำได้ 2 รอบ</p>
         <div class="ex-actions"><button class="btn sm primary" type="button" data-yt="${v.id}">▶ เปิดเพลง</button><button class="btn sm" type="button" data-vlog="1">บันทึกว่าฝึกครบชุดแล้ว (${v.min} นาที)</button>
@@ -706,7 +706,7 @@
         <small class="vsrc">เพลง: ${esc(v.by)}</small></div></section>`;
     return `<section class="vcard" aria-label="วิดีโอและดนตรีประกอบการฝึก">
       <div class="vframe" id="vframe"><button type="button" class="vthumb" data-yt="${v.id}" aria-label="เล่นวิดีโอ ${esc(v.title)}">
-        <img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"><span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlen">${v.min}:00</span></button></div>
+        <span class="vthumb-ph" aria-hidden="true">${v.music ? "🎶" : "🎬"}<small>กดเล่นแล้วจึงเชื่อมต่อ YouTube</small></span><span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlen">${v.min}:00</span></button></div>
       <div class="vinfo"><small class="k">🎵 วิดีโอและดนตรีประกอบการฝึก</small><h3>${esc(v.title)}</h3>
         <p>ฝึกตามวิดีโอพร้อมเพลงจังหวะสนุก ครบทุกท่าในชุด ${v.min} นาที เหมาะกับการทำต่อเนื่องเป็นแอโรบิกเบา ๆ ทำได้วันละ 1–3 รอบ</p>
         <div class="ex-actions"><button class="btn sm primary" type="button" data-yt="${v.id}">▶ ฝึกตามวิดีโอ</button><button class="btn sm" type="button" data-vlog="1">บันทึกว่าฝึกตามวิดีโอแล้ว (${v.min} นาที)</button>
@@ -1344,7 +1344,7 @@
   let tessLoading = null;
   function loadTesseract() {
     if (window.Tesseract) return Promise.resolve();
-    if (!tessLoading) tessLoading = new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; sc.onload = res; sc.onerror = () => rej(new Error("โหลดตัวอ่านข้อความไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(sc); });
+    if (!tessLoading) tessLoading = new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "vendor/tesseract/tesseract.min.js"; sc.onload = res; sc.onerror = () => rej(new Error("โหลดตัวอ่านข้อความไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต")); document.head.appendChild(sc); });
     return tessLoading;
   }
   async function readBodyPhoto(file) {
@@ -1355,7 +1355,7 @@
     $$("#bodyForm input").forEach((i) => i.classList.remove("auto"));
     try {
       await loadTesseract();
-      const { data } = await Tesseract.recognize(url, "tha+eng", { logger: (m) => { if (m.status === "recognizing text") { bar.style.width = Math.round(10 + m.progress * 90) + "%"; st.textContent = `กำลังอ่านค่าจากรูป ${Math.round(m.progress * 100)}%`; } else if (m.status) st.textContent = "กำลังเตรียม: " + m.status; } });
+      const { data } = await Tesseract.recognize(url, "tha+eng", { workerPath: new URL("vendor/tesseract/worker.min.js", location.href).href, corePath: new URL("vendor/tesseract/core", location.href).href, langPath: new URL("vendor/tesseract/lang", location.href).href, logger: (m) => { if (m.status === "recognizing text") { bar.style.width = Math.round(10 + m.progress * 90) + "%"; st.textContent = `กำลังอ่านค่าจากรูป ${Math.round(m.progress * 100)}%`; } else if (m.status) st.textContent = "กำลังเตรียม: " + m.status; } });
       const found = parseOcr(data.text);
       $("#ocrRaw").textContent = data.text.trim() || "(อ่านข้อความไม่ได้)"; $("#ocrRawBox").hidden = false;
       const names = { "#b-wt": "น้ำหนัก", "#b-fat": "ไขมัน %", "#b-muscle": "กล้ามเนื้อ", "#b-visc": "ไขมันช่องท้อง", "#b-bmr": "BMR", "#b-water": "น้ำในร่างกาย", "#b-bone": "มวลกระดูก", "#b-mage": "อายุร่างกาย", "#b-ht": "ส่วนสูง", "#b-waist": "รอบเอว" };
@@ -1751,6 +1751,9 @@ Return only the edited image.`;
     const m0 = store.get("geminiModel", null); if (m0 && [...$("#tf-model").options].some((o) => o.value === m0)) $("#tf-model").value = m0;
     const setEngine = (en) => { $$("#tfEngine [data-engine]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.engine === en))); $("#tfAiBox").hidden = en !== "ai"; store.set("tfEngine", en); };
     setEngine(store.get("tfEngine", "ai"));
+    // privacy mode (config.js loads after this file, so apply once the page has parsed)
+    const privacy = () => { if (window.PREDM_CONFIG?.externalAI !== false || $(".privacy-note")) return; $("#tfEngine [data-engine='ai']").hidden = true; $("#tfEngine").insertAdjacentHTML("afterend", `<p class="hint privacy-note">🔒 โหมดความเป็นส่วนตัว: รูปของคุณประมวลผลในเครื่องนี้เท่านั้น ไม่ส่งออกไปภายนอก</p>`); setEngine("local"); };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", privacy); else privacy();
     $("#tfEngine").addEventListener("click", (e) => { const b = e.target.closest("[data-engine]"); if (b) setEngine(b.dataset.engine); });
     $("#tf-remember").addEventListener("change", (e) => { if (!e.target.checked) store.set("geminiKey", null); });
     $("#tf-showpts").addEventListener("change", tfPaint);

@@ -1655,3 +1655,9 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 .fq-pic span { position: relative; z-index: 1; font-size: clamp(2.2rem, 7vw, 3.2rem); line-height: 1.15; text-align: center; letter-spacing: 2px; filter: drop-shadow(0 3px 3px rgba(80, 50, 20, .25)); margin-bottom: 14px; }
 .fq-choices.dish .fq-c { display: grid; justify-items: center; gap: 8px; }
 .fq-plate { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 3rem; background: radial-gradient(circle at 50% 40%, #fff 0 58%, #e9ecf4 60%); box-shadow: 0 6px 12px rgba(80, 50, 20, .25); }
+
+/* local video placeholder (no YouTube request until play) */
+.vthumb-ph { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; font-size: 3rem; background: linear-gradient(135deg, #2f4aa0, #7b5cff); color: #fff; }
+.vthumb-ph small { font-size: .74rem; opacity: .85; }
+.privacy-note { color: #2f8a4a; font-weight: 600; }
+.seg [hidden] { display: none !important; }

@@ -205,7 +205,7 @@
     const pick = F.pick && byKey[F.pick];
     return `<div class="fd-modal" role="dialog" aria-modal="true" aria-label="หยิบกับข้าวจากตู้ใส่${meal[1]}"><div class="fd-sheet card kitchen">
       <div class="fd-sheet-h"><h2>${meal[2]} หยิบกับข้าวใส่${meal[0] === "s" ? "ถาดของว่าง" : "พาข้าว" + meal[1]}</h2><button type="button" class="icon-btn" data-close aria-label="ปิด">✕</button></div>
-      <div class="seg fd-mode" role="tablist"><button type="button" role="tab" aria-selected="${!F.ai}" data-mode="search">🗄️ หยิบจากตู้กับข้าว</button><button type="button" role="tab" aria-selected="${!!F.ai}" data-mode="photo">📷 ถ่ายรูปพาข้าว</button></div>
+      <div class="seg fd-mode" role="tablist"><button type="button" role="tab" aria-selected="${!F.ai}" data-mode="search">🗄️ หยิบจากตู้กับข้าว</button>${window.PREDM_CONFIG?.externalAI === false ? "" : `<button type="button" role="tab" aria-selected="${!!F.ai}" data-mode="photo">📷 ถ่ายรูปพาข้าว</button>`}</div>
       ${F.ai ? photoPane() : `
         <div class="cup">
           <div class="cup-top"><span class="cup-name">🗄️ ตู้กับข้าว</span><input class="fd-search" id="fdQ" placeholder="ค้นหา เช่น ตำ ลาบ ข้าวเหนียว แจ่ว" value="${esc(F.q)}" aria-label="ค้นหาเมนูในตู้กับข้าว"></div>
