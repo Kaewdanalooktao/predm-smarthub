@@ -8,6 +8,6 @@
   const strip = (e) => String(e || "").replace(/\uFE0F/g, "");
   const NORM = Object.fromEntries(Object.entries(MAP).map(([k, v]) => [strip(k), v]));
   function src(e, key) { if (key && DISH[key]) return "vendor/food3d/" + DISH[key]; const n = NORM[strip(e)]; return n ? `vendor/food3d/${n}.webp` : ""; }
-  window.FI = function (e, key, cls) { const s = src(e, key); return s ? `<img class="fi${cls ? " " + cls : ""}" src="${s}" alt="" draggable="false" loading="lazy" decoding="async">` : `<span class="fi-e">${e || "🍽️"}</span>`; };
+  window.FI = function (e, key, cls) { const s = src(e, key); return s ? `<img class="fi${cls ? " " + cls : ""}" src="${s}" alt="" draggable="false" decoding="async">` : `<span class="fi-e">${e || "🍽️"}</span>`; };
   window.FI.src = src;
 })();

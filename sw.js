@@ -2,7 +2,7 @@
    Pages: network first (always fresh when online, cached copy when offline).
    Same-origin files (js/css/images, versioned with ?v=): cache first, refreshed in the background.
    Other origins (Supabase, CDNs, YouTube, Gemini) are never cached here. Bump VERSION on each deploy. */
-const VERSION = "predm-v10";
+const VERSION = "predm-v11";
 const SHELL = ["index.html", "manual.html", "styles.css", "manifest.webmanifest", "icon-192.png", "icon-512.png", "vendor/fonts/fonts.css", "vendor/chart.umd.min.js"];
 
 self.addEventListener("install", (e) => {

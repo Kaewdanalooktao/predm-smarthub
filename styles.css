@@ -1765,3 +1765,65 @@ body.in-kitchen #view-food .fd-score.good { background: #dff2e3; }
 .hk-mu { flex: none; }
 .pl-shelf { flex-wrap: wrap; justify-content: center; max-height: min(34vh, 300px); overflow-y: auto; overflow-x: hidden; }
 .pl-cats { flex-wrap: wrap; }
+
+/* ---------- bigger food pictures ---------- */
+.cup-plate { width: 74px; height: 74px; } .cup-plate .fi { width: 58px; height: 58px; }
+.cup-dish { min-width: 104px; }
+.fd-e { width: 52px; } .fd-e .fi { width: 48px; height: 48px; }
+.fq-plate { width: 124px; height: 124px; } .fq-plate .fi { width: 94px; height: 94px; }
+.mk-item { width: 118px; } .mk-e .fi { width: 74px; height: 74px; } .mk-in { width: 52px; height: 52px; } .mk-in .fi { width: 42px; height: 42px; }
+.pa-dish i .fi { width: 2.3em; height: 2.3em; }
+.fi-sm { width: 1.8em; height: 1.8em; }
+.hk-card { width: clamp(118px, 14vw, 168px); padding: 12px 8px 10px; }
+.hk-card .hk-pic .fi { width: clamp(76px, 9vw, 112px); height: clamp(76px, 9vw, 112px); }
+.hk-card b { font-size: .86rem; }
+.hk-card.big { width: clamp(130px, 16vw, 180px); }
+.hk-chip .fi { width: 46px; height: 46px; }
+@media (max-width: 760px) { .hk-card { width: 29vw; max-width: 132px; padding: 8px 4px; } .hk-card .hk-pic .fi { width: 64px; height: 64px; } .hk-card b { font-size: .74rem; } .hk-card small { font-size: .62rem; } }
+@media (max-width: 560px) { .cup-plate { width: 64px; height: 64px; } .cup-plate .fi { width: 50px; height: 50px; } .mk-item { width: 98px; } .mk-e .fi { width: 60px; height: 60px; } }
+
+/* ---------- ตลาดแตะมือ ---------- */
+.hk-bg.market { background: linear-gradient(180deg, #2a160a 0, #4a2a14 60%, #6b3f1d 100%); }
+.hk-bg.market::before { content: ""; position: absolute; left: 0; right: 0; top: 64px; height: 46px; background: repeating-linear-gradient(90deg, #e8553f 0 60px, #fff3e0 60px 120px); clip-path: polygon(0 0, 100% 0, 100% 70%, 97.5% 100%, 95% 70%, 92.5% 100%, 90% 70%, 87.5% 100%, 85% 70%, 82.5% 100%, 80% 70%, 77.5% 100%, 75% 70%, 72.5% 100%, 70% 70%, 67.5% 100%, 65% 70%, 62.5% 100%, 60% 70%, 57.5% 100%, 55% 70%, 52.5% 100%, 50% 70%, 47.5% 100%, 45% 70%, 42.5% 100%, 40% 70%, 37.5% 100%, 35% 70%, 32.5% 100%, 30% 70%, 27.5% 100%, 25% 70%, 22.5% 100%, 20% 70%, 17.5% 100%, 15% 70%, 12.5% 100%, 10% 70%, 7.5% 100%, 5% 70%, 2.5% 100%, 0 70%); opacity: .9; }
+.hk-stage.cam .hk-bg.market::before { opacity: .75; }
+.hk-card.need { box-shadow: 0 0 0 4px #ffd23f, 0 10px 26px rgba(0, 0, 0, .35); }
+.hk-card.in { background: rgba(220, 245, 226, .95); } .hk-card.in .hk-pic { opacity: .7; }
+.hk-badge { position: absolute; top: -10px; right: -8px; min-width: 30px; height: 30px; border-radius: 99px; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 1rem; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.hk-card.in .hk-badge { background: #2f8a4a; color: #fff; font-weight: 800; }
+.hk-card.shake { animation: hkShake .4s; } @keyframes hkShake { 25% { transform: translate(-56%, -50%); } 50% { transform: translate(-44%, -50%); } 75% { transform: translate(-53%, -50%); } }
+.hk-list { position: absolute; left: 12px; top: 120px; z-index: 4; width: 190px; max-height: calc(100% - 220px); overflow: auto; background: rgba(255, 250, 240, .95); color: #3a2414; border-radius: 18px; padding: 10px 12px; box-shadow: 0 8px 22px rgba(0, 0, 0, .35); font-size: .82rem; }
+.hk-list ul { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 3px; }
+.hk-list li { display: flex; align-items: center; gap: 6px; } .hk-list li .fi { width: 28px; height: 28px; }
+.hk-list li.got span { text-decoration: line-through; opacity: .55; } .hk-list li.got::after { content: "✓"; margin-left: auto; color: #2f8a4a; font-weight: 800; }
+.hk-list small { opacity: .7; }
+.hk-money { font-weight: 800; color: #b25a28; margin-left: 4px; }
+.hk-tray .hk-chip .fi { width: 38px; height: 38px; }
+@media (max-width: 760px) { .hk-list { top: auto; bottom: 78px; left: 8px; right: 8px; width: auto; max-height: 64px; padding: 6px 10px; } .hk-list ul { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 2px 0; } .hk-list small, .hk-list > b { display: none; } .hk-list li .fi { width: 22px; height: 22px; } }
+@media (min-width: 761px) and (max-width: 1100px) { .hk-list { width: 160px; } }
+.hk-rbasket { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 6px 0; } .hk-rbasket .hk-chip { font-size: 1.4rem; } .hk-rbasket .hk-chip .fi { width: 40px; height: 40px; }
+.hk-chip.bad { filter: drop-shadow(0 0 4px #ff7a59); } .hk-chip.need small { color: #2f8a4a; font-weight: 700; }
+.hk-result { max-height: calc(100% - 150px); overflow: auto; } .hk-rmasc { display: block; width: 74px; margin: -6px auto 0; } .hk-rmasc svg { width: 100%; height: auto; }
+
+/* ---------- fun effects ---------- */
+.hk-fxl { position: absolute; inset: 0; pointer-events: none; z-index: 6; overflow: hidden; }
+.hk-float { position: absolute; transform: translate(-50%, -50%); font-weight: 800; font-size: 1.3rem; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .55), 0 0 12px rgba(63, 191, 106, .9); white-space: nowrap; animation: hkFloat 1s ease-out forwards; }
+.hk-float.bad { text-shadow: 0 2px 6px rgba(0, 0, 0, .55), 0 0 12px rgba(255, 122, 89, .95); }
+@keyframes hkFloat { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.6); } 20% { opacity: 1; transform: translate(-50%, -80%) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -220%) scale(1); } }
+.hk-spark { position: absolute; width: 10px; height: 10px; border-radius: 50%; animation: hkSpark .8s ease-out forwards; }
+@keyframes hkSpark { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); opacity: 0; } }
+.hk-conf { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 3px; animation: hkConf 2.6s ease-in forwards; }
+@keyframes hkConf { to { transform: translateY(110vh) rotate(var(--rot)); opacity: .9; } }
+.hk-masc { width: 52px; height: 52px; flex: none; } .hk-masc svg { width: 100%; height: 100%; }
+.hk-masc.cheer { animation: hkCheer .6s ease-out; } .hk-masc.oops { animation: hkOops .5s; }
+@keyframes hkCheer { 30% { transform: translateY(-14px) rotate(-8deg) scale(1.12); } 60% { transform: translateY(0) rotate(6deg); } }
+@keyframes hkOops { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+@media (prefers-reduced-motion: reduce) { .hk-spark, .hk-conf, .hk-masc.cheer, .hk-masc.oops { animation: none; display: none; } }
+
+/* shopping list as a strip above the basket (all screen sizes) */
+.hk-list { top: auto; left: 50%; right: auto; bottom: 84px; transform: translateX(-50%); width: auto; max-width: calc(100% - 24px); max-height: none; overflow: visible; display: flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 99px; }
+.hk-list > b { white-space: nowrap; } .hk-list > small { display: none; }
+.hk-list ul { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; }
+.hk-list li .fi { width: 26px; height: 26px; } .hk-list li.got::after { margin-left: 2px; }
+@media (max-width: 760px) { .hk-list { left: 8px; right: 8px; transform: none; border-radius: 16px; bottom: 80px; } }
+
+@media (max-width: 760px) { .hk-list { bottom: 112px; } .hk-masc { width: 40px; height: 40px; } .hk-tray { padding: 6px 10px; gap: 6px; } }

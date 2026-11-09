@@ -16,7 +16,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=111">
+<link rel="stylesheet" href="styles.css?v=114">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -211,7 +211,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <h1>เลือกเกมส์ ฝึกทั้งแขน ขา หัวใจ และการทรงตัว</h1>
         <p class="lede">เล่นด้วยกล้องเว็บแคม AI จับท่าทางของคุณ เกมส์ละ 60 วินาที สะสมคะแนนและเหรียญรางวัล</p>
       </header>
-      <div class="fq-cards"><a class="fq-card" href="#food" data-kgame="market"><span class="fq-card-ico" aria-hidden="true">🧺</span><span><b>เกมจ่ายตลาด</b><small>งบ 250 บาท ของให้เลือก 60+ อย่าง · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
+      <div class="fq-cards"><a class="fq-card hand" href="#food" data-handgame="market"><span class="fq-card-ico" aria-hidden="true">🧺</span><span><b>ตลาดแตะมือ (VR)</b><small>เลือกเมนูมื้อเย็น แล้วเดินตลาด 5 แผง หยิบวัตถุดิบด้วยนิ้ว (หรือเมาส์/แตะจอ)</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card hand" href="#food" data-handgame="plate"><span class="fq-card-ico" aria-hidden="true">🖐️</span><span><b>ครัวแตะมือ (AI กล้อง)</b><small>ชี้นิ้วแตะเมนูบนจอเพื่อจัดพาข้าว หรือยกมือตำส้มตำ · ประมวลผลในเครื่อง</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card" href="#food" data-kgame="plate"><span class="fq-card-ico" aria-hidden="true">🍽️</span><span><b>เกมจัดสำรับ</b><small>เลือกว่าจะกินอะไร ให้ได้จาน 2:1:1 · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card" href="#food" data-foodquiz="go"><span class="fq-card-ico" aria-hidden="true">🍲</span><span><b>เกมตู้กับข้าวทายใจ</b><small>เกมความรู้เรื่องการกิน ไม่ต้องใช้กล้อง · 8 ข้อ มีเฉลยทุกข้อ</small></span><span class="fq-card-go">เล่น →</span></a></div>
@@ -527,7 +527,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
           <h1>ครัวอีสานของฉัน</h1>
           <p class="lede">หยิบกับข้าวจาก “ตู้กับข้าว” วางลง “พาข้าว” แต่ละมื้อ แล้วดูว่าข้าว น้ำตาล และความเค็มวันนี้พอดีไหม</p>
           <div class="kh-games"><button type="button" class="btn kh-quiz" data-foodquiz="1">🗄️ เกมตู้กับข้าวทายใจ <small id="fqBest">8 ข้อ · มีเฉลยทุกข้อ</small></button>
-          <button type="button" class="btn kh-quiz alt" data-kgame="market">🧺 เกมจ่ายตลาด <small>งบ 250 บาท ของให้เลือก 60+ อย่าง</small></button>
+          <button type="button" class="btn kh-quiz alt" data-handgame="market">🧺 ตลาดแตะมือ (VR) <small>เลือกเมนูเย็นนี้ แล้วไปจ่ายตลาด 90 อย่าง</small></button>
           <button type="button" class="btn kh-quiz alt" data-kgame="plate">🍽️ เกมจัดสำรับ <small>200 เมนู อีสาน ภาคกลาง เหนือ ใต้ นานาชาติ</small></button>
           <button type="button" class="btn kh-quiz hand" data-handgame="plate">🖐️ ครัวแตะมือ (กล้อง) <small>ชี้นิ้วแตะเมนูบนจอ เหมือน VR</small></button></div>
         </div>
@@ -621,7 +621,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="hub.js?v=8"></script>
 <script src="tree.js?v=2"></script>
 <script src="music.js?v=1"></script>
-<script src="foodimg.js?v=3"></script>
+<script src="foodimg.js?v=4"></script>
 <script src="food.js?v=9"></script>
 <script src="foodquiz.js?v=7"></script>
 <script src="kitchengames.js?v=3"></script>
@@ -629,6 +629,6 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="cert.js?v=11"></script>
 <script src="profile.js?v=6"></script>
 <script type="module" src="pose.js?v=65"></script>
-<script type="module" src="handkitchen.js?v=4"></script>
+<script type="module" src="handkitchen.js?v=7"></script>
 </body>
 </html>
