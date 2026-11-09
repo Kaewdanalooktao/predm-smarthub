@@ -91,6 +91,13 @@ function shell() {
         <span class="hk-masc" id="hkMasc" aria-hidden="true"></span><div class="hk-title"><b id="hkTitle">ครัวแตะมือ</b><span id="hkSay">ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก</span></div>
         <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="market">🧺 จ่ายตลาด</button><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
       </div>
+      <div class="hk-mortar" id="hkMortar" hidden aria-hidden="true">
+        <svg class="hk-m-back" viewBox="0 0 240 150"><ellipse cx="120" cy="34" rx="104" ry="26" fill="#9c5b2e"/><ellipse cx="120" cy="36" rx="88" ry="19" fill="#3d2112"/></svg>
+        <div class="hk-mix" id="hkMix"></div>
+        <div class="hk-pestle" id="hkPestle" hidden><svg viewBox="0 0 60 220"><defs><linearGradient id="hkWood" x1="0" x2="1"><stop offset="0" stop-color="#8a5a2b"/><stop offset=".45" stop-color="#d9a066"/><stop offset="1" stop-color="#7a4a20"/></linearGradient></defs><rect x="20" y="6" width="20" height="120" rx="10" fill="url(#hkWood)"/><path d="M14 118h32l6 80a22 18 0 0 1-44 0z" fill="url(#hkWood)"/><ellipse cx="30" cy="198" rx="22" ry="9" fill="#6b3f1a"/><path d="M24 20v90" stroke="#f3cf9a" stroke-width="3" opacity=".5" stroke-linecap="round"/></svg></div>
+        <svg class="hk-m-front" viewBox="0 0 240 150"><defs><linearGradient id="hkClay" x1="0" x2="1"><stop offset="0" stop-color="#7a3f1d"/><stop offset=".5" stop-color="#c46e37"/><stop offset="1" stop-color="#6e3818"/></linearGradient></defs><path d="M16 34a104 26 0 0 0 208 0c0 50-36 84-70 92v14H86v-14C52 118 16 84 16 34z" fill="url(#hkClay)"/><path d="M40 60c18 30 44 46 80 48" stroke="#e8a06a" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/><rect x="72" y="134" width="96" height="12" rx="6" fill="#5a2c12"/></svg>
+      </div>
+      <div class="hk-serve" id="hkServe" hidden aria-hidden="true"></div>
       <div class="hk-list" id="hkList" hidden></div>
       <div class="hk-fxl" id="hkFx" aria-hidden="true"></div>
       <div class="hk-tray" id="hkTray"></div>
@@ -110,7 +117,7 @@ function shell() {
   m.addEventListener("click", onClick);
   if (window.PreDMMascot) $("#hkMasc").innerHTML = PreDMMascot.svg();
   const st = $("#hkStage");
-  st.addEventListener("pointermove", (e) => { if (G.cam) return; const r = st.getBoundingClientRect(); G.ptr = { x: e.clientX - r.left, y: e.clientY - r.top, ny: (e.clientY - r.top) / r.height }; if (G.pound && !G.busy) poundStep(G.ptr.ny); });
+  st.addEventListener("pointermove", (e) => { if (G.cam) return; const r = st.getBoundingClientRect(); G.ptr = { x: e.clientX - r.left, y: e.clientY - r.top, ny: (e.clientY - r.top) / r.height }; if (G.pound && !G.busy) { pestleTo(G.ptr.ny); poundStep(G.ptr.ny); } });
   st.addEventListener("pointerleave", () => { if (!G.cam) G.ptr = null; });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !m.hidden) close(); });
 }
@@ -150,6 +157,7 @@ function newRound() {
   G.step = 0; G.picks = []; G.pound = null; G.busy = false; G.spoke = null;
   document.querySelectorAll("#hkModal [data-hkmode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.hkmode === G.mode)));
   $("#hkBg").className = "hk-bg " + G.mode;
+  $("#hkMortar").hidden = G.mode !== "somtam"; $("#hkPestle").hidden = true; $("#hkServe").hidden = true; $("#hkMix").innerHTML = ""; $("#hkMortar").classList.remove("gone");
   G.mk = { phase: "menu", recipe: null, stall: 0, page: 0, menuPage: 0, cart: [], combo: 0, t0: 0 };
   G.score = 0; $("#hkList").hidden = true;
   if (G.mode === "plate") { const kg = window.PreDMKitchenGames; G.sc = kg?.scenes ? kg.scenes[Math.floor(Math.random() * kg.scenes.length)] : { t: "มื้อกลางวัน", meal: "l", cap: 650, ic: "☀️" }; }
@@ -220,8 +228,27 @@ function choose(id, el) {
     if (id === "skip" || have >= st.n) G.step++;
     pop(); layout(); return;
   }
-  if (id === "pound") { window.PreDMMusic?.stop(); window.PreDMVoice?.say("st_pound"); G.pound = { n: 0, goal: 15, dir: 0, ext: null }; say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
-  G.picks.push({ id }); pop(); layout();
+  if (id === "pound") { window.PreDMMusic?.stop(); window.PreDMVoice?.say("st_pound"); G.pound = { n: 0, goal: 15, dir: 0, ext: null }; G.pY = null; $("#hkPestle").hidden = false; $("#hkPestle").style.setProperty("--k", 0); say("ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก 15 ครั้ง"); layout(); return; }
+  G.picks.push({ id }); pop(); addToMortar(SOMTAM[+id.slice(1)][0]); layout();
+}
+const picSrc = (e) => (window.FI?.src ? window.FI.src(e) : "");
+function addToMortar(e) { // the chosen ingredient drops into the mortar
+  const mix = $("#hkMix"), n = mix.children.length, src = picSrc(e);
+  const el = document.createElement("span"); el.className = "hk-ing drop";
+  el.style.left = `${18 + ((n * 37) % 64)}%`; el.style.top = `${4 + (n % 2) * 8}%`; el.style.setProperty("--r", `${(n * 47) % 50 - 25}deg`);
+  el.innerHTML = src ? `<img src="${src}" alt="">` : e; mix.appendChild(el);
+}
+function pestleTo(ny) { // the pestle follows the hand: hand high = pestle up, hand low = pestle in the mortar
+  const el = $("#hkPestle"); if (!el || el.hidden || ny == null) return;
+  G.pY = G.pY == null ? ny : G.pY + (ny - G.pY) * 0.5;
+  const k = Math.max(0, Math.min(1, (G.pY - 0.28) / 0.4)); el.style.setProperty("--k", k.toFixed(3));
+}
+function splash() { // bits of the ingredients fly up when the pestle strikes
+  const m = $("#hkMortar"); m.classList.remove("hit"); void m.offsetWidth; m.classList.add("hit");
+  const items = G.picks.map((p) => picSrc(SOMTAM[+p.id.slice(1)][0])).filter(Boolean); if (!items.length) return;
+  const wrap = document.createElement("div"); wrap.className = "hk-splash";
+  wrap.innerHTML = Array.from({ length: 6 }, (_, i) => `<img src="${items[i % items.length]}" alt="" style="--dx:${Math.round((Math.random() - 0.5) * 220)}px;--dy:${-Math.round(60 + Math.random() * 90)}px;--r:${Math.round((Math.random() - 0.5) * 360)}deg">`).join("");
+  m.appendChild(wrap); setTimeout(() => wrap.remove(), 700);
 }
 function pop() { const t = $("#hkTray"); t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); }
 
@@ -230,9 +257,20 @@ function poundStep(ny) { // count one stroke each time the hand travels up then 
   if (P.ext == null) { P.ext = ny; return; }
   const TH = 0.1;
   if (P.dir >= 0 && ny < P.ext - TH) { P.dir = -1; P.ext = ny; }
-  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; window.PreDMMusic?.sfx("pok"); if (P.n % 5 === 0 && P.n < P.goal) window.PreDMVoice?.say(String(P.n)); tray(); $("#hkBg").classList.remove("hit"); void $("#hkBg").offsetWidth; $("#hkBg").classList.add("hit"); } P.dir = 1; P.ext = ny; }
+  else if (P.dir <= 0 && ny > P.ext + TH) { if (P.dir === -1) { P.n++; window.PreDMMusic?.sfx("pok"); if (P.n % 5 === 0 && P.n < P.goal) window.PreDMVoice?.say(String(P.n)); tray(); splash(); } P.dir = 1; P.ext = ny; }
   else if ((P.dir === -1 && ny < P.ext) || (P.dir === 1 && ny > P.ext)) P.ext = ny;
-  if (P.n >= P.goal) { G.busy = true; window.PreDMMusic?.sfx("win"); window.PreDMVoice?.say("st_done"); setTimeout(somtamResult, 400); }
+  if (P.n >= P.goal) { G.busy = true; window.PreDMMusic?.sfx("win"); setTimeout(serveSomtam, 350); }
+}
+function plateHTML(cls) { // a plate of som tam with the chosen ingredients as garnish
+  const items = G.picks.map((p) => SOMTAM[+p.id.slice(1)]).filter((x) => x[2] >= 0).slice(0, 6), main = picSrc("🥗");
+  const garnish = items.map((x, i) => { const a = (i / Math.max(1, items.length)) * Math.PI * 2 - Math.PI / 2, src = picSrc(x[0]); return src ? `<img class="hk-gar" src="${src}" alt="" style="left:${50 + Math.cos(a) * 34}%;top:${50 + Math.sin(a) * 30}%">` : ""; }).join("");
+  return `<div class="hk-plate ${cls || ""}"><span class="hk-plate-dish"></span>${main ? `<img class="hk-plate-main" src="${main}" alt="ส้มตำ">` : "🥗"}${garnish}</div>`;
+}
+function serveSomtam() { // pestle out, mortar slides away, the finished plate comes in
+  $("#hkPestle").hidden = true; $("#hkMortar").classList.add("gone");
+  const sv = $("#hkServe"); sv.hidden = false; sv.innerHTML = `${plateHTML("big")}<b class="hk-serve-t">🥗 ส้มตำเสร็จแล้ว เสิร์ฟ!</b>`;
+  confetti(); window.PreDMVoice?.say("st_done");
+  setTimeout(() => { sv.hidden = true; $("#hkMortar").hidden = true; somtamResult(); }, 1900);
 }
 function somtamResult() {
   const items = G.picks.map((p) => SOMTAM[+p.id.slice(1)]);
@@ -244,10 +282,10 @@ function somtamResult() {
   const st = pts >= 12 ? 3 : pts >= 8 ? 2 : pts >= 4 ? 1 : 0;
   if (st >= 2) confetti();
   const best = Math.max(pts, window.PreDM?.store.get("somtamBest", 0) || 0); window.PreDM?.store.set("somtamBest", best);
-  $("#hkCards").innerHTML = `<div class="hk-result"><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div>
+  $("#hkCards").innerHTML = `<div class="hk-result">${plateHTML("small")}<div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div>
     <h2>${["ลองตำใหม่นะคะ", "ใช้ได้ค่ะ", "ส้มตำสุขภาพ อร่อยด้วย!", "สุดยอดแม่ครัว! 🥗"][st]}</h2><p>${pts} คะแนน · ตำไป ${G.pound.goal} ครั้ง (ได้ขยับแขนด้วย 💪) · ดีที่สุด ${best}</p>
     ${good.length ? `<p class="ok">👍 ${good.map(esc).join(" · ")}</p>` : ""}${tips.length ? `<ul>${tips.slice(0, 4).map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-    <div class="hk-start-btns"><button type="button" class="btn primary" data-hk="again">ตำอีกครก ↺</button><button type="button" class="btn" data-hkmode="plate">ไปจัดพาข้าว</button></div></div>`;
+    <div class="hk-start-btns"><button type="button" class="btn primary" data-hk="eat">🍽️ วางส้มตำลงพาข้าววันนี้</button><button type="button" class="btn" data-hk="again">ตำอีกครก ↺</button><button type="button" class="btn" data-hkmode="plate">ไปจัดพาข้าว</button></div></div>`;
   G.cards = []; say("แตะปุ่มด้วยเมาส์หรือนิ้วบนจอ");
 }
 
@@ -405,7 +443,7 @@ function loop() {
       }
       (G.hands || []).forEach((h) => { drawHand(ctx, h.pts); raws.push({ key: h.key, p: h.pts[8] }); });
     } else if (G.ptr) { raws.push({ key: "m", p: G.ptr }); ny = G.ptr.ny; }
-    if (G.pound && G.cam && !G.busy && ny != null) poundStep(ny);
+    if (G.pound && G.cam && !G.busy && ny != null) { pestleTo(ny); poundStep(ny); }
     // smooth each fingertip so small shakes do not move its pointer off a card
     const A = G.cam ? 0.3 : 1, live = new Set(raws.map((r) => r.key));
     Object.entries(PTR).forEach(([k, q]) => { if (!live.has(k)) { q.sm = null; } });
@@ -427,6 +465,11 @@ function onClick(e) {
     if (a === "cam") return startCam();
     if (a === "nocam") return startNoCam();
     if (a === "again") return newRound();
+    if (a === "eat") { // log the som tam on today's tray, in the meal that fits the time of day
+      const hr = new Date().getHours(), meal = hr < 10 ? "b" : hr < 15 ? "l" : hr < 21 ? "d" : "s";
+      if (window.PreDMFood?.add) { window.PreDMFood.add("somtam-thai", 1, meal); window.PreDM?.toast("วางส้มตำลงพาข้าววันนี้แล้ว"); }
+      close(); if (location.hash !== "#food") location.hash = "food"; return;
+    }
     if (a === "cook") { const r = G.mk.recipe; if (r && window.PreDMFood?.add && window.PreDMFood.DB.some((d) => d.key === r.key)) { window.PreDMFood.add(r.key, 1, "d"); window.PreDM?.toast(`วาง “${r.n}” ลงพาข้าวมื้อเย็นวันนี้แล้ว`); } close(); if (location.hash !== "#food") location.hash = "food"; return; }
   }
   const c = t(".hk-card"); if (c && !G.cam) { window.PreDMMusic?.sfx("pick"); lockAll(); choose(c.dataset.id, c); } // tap also works without camera
