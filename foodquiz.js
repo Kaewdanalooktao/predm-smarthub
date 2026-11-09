@@ -69,7 +69,7 @@
       <div class="fq-prog" aria-hidden="true"><i style="width:${(Q.i / Q.list.length) * 100}%"></i></div>
       ${it.dish ? "" : `<div class="fq-pic" role="img" aria-label="ภาพประกอบคำถาม"><span>${esc(it.pic || "🍽️")}</span></div>`}
       <p class="fq-q">${esc(it.q)}</p>
-      <div class="fq-choices${it.dish ? " dish" : ""}" role="group" aria-label="ตัวเลือก">${it.choices.map((c, k) => `<button type="button" class="fq-c${answered ? (k === it.ok ? " ok" : k === Q.picked ? " no" : "") : ""}" data-fqc="${k}" ${answered ? "disabled" : ""}>${it.dish ? `<span class="fq-plate" aria-hidden="true">${it.emo[k]}</span>` : ""}<span>${esc(c)}</span></button>`).join("")}</div>
+      <div class="fq-choices${it.dish ? " dish" : ""}" role="group" aria-label="ตัวเลือก">${it.choices.map((c, k) => `<button type="button" class="fq-c${answered ? (k === it.ok ? " ok" : k === Q.picked ? " no" : "") : ""}" data-fqc="${k}" ${answered ? "disabled" : ""}>${it.dish ? `<span class="fq-plate" aria-hidden="true">${window.FI ? FI(it.emo[k], it.keys && it.keys[k]) : it.emo[k]}</span>` : ""}<span>${esc(c)}</span></button>`).join("")}</div>
       ${answered ? `<div class="fq-why ${right ? "ok" : "no"}" role="status"><b>${right ? "ถูกต้องค่ะ! 🎉" : "ยังไม่ใช่นะคะ 😊"}</b> ${esc(it.why)}</div>
         <div class="care-foot"><button type="button" class="btn primary" data-fq="next" autofocus>${Q.i === Q.list.length - 1 ? "ดูผลคะแนน" : "ข้อต่อไป ›"}</button></div>` : ""}`;
     (box.querySelector('[data-fq="next"]') || box.querySelector(".fq-c"))?.focus();

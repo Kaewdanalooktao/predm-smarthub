@@ -71,6 +71,46 @@
     ["beer", "เบียร์", "🍺", "เครื่องดื่ม", "1 ขวดเล็ก (330 มล.)", 150, 13, 1, 0, 0, 15, 0, "", "แอลกอฮอล์ทำให้น้ำตาลแกว่ง ไม่เกิน 1 ดื่มมาตรฐาน/วัน และไม่ดื่มตอนท้องว่าง"],
     ["lao-kao", "เหล้าขาว", "🥃", "เครื่องดื่ม", "1 เป๊ก (30 มล.)", 85, 0, 0, 0, 0, 0, 0, "", "ลดหรือเลิก อาจทำให้น้ำตาลต่ำหากใช้ยาเบาหวาน"],
     ["water", "น้ำเปล่า", "💧", "เครื่องดื่ม", "1 แก้ว", 0, 0, 0, 0, 0, 0, 0, "veg", "ดื่มวันละ 6–8 แก้ว"],
+    ["kai-tom", "ไข่ต้ม", "🥚", "ปิ้ง-ย่าง", "1 ฟอง", 75, 0.5, 6.5, 5, 0, 70, 0, "", "โปรตีนดี ราคาประหยัด วันละ 1–2 ฟองได้"],
+    ["kai-pam", "ไข่ป่าม", "🥚", "ปิ้ง-ย่าง", "1 กระทง (2 ฟอง)", 190, 2, 13, 14, 0, 450, 0.5, "", "เมนูไข่อีสาน ใส่ผักชีต้นหอมเยอะ ๆ ลดน้ำปลา"],
+    ["kai-jiew", "ไข่เจียว", "🍳", "ปิ้ง-ย่าง", "1 ฟอง (ทอด)", 200, 1, 7, 18, 0, 300, 0, "fat", "ซับน้ำมันออก หรือเปลี่ยนเป็นไข่ต้ม/ไข่ตุ๋น"],
+    ["pla-tod", "ปลาทูทอด / ปลาทอด", "🐟", "ปิ้ง-ย่าง", "1 ตัว (~80 ก.)", 220, 0, 20, 15, 0, 550, 0, "fat", "เปลี่ยนเป็นปลานึ่ง/ปลาย่าง ไขมันน้อยกว่า"],
+    ["goong-pao", "กุ้งเผา", "🦐", "ปิ้ง-ย่าง", "5 ตัว (~100 ก.)", 120, 1, 24, 2, 0, 450, 0, "", "โปรตีนดี ไขมันต่ำ จิ้มน้ำจิ้มน้อย ๆ"],
+    ["muek-yang", "ปลาหมึกย่าง", "🦑", "ปิ้ง-ย่าง", "1 ตัว (~100 ก.)", 110, 3, 18, 2, 2, 600, 0, "", "ไขมันต่ำ แต่คอเลสเตอรอลสูง กินพอประมาณ"],
+    ["kob-yang", "กบย่าง", "🐸", "ปิ้ง-ย่าง", "1 ตัว (~100 ก.)", 130, 1, 20, 4, 0, 450, 0, "", "โปรตีนสูง ไขมันต่ำ ปิ้งให้สุกทั่ว"],
+    ["moo-tod", "หมูทอดกระเทียม", "🍖", "ปิ้ง-ย่าง", "1 จาน (~100 ก.)", 330, 6, 20, 25, 2, 700, 0, "fat", "ทอดน้ำมันเยอะ เปลี่ยนเป็นหมูย่าง/ลวก"],
+    ["gai-tod", "ไก่ทอด", "🍗", "ปิ้ง-ย่าง", "1 ชิ้น (~100 ก.)", 290, 10, 20, 19, 0, 600, 0, "fat", "แป้งชุบและน้ำมันเยอะ ลอกหนังและแป้งออก"],
+    ["luk-chin", "ลูกชิ้นปิ้ง", "🍢", "ปิ้ง-ย่าง", "1 ไม้ (5 ลูก)", 140, 10, 8, 7, 5, 600, 0, "salt", "อาหารแปรรูป น้ำจิ้มหวาน กินไม่บ่อย"],
+    ["hed-yang", "เห็ดย่าง / เห็ดนึ่งจิ้มแจ่ว", "🍄", "น้ำพริก-ผัก", "1 จาน", 40, 6, 3, 0.5, 2, 150, 3, "veg", "ผักแคลอรีต่ำ เติมความอิ่ม"],
+    ["pad-pak", "ผัดผักรวม", "🥦", "น้ำพริก-ผัก", "1 จาน", 120, 9, 4, 8, 3, 650, 4, "veg", "ใช้น้ำมันน้อย ลดซอสหอยนางรม"],
+    ["salad", "สลัดผัก น้ำใส", "🥗", "น้ำพริก-ผัก", "1 จาน", 70, 10, 2, 2, 4, 200, 4, "veg", "เลือกน้ำสลัดใส/น้ำยำ แทนน้ำสลัดครีม"],
+    ["corn", "ข้าวโพดต้ม", "🌽", "ข้าว-แป้ง", "1 ฝัก", 120, 26, 4, 1.5, 5, 15, 3, "rice", "นับเป็นข้าวแป้ง ใช้แทนข้าว 1 ทัพพีได้"],
+    ["man-tom", "มันเทศต้ม", "🍠", "ข้าว-แป้ง", "1 หัวเล็ก (~100 ก.)", 90, 21, 1.6, 0.1, 6, 35, 3, "rice", "ใยอาหารดี แต่นับเป็นแป้ง ไม่กินเพิ่มจากข้าว"],
+    ["bread-ww", "ขนมปังโฮลวีต", "🍞", "ข้าว-แป้ง", "1 แผ่น", 80, 14, 4, 1, 2, 140, 2, "rice", "ดีกว่าขนมปังขาว 2 แผ่น = ข้าว 1 ทัพพีครึ่ง"],
+    ["mama", "บะหมี่กึ่งสำเร็จรูป", "🍜", "ข้าว-แป้ง", "1 ซอง", 300, 40, 6, 13, 2, 1500, 1, "rice salt fat", "โซเดียมสูงมาก ใส่เครื่องปรุงครึ่งซอง เติมผักและไข่"],
+    ["pad-mee", "ผัดหมี่โคราช", "🍝", "ข้าว-แป้ง", "1 จาน", 420, 62, 10, 14, 12, 1200, 2, "rice sweet salt", "หวานและเค็ม แบ่งครึ่งจาน เติมผักแนม"],
+    ["kuay-jap", "ก๋วยจั๊บญวน", "🍜", "ข้าว-แป้ง", "1 ชาม", 350, 50, 15, 9, 2, 1600, 1, "rice salt", "ไม่ซดน้ำจนหมด เลือกหมูไม่ติดมัน"],
+    ["kao-tom", "ข้าวต้มปลา", "🥣", "ข้าว-แป้ง", "1 ชาม", 230, 30, 16, 4, 0, 900, 0.5, "rice", "มื้อเบา ๆ ลดน้ำปลาพริกไทยปรุงเพิ่ม"],
+    ["kao-pad", "ข้าวผัด", "🍛", "ข้าว-แป้ง", "1 จาน", 520, 70, 15, 18, 3, 1100, 1, "rice fat salt", "ข้าวและน้ำมันเยอะ ขอข้าวน้อย เพิ่มแตงกวา/ผัก"],
+    ["kaprao", "ข้าวกะเพราไก่", "🍛", "ข้าว-แป้ง", "1 จาน", 550, 65, 25, 20, 5, 1200, 1, "rice fat salt", "ขอข้าวน้อย ไม่ใส่ไข่ดาว หรือเปลี่ยนเป็นไข่ต้ม"],
+    ["tomyum", "ต้มยำกุ้งน้ำใส", "🍲", "แกง-ต้ม", "1 ถ้วย", 110, 6, 15, 3, 2, 1000, 1, "salt", "ซุปน้ำใสดีกว่าน้ำข้น ไม่ซดหมด"],
+    ["gaeng-jued", "แกงจืดเต้าหู้หมูสับ", "🍲", "แกง-ต้ม", "1 ถ้วย", 120, 5, 12, 6, 1, 800, 1.5, "veg", "เบาท้อง มีผักและโปรตีน"],
+    ["tom-kob", "ต้มกบ / อ่อมกบ", "🐸", "แกง-ต้ม", "1 ถ้วย", 140, 5, 18, 5, 1, 950, 2, "salt veg", "โปรตีนดี ลดปลาร้าและผงชูรส"],
+    ["tam-poo", "ตำปูนา", "🦀", "ตำ", "1 จาน", 130, 15, 6, 3, 5, 1500, 3, "salt veg", "ปูนาดองโซเดียมสูง ต้องสุก ไม่ซดน้ำตำ"],
+    ["tam-ponlamai", "ตำผลไม้", "🍇", "ตำ", "1 จาน", 160, 34, 2, 2, 26, 600, 3, "sweet", "ผลไม้หวานหลายชนิด กินครึ่งจาน"],
+    ["som-o", "ส้มโอ", "🍊", "ผลไม้", "4–5 กลีบ", 60, 15, 1, 0, 11, 1, 1.5, "", "ผลไม้น้ำตาลปานกลาง กินพอดี"],
+    ["taeng-mo", "แตงโม", "🍉", "ผลไม้", "6–8 ชิ้นคำ", 50, 12, 1, 0.2, 10, 2, 0.6, "", "น้ำเยอะ แต่ดัชนีน้ำตาลสูง กินพอดี"],
+    ["sapparod", "สับปะรด", "🍍", "ผลไม้", "6–8 ชิ้นคำ", 60, 15, 0.6, 0.1, 12, 1, 1.5, "", "เลี่ยงจิ้มพริกเกลือน้ำตาล"],
+    ["chompoo", "ชมพู่", "🍎", "ผลไม้", "2–3 ผล", 40, 9, 0.6, 0.2, 6, 1, 2, "veg", "น้ำตาลต่ำ เหมาะสำหรับกลุ่มเสี่ยง"],
+    ["grape", "องุ่น", "🍇", "ผลไม้", "10–12 ผล", 60, 16, 0.6, 0.1, 15, 2, 0.8, "", "หวาน จำกัด 10 ผล"],
+    ["nom-jued", "นมจืด", "🥛", "เครื่องดื่ม", "1 กล่อง (200 มล.)", 130, 10, 7, 7, 10, 100, 0, "", "เลือกนมจืดพร่องมันเนย ไม่เลือกนมหวาน"],
+    ["nam-taohu", "น้ำเต้าหู้ไม่หวาน", "🥛", "เครื่องดื่ม", "1 แก้ว", 80, 4, 7, 4, 1, 50, 1, "", "โปรตีนจากพืช สั่งไม่ใส่น้ำตาล"],
+    ["nam-maprao", "น้ำมะพร้าว", "🥥", "เครื่องดื่ม", "1 แก้ว", 60, 15, 0.7, 0, 13, 250, 0, "", "มีน้ำตาลธรรมชาติ ดื่มไม่เกิน 1 แก้ว"],
+    ["cha-plain", "ชาร้อนไม่หวาน", "🍵", "เครื่องดื่ม", "1 แก้ว", 2, 0, 0, 0, 0, 5, 0, "", "ทางเลือกแทนชาเย็น"],
+    ["donut", "โดนัท / ขนมหวาน", "🍩", "ของว่าง", "1 ชิ้น", 260, 30, 3, 14, 14, 200, 1, "sweet fat", "น้ำตาลและไขมันสูง กินเป็นครั้งคราว"],
+    ["icecream", "ไอศกรีม", "🍦", "ของว่าง", "1 ถ้วย", 210, 25, 4, 11, 21, 80, 0, "sweet fat", "เลือกไอศกรีมผลไม้ หรือแบ่งครึ่ง"],
+    ["peanut", "ถั่วลิสงต้ม", "🥜", "ของว่าง", "1 กำมือ (~30 ก.)", 120, 5, 6, 9, 1, 100, 2.5, "", "ของว่างโปรตีนดี ไม่เค็ม กินกำมือเดียว"],
+    ["kluay-ping", "กล้วยปิ้ง", "🍌", "ของว่าง", "2 ลูก", 150, 36, 1.5, 0.5, 20, 5, 3, "sweet", "ไม่ราดน้ำจิ้มหวาน กิน 1 ลูกพอ"],
   ];
   const DB = DB_ROWS.map(([key, n, e, cat, unit, kcal, carb, pro, fat, sugar, na, fib, flags, tip]) => ({ key, n, e, cat, unit, kcal, carb, pro, fat, sugar, na, fib, flags: flags.split(" ").filter(Boolean), tip }));
   const byKey = Object.fromEntries(DB.map((d) => [d.key, d]));
@@ -125,7 +165,7 @@
         <button type="button" class="pa" data-add="${k}" aria-label="หยิบกับข้าวจากตู้ใส่${k === "s" ? "ถาดของว่าง" : "พาข้าว" + label}">${trayDishes(items)}${items.length ? "" : `<span class="pa-empty">พายังว่าง<br><b>แตะเพื่อหยิบกับข้าว</b></span>`}</button>
         <button class="btn sm pa-add" type="button" data-add="${k}">🗄️ หยิบจากตู้กับข้าว</button>
         ${items.length ? ownLine(items, sc) : ""}
-        ${items.length ? `<ul class="fd-items">${items.map((x) => `<li><span class="fd-e">${x.d.e || "🍽️"}</span><span class="fd-n"><b>${esc(x.d.n)}</b><small>${x.portion !== 1 ? `× ${x.portion} · ` : ""}${esc(x.d.unit || "")} · ${r0(x.d.kcal * x.portion)} kcal · คาร์บ ${r0(x.d.carb * x.portion)} ก.${x.ai ? " · 📷 AI" : ""}</small></span>${(x.d.flags || []).filter((f) => FLAG[f]).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}<button type="button" class="fd-del" data-del="${x.id}" aria-label="ลบ ${esc(x.d.n)}">✕</button></li>`).join("")}</ul>` : `<p class="fd-empty">ยังไม่ได้บันทึก</p>`}
+        ${items.length ? `<ul class="fd-items">${items.map((x) => `<li><span class="fd-e">${FI(x.d.e, x.d.key)}</span><span class="fd-n"><b>${esc(x.d.n)}</b><small>${x.portion !== 1 ? `× ${x.portion} · ` : ""}${esc(x.d.unit || "")} · ${r0(x.d.kcal * x.portion)} kcal · คาร์บ ${r0(x.d.carb * x.portion)} ก.${x.ai ? " · 📷 AI" : ""}</small></span>${(x.d.flags || []).filter((f) => FLAG[f]).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}<button type="button" class="fd-del" data-del="${x.id}" aria-label="ลบ ${esc(x.d.n)}">✕</button></li>`).join("")}</ul>` : `<p class="fd-empty">ยังไม่ได้บันทึก</p>`}
       </section>`;
     }).join("");
     root.innerHTML = `
@@ -159,7 +199,7 @@
     return items.slice(0, 8).map((x, i) => {
       const ang = (i / n) * Math.PI * 2 - Math.PI / 2, rad = n === 1 ? 0 : n <= 3 ? 24 : 30;
       const left = 50 + rad * Math.cos(ang), top = 50 + rad * Math.sin(ang), sticky = x.key === "sticky" || x.key === "sticky-b";
-      return `<span class="pa-dish${sticky ? " katib" : ""}" style="left:${left.toFixed(1)}%;top:${top.toFixed(1)}%" title="${esc(x.d.n)}"><i>${x.d.e || "🍽️"}</i>${x.portion !== 1 ? `<em>×${x.portion}</em>` : ""}</span>`;
+      return `<span class="pa-dish${sticky ? " katib" : ""}" style="left:${left.toFixed(1)}%;top:${top.toFixed(1)}%" title="${esc(x.d.n)}"><i>${FI(x.d.e, x.d.key)}</i>${x.portion !== 1 ? `<em>×${x.portion}</em>` : ""}</span>`;
     }).join("") + (items.length > 8 ? `<span class="pa-more">+${items.length - 8}</span>` : "");
   }
   function ownLine(items, sc) {
@@ -184,7 +224,7 @@
     if (t.fib < 15 && t.items.length >= 2) out.push(["🥬", "ใยอาหารยังน้อย เพิ่มผักสด/ผักลวก/ผักแนมทุกมื้อ ช่วยให้น้ำตาลขึ้นช้า"]);
     if (!out.length) out.push(["🌟", "วันนี้สมดุลดีมาก! ข้าว น้ำตาล และโซเดียมอยู่ในเกณฑ์"]);
     const tips = [...new Map(t.items.filter((x) => x.d.tip && (x.d.flags || []).some((f) => ["raw", "salt", "sweet", "fat", "rice"].includes(f))).map((x) => [x.d.n, x.d])).values()].slice(0, 3);
-    return `<ul class="fd-tips">${out.map(([i, s]) => `<li><span>${i}</span>${esc(s)}</li>`).join("")}</ul>${tips.length ? `<h4>ปรับเมนูที่กินวันนี้</h4><ul class="fd-swaps">${tips.map((d) => `<li><b>${d.e} ${esc(d.n)}</b>${esc(d.tip)}</li>`).join("")}</ul>` : ""}`;
+    return `<ul class="fd-tips">${out.map(([i, s]) => `<li><span>${i}</span>${esc(s)}</li>`).join("")}</ul>${tips.length ? `<h4>ปรับเมนูที่กินวันนี้</h4><ul class="fd-swaps">${tips.map((d) => `<li><b>${FI(d.e, d.key, "fi-sm")} ${esc(d.n)}</b>${esc(d.tip)}</li>`).join("")}</ul>` : ""}`;
   }
   function drawWeek() {
     if (F.chart) { F.chart.destroy(); F.chart = null; }
@@ -210,9 +250,9 @@
         <div class="cup">
           <div class="cup-top"><span class="cup-name">🗄️ ตู้กับข้าว</span><input class="fd-search" id="fdQ" placeholder="ค้นหา เช่น ตำ ลาบ ข้าวเหนียว แจ่ว" value="${esc(F.q)}" aria-label="ค้นหาเมนูในตู้กับข้าว"></div>
           <div class="fd-cats">${CATS.map((c) => `<button type="button" aria-pressed="${c === F.cat}" data-cat="${c}">${c === "ทั้งหมด" ? "ทุกชั้น" : c}</button>`).join("")}</div>
-          <div class="cup-body">${CATS.slice(1).map((c) => { const row = list.filter((d) => d.cat === c); return row.length ? `<div class="shelf"><b class="shelf-l">${c}</b><div class="shelf-row">${row.map((d) => `<button type="button" class="fd-opt cup-dish" aria-pressed="${d.key === F.pick}" data-pick="${d.key}" aria-label="${esc(d.n)} ${d.kcal} กิโลแคลอรี"><span class="cup-plate">${d.e}</span><b>${d.n}</b><small>${d.kcal} kcal</small><span class="cup-flags">${d.flags.filter((f) => FLAG[f]).slice(0, 2).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}</span></button>`).join("")}</div></div>` : ""; }).join("") || `<p class="fd-empty">ไม่พบเมนูในตู้ ลองคำอื่น</p>`}</div>
+          <div class="cup-body">${CATS.slice(1).map((c) => { const row = list.filter((d) => d.cat === c); return row.length ? `<div class="shelf"><b class="shelf-l">${c}</b><div class="shelf-row">${row.map((d) => `<button type="button" class="fd-opt cup-dish" aria-pressed="${d.key === F.pick}" data-pick="${d.key}" aria-label="${esc(d.n)} ${d.kcal} กิโลแคลอรี"><span class="cup-plate">${FI(d.e, d.key)}</span><b>${d.n}</b><small>${d.kcal} kcal</small><span class="cup-flags">${d.flags.filter((f) => FLAG[f]).slice(0, 2).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}</span></button>`).join("")}</div></div>` : ""; }).join("") || `<p class="fd-empty">ไม่พบเมนูในตู้ ลองคำอื่น</p>`}</div>
         </div>
-        ${pick ? `<div class="fd-pick"><div><b>${pick.e} ${pick.n}</b><small>${pick.unit}</small></div>
+        ${pick ? `<div class="fd-pick"><div><b>${FI(pick.e, pick.key, "fi-sm")} ${pick.n}</b><small>${pick.unit}</small></div>
           <div class="fd-por">${PORTIONS.map(([v, l]) => `<button type="button" aria-pressed="${v === F.portion}" data-por="${v}">${l}</button>`).join("")}</div>
           <div class="fd-nut"><span>${r0(pick.kcal * F.portion)} <small>kcal</small></span><span>คาร์บ ${r0(pick.carb * F.portion)} ก.</span><span>น้ำตาล ${r0(pick.sugar * F.portion)} ก.</span><span>โซเดียม ${r0(pick.na * F.portion)} มก.</span></div>
           ${pick.tip ? `<p class="fd-tip">💡 ${esc(pick.tip)}</p>` : ""}
@@ -223,7 +263,7 @@
     const a = F.ai, key = A().store.get("geminiKey", null);
     if (a.results) return `<div class="fd-ai"><img src="${a.preview}" alt="รูปอาหารที่ถ่าย" class="fd-ai-img">
       <h3>AI พบเมนูเหล่านี้ — ตรวจสอบและปรับปริมาณก่อนบันทึก</h3>
-      ${a.results.length ? `<ul class="fd-ai-list">${a.results.map((r, i) => { const d = byKey[r.key]; return `<li><label class="fd-ai-chk"><input type="checkbox" data-aion="${i}" ${r.on ? "checked" : ""}><span class="fd-e">${d.e}</span><span><b>${d.n}</b><small>${d.unit} · ความมั่นใจ ${Math.round((r.conf || 0.5) * 100)}%</small></span></label>
+      ${a.results.length ? `<ul class="fd-ai-list">${a.results.map((r, i) => { const d = byKey[r.key]; return `<li><label class="fd-ai-chk"><input type="checkbox" data-aion="${i}" ${r.on ? "checked" : ""}><span class="fd-e">${FI(d.e, d.key)}</span><span><b>${d.n}</b><small>${d.unit} · ความมั่นใจ ${Math.round((r.conf || 0.5) * 100)}%</small></span></label>
         <span class="fd-por sm">${PORTIONS.map(([v, l]) => `<button type="button" aria-pressed="${v === r.portion}" data-aipor="${i}:${v}">${l}</button>`).join("")}</span></li>`; }).join("")}</ul>` : `<p class="fd-empty">AI ไม่พบเมนูที่ตรงกับฐานข้อมูล ลองเลือกเมนูเองจากแท็บ “เลือกเมนูอีสาน”</p>`}
       ${a.note ? `<p class="hint">AI: ${esc(a.note)}</p>` : ""}
       <div class="btns"><button class="btn primary" type="button" data-aisave ${a.results.some((r) => r.on) ? "" : "disabled"}>บันทึกเมนูที่เลือก</button><button class="btn" type="button" data-aireset>ถ่ายใหม่</button></div>

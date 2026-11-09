@@ -16,7 +16,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=106">
+<link rel="stylesheet" href="styles.css?v=109">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -211,7 +211,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <h1>เลือกเกมส์ ฝึกทั้งแขน ขา หัวใจ และการทรงตัว</h1>
         <p class="lede">เล่นด้วยกล้องเว็บแคม AI จับท่าทางของคุณ เกมส์ละ 60 วินาที สะสมคะแนนและเหรียญรางวัล</p>
       </header>
-      <div class="fq-cards"><a class="fq-card" href="#food" data-kgame="market"><span class="fq-card-ico" aria-hidden="true">🧺</span><span><b>เกมจ่ายตลาด</b><small>งบ 200 บาท เลือกของดีต่อสุขภาพ · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
+      <div class="fq-cards"><a class="fq-card" href="#food" data-kgame="market"><span class="fq-card-ico" aria-hidden="true">🧺</span><span><b>เกมจ่ายตลาด</b><small>งบ 250 บาท ของให้เลือก 60+ อย่าง · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
+      <a class="fq-card hand" href="#food" data-handgame="plate"><span class="fq-card-ico" aria-hidden="true">🖐️</span><span><b>ครัวแตะมือ (AI กล้อง)</b><small>ชี้นิ้วแตะเมนูบนจอเพื่อจัดพาข้าว หรือยกมือตำส้มตำ · ประมวลผลในเครื่อง</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card" href="#food" data-kgame="plate"><span class="fq-card-ico" aria-hidden="true">🍽️</span><span><b>เกมจัดสำรับ</b><small>เลือกว่าจะกินอะไร ให้ได้จาน 2:1:1 · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card" href="#food" data-foodquiz="go"><span class="fq-card-ico" aria-hidden="true">🍲</span><span><b>เกมตู้กับข้าวทายใจ</b><small>เกมความรู้เรื่องการกิน ไม่ต้องใช้กล้อง · 8 ข้อ มีเฉลยทุกข้อ</small></span><span class="fq-card-go">เล่น →</span></a></div>
       <div class="game-pick" id="gamePick" role="radiogroup" aria-label="เลือกเกมส์"></div>
@@ -452,6 +453,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
     <linearGradient id="khSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd59a"/><stop offset="1" stop-color="#ffefc9"/></linearGradient>
     <pattern id="khTile" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#f6e2c3"/><path d="M0 0h22v22H0z" fill="none" stroke="#e6c79a" stroke-width="1.2"/><circle cx="11" cy="11" r="2.2" fill="#e7a86b" opacity=".55"/></pattern>
     <pattern id="khMesh" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#f4e4c8"/><path d="M0 0h5M0 0v5" stroke="#b9925f" stroke-width=".8"/></pattern>
+    <pattern id="khCloth" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#e8f1ff"/><path d="M0 0h5v5H0zM5 5h5v5H5z" fill="#c9dbff"/></pattern>
     <linearGradient id="khWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c88b52"/><stop offset="1" stop-color="#9c6230"/></linearGradient>
     <linearGradient id="khCab" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a5693a"/><stop offset=".5" stop-color="#bb7f48"/><stop offset="1" stop-color="#94592c"/></linearGradient>
   </defs>
@@ -462,45 +464,72 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
     <rect x="10" y="18" width="24" height="26" rx="5" fill="#fff6e6" stroke="#d9b98c"/><rect x="10" y="26" width="24" height="18" rx="4" fill="#e45b4a" opacity=".85"/><rect x="8" y="14" width="28" height="6" rx="3" fill="#b8793d"/>
     <rect x="42" y="12" width="24" height="32" rx="5" fill="#fff6e6" stroke="#d9b98c"/><rect x="42" y="24" width="24" height="20" rx="4" fill="#f2c14e" opacity=".9"/><rect x="40" y="8" width="28" height="6" rx="3" fill="#b8793d"/>
     <path d="M100 44h26l-4-18h-18z" fill="#c97b4a"/><path d="M113 26c-10-14-2-24 0-26 2 2 10 12 0 26zM113 28c-14-4-18-14-17-18 4 0 14 4 17 18zM113 28c14-4 18-14 17-18-4 0-14 4-17 18z" fill="#5f9f4b"/></g>
-  <!-- window -->
-  <g transform="translate(286 18)"><rect width="100" height="78" rx="6" fill="#8a5a2e"/><rect x="6" y="6" width="88" height="66" rx="3" fill="url(#khSky)"/>
-    <circle cx="64" cy="46" r="12" fill="#ffb347" opacity=".9"/><path d="M6 56q22-12 44 0t44-4v20H6z" fill="#c9e3a5"/><path d="M50 6v66M6 39h88" stroke="#8a5a2e" stroke-width="4"/>
-    <path d="M-6 0h24q-5 36 3 78H-6z" fill="#e56b5d" opacity=".9"/><path d="M82 0h24v78H79q8-42 3-78z" fill="#e56b5d" opacity=".9"/><rect x="-10" y="-6" width="120" height="8" rx="4" fill="#6d4524"/></g>
-  <!-- pendant lamp -->
-  <g transform="translate(530 0)"><path d="M0 0v30" stroke="#5a3a1e" stroke-width="2"/><path d="M-18 48q18-26 36 0z" fill="#e8a33d"/><ellipse cx="0" cy="48" rx="18" ry="4" fill="#ffd27a"/><ellipse cx="0" cy="110" rx="80" ry="64" fill="url(#khGlow)"/></g>
-  <!-- ตู้กับข้าว: wooden food cupboard with mesh doors -->
-  <g transform="translate(398 46)">
+  <!-- window over the dining corner -->
+  <g transform="translate(432 14)"><rect width="96" height="74" rx="6" fill="#8a5a2e"/><rect x="6" y="6" width="84" height="62" rx="3" fill="url(#khSky)"/>
+    <circle cx="62" cy="42" r="11" fill="#ffb347" opacity=".9"/><path d="M6 52q21-11 42 0t42-4v20H6z" fill="#c9e3a5"/><path d="M48 6v62M6 37h84" stroke="#8a5a2e" stroke-width="4"/>
+    <path d="M-6 0h22q-5 34 3 74H-6z" fill="#e56b5d" opacity=".9"/><path d="M80 0h22v74H77q8-40 3-74z" fill="#e56b5d" opacity=".9"/><rect x="-10" y="-6" width="116" height="8" rx="4" fill="#6d4524"/></g>
+  <!-- pendant lamp over the table -->
+  <g transform="translate(500 0)"><path d="M0 0v16" stroke="#5a3a1e" stroke-width="2"/><path d="M-14 30q14-22 28 0z" fill="#e8a33d"/><ellipse cx="0" cy="30" rx="14" ry="3.5" fill="#ffd27a"/><ellipse cx="0" cy="110" rx="80" ry="70" fill="url(#khGlow)"/></g>
+  <!-- ตู้กับข้าว -->
+  <g transform="translate(292 46) scale(.72 1)">
     <rect x="-6" y="-8" width="92" height="10" rx="3" fill="#7d4a22"/><rect x="0" y="0" width="80" height="136" rx="4" fill="url(#khCab)"/>
     <rect x="6" y="8" width="32" height="56" rx="2" fill="url(#khMesh)" stroke="#7d4a22" stroke-width="2.5"/><rect x="42" y="8" width="32" height="56" rx="2" fill="url(#khMesh)" stroke="#7d4a22" stroke-width="2.5"/>
     <ellipse cx="22" cy="44" rx="11" ry="4" fill="#fff" opacity=".85"/><path d="M14 40q8-10 16 0z" fill="#e45b4a" opacity=".7"/><ellipse cx="58" cy="46" rx="10" ry="3.5" fill="#fff" opacity=".85"/><rect x="51" y="30" width="14" height="14" rx="3" fill="#d9b26f" opacity=".85"/>
     <rect x="6" y="70" width="32" height="56" rx="2" fill="url(#khMesh)" stroke="#7d4a22" stroke-width="2.5"/><rect x="42" y="70" width="32" height="56" rx="2" fill="url(#khMesh)" stroke="#7d4a22" stroke-width="2.5"/>
-    <path d="M12 112h22M48 112h22" stroke="#9c6a37" stroke-width="2"/><circle cx="22" cy="104" r="7" fill="#fff" opacity=".85"/><circle cx="22" cy="104" r="4" fill="#7aa95c" opacity=".8"/><path d="M50 106h18l-3 6h-12z" fill="#c97b4a" opacity=".8"/>
+    <circle cx="22" cy="104" r="7" fill="#fff" opacity=".85"/><circle cx="22" cy="104" r="4" fill="#7aa95c" opacity=".8"/><path d="M50 106h18l-3 6h-12z" fill="#c97b4a" opacity=".8"/>
     <circle cx="36" cy="38" r="2.4" fill="#f2c14e"/><circle cx="44" cy="38" r="2.4" fill="#f2c14e"/><circle cx="36" cy="100" r="2.4" fill="#f2c14e"/><circle cx="44" cy="100" r="2.4" fill="#f2c14e"/>
   </g>
   <!-- countertop -->
   <rect y="182" width="560" height="58" fill="url(#khWood)"/><rect y="182" width="560" height="7" fill="#d9a066"/>
-  <!-- cooking: clay charcoal stove + pot with rising smoke -->
-  <g transform="translate(300 118)">
+  <!-- the cook in an apron, stirring the pot (drawn behind the stove) -->
+  <g class="kh-cook" transform="translate(384 70)">
+    <path d="M10 112l2-34h20l2 34z" fill="#3d4a66"/>
+    <path d="M4 38q18-8 36 0l-2 44H6z" fill="#5aa4d6"/>
+    <path d="M9 42h26l2 56H7z" fill="#e2725b"/><path d="M12 42q10-8 20 0" stroke="#c75a44" stroke-width="2" fill="none"/><rect x="14" y="62" width="16" height="10" rx="2" fill="#f19a84"/><path d="M8 52q-4 0-6 4M36 52q4 0 6 4" stroke="#c75a44" stroke-width="1.6" fill="none"/>
+    <g class="kh-stir"><path d="M6 46q-14 8-18 22" stroke="#f1c6a2" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M-12 66l-8 30" stroke="#8a5a2e" stroke-width="3" stroke-linecap="round"/><ellipse cx="-21" cy="98" rx="5" ry="3" fill="#8a5a2e"/></g>
+    <path d="M38 46q8 10 4 22" stroke="#f1c6a2" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <rect x="18" y="28" width="8" height="10" fill="#f1c6a2"/>
+    <circle cx="22" cy="18" r="13" fill="#f1c6a2"/><path d="M9 16q2-14 14-14 12 0 14 12-8-6-28 2z" fill="#3a2a22"/><circle cx="34" cy="8" r="5" fill="#3a2a22"/>
+    <path d="M8 12q14-10 28-2l-2 5q-12-6-24 2z" fill="#e2725b"/>
+    <circle cx="17" cy="19" r="1.6" fill="#2a2340"/><circle cx="26" cy="19" r="1.6" fill="#2a2340"/><path d="M18 24q4 3 8 0" stroke="#c2304f" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="13" cy="23" r="2.4" fill="#ff9aa8" opacity=".6"/>
+  </g>
+  <!-- clay charcoal stove + pot with rising smoke -->
+  <g transform="translate(330 118)">
     <g class="kh-smoke"><circle cx="34" cy="-6" r="10"/><circle cx="26" cy="-6" r="8" class="p2"/><circle cx="42" cy="-6" r="9" class="p3"/><circle cx="32" cy="-6" r="11" class="p4"/></g>
     <path d="M4 10h60v6H4z" fill="#5f6670"/><path d="M8 16h52q-2 22-26 22T8 16z" fill="#7d858f"/><path d="M8 10q26-12 52 0" fill="#9aa3ad"/><rect x="28" y="0" width="12" height="5" rx="2" fill="#5f6670"/>
     <path d="M6 38h56l-6 26H12z" fill="#c26a3d"/><path d="M6 38h56l-6 26H12z" fill="none" stroke="#9a4f2a" stroke-width="2"/><ellipse cx="34" cy="52" rx="13" ry="7" fill="#4a2a16"/><ellipse cx="34" cy="53" rx="10" ry="5" fill="url(#khFire)" class="kh-fire"/>
   </g>
-  <!-- sticky-rice steamer with steam -->
+  <!-- dining table with someone eating -->
+  <g transform="translate(436 96)">
+    <rect x="52" y="0" width="34" height="70" rx="5" fill="#9c6230"/><rect x="56" y="4" width="26" height="40" rx="3" fill="#b8793d"/>
+    <path d="M58 104l2-36h22l2 36z" fill="#3d4a66"/>
+    <path d="M52 40q18-8 36 0l-2 34H54z" fill="#7cc79a"/>
+    <g class="kh-eat"><path d="M56 48q-10 4-12 14l10 6" stroke="#e8b48a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M52 66l4-24" stroke="#c9ccd2" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="56" cy="40" rx="3" ry="2" fill="#c9ccd2"/></g>
+    <path d="M86 48q6 10 0 20" stroke="#e8b48a" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <rect x="66" y="30" width="8" height="10" fill="#e8b48a"/><circle cx="70" cy="20" r="13" fill="#e8b48a"/>
+    <path d="M57 18q0-14 13-14t13 14q-5-7-13-7t-13 7z" fill="#4a3a33"/><path d="M57 20q-2 8 2 14" stroke="#c8c3bd" stroke-width="3" fill="none"/>
+    <circle cx="64" cy="21" r="1.6" fill="#2a2340"/><circle cx="74" cy="21" r="1.6" fill="#2a2340"/><ellipse cx="69" cy="27" rx="3" ry="2.2" fill="#c2304f"/>
+    <rect x="0" y="70" width="124" height="34" fill="url(#khCloth)"/><rect x="-4" y="66" width="132" height="8" rx="3" fill="url(#khWood)"/>
+    <rect x="6" y="104" width="7" height="40" fill="#8a5a2e"/><rect x="112" y="104" width="7" height="40" fill="#8a5a2e"/>
+    <ellipse cx="36" cy="64" rx="18" ry="5" fill="#fff" stroke="#e6dccb"/><circle cx="31" cy="61" r="5" fill="#7cc79a"/><circle cx="40" cy="61" r="5" fill="#e8885a"/>
+    <path d="M90 52h18v14q-9 4-18 0z" fill="#d9b26f"/><path d="M90 57h18M90 62h18" stroke="#b88a48" stroke-width="1.5"/><ellipse cx="99" cy="52" rx="9" ry="2.5" fill="#e8c88a"/>
+    <rect x="114" y="50" width="9" height="16" rx="2" fill="#cfe9ff" opacity=".9"/>
+  </g>
+  <!-- sticky-rice steamer, mortar, กระติบ (left, partly behind the text) -->
   <g transform="translate(200 128)"><path class="kh-steam" d="M20 -8q-8-12 0-22t0-22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/><path class="kh-steam s2" d="M34 -4q-8-12 0-22t0-22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
     <path d="M6 0h46l-9 30H15z" fill="#e3bf7c"/><path d="M6 0h46l-9 30H15z" fill="none" stroke="#b98a45" stroke-width="2"/><path d="M13 8h32M16 16h26M19 23h20" stroke="#c89a55" stroke-width="2"/>
     <path d="M0 30h58v5q0 20-29 20T0 35z" fill="#9aa3ad"/><ellipse cx="29" cy="30" rx="29" ry="5" fill="#b9c1ca"/></g>
-  <!-- mortar, กระติบ, veggies -->
   <g transform="translate(120 152)"><path d="M0 18h46l-5 20H5z" fill="#8a6c4f"/><ellipse cx="23" cy="18" rx="23" ry="5" fill="#a6876a"/><rect x="30" y="-12" width="7" height="30" rx="3.5" transform="rotate(25 33 4)" fill="#c49a6c"/></g>
   <g transform="translate(64 156)"><path d="M4 8h36v26q-18 6-36 0z" fill="#d9b26f"/><path d="M4 14h36M4 21h36M4 28h36" stroke="#b88a48" stroke-width="2"/><ellipse cx="22" cy="8" rx="18" ry="4.5" fill="#e8c88a"/></g>
-  <g transform="translate(250 166)"><path d="M0 8h42q-3 16-21 16T0 8z" fill="#fff" stroke="#e2c79c" stroke-width="2"/><circle cx="12" cy="4" r="6" fill="#6fb24f"/><circle cx="22" cy="2" r="7" fill="#89c46a"/><circle cx="31" cy="5" r="5" fill="#e86b4a"/></g>
 </svg>
         <div class="kh-text">
           <p class="eyebrow">Isan Food Log · กินเป็น เห็นเสี่ยง เลี่ยงเบาหวาน</p>
           <h1>ครัวอีสานของฉัน</h1>
           <p class="lede">หยิบกับข้าวจาก “ตู้กับข้าว” วางลง “พาข้าว” แต่ละมื้อ แล้วดูว่าข้าว น้ำตาล และความเค็มวันนี้พอดีไหม</p>
           <div class="kh-games"><button type="button" class="btn kh-quiz" data-foodquiz="1">🗄️ เกมตู้กับข้าวทายใจ <small id="fqBest">8 ข้อ · มีเฉลยทุกข้อ</small></button>
-          <button type="button" class="btn kh-quiz alt" data-kgame="market">🧺 เกมจ่ายตลาด <small>งบ 200 บาท เลือกของดีต่อสุขภาพ</small></button>
-          <button type="button" class="btn kh-quiz alt" data-kgame="plate">🍽️ เกมจัดสำรับ <small>เลือกว่าจะกินอะไร จาน 2:1:1</small></button></div>
+          <button type="button" class="btn kh-quiz alt" data-kgame="market">🧺 เกมจ่ายตลาด <small>งบ 250 บาท ของให้เลือก 60+ อย่าง</small></button>
+          <button type="button" class="btn kh-quiz alt" data-kgame="plate">🍽️ เกมจัดสำรับ <small>เมนูอีสาน 95 เมนู จาน 2:1:1</small></button>
+          <button type="button" class="btn kh-quiz hand" data-handgame="plate">🖐️ ครัวแตะมือ (กล้อง) <small>ชี้นิ้วแตะเมนูบนจอ เหมือน VR</small></button></div>
         </div>
         <div class="kh-chef" aria-hidden="true"><svg class="kh-hat" viewBox="0 0 60 40"><path d="M8 26c-8-2-9-14 0-16 1-8 12-11 17-5 5-8 18-6 19 3 9-1 12 12 3 16v8H8z" fill="#fff" stroke="#e6dccb" stroke-width="2"/><rect x="8" y="26" width="44" height="10" rx="3" fill="#f7f1e6" stroke="#e6dccb" stroke-width="2"/></svg><div id="khMascot"></div></div>
       </header>
@@ -591,12 +620,14 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="db.js?v=9"></script>
 <script src="hub.js?v=8"></script>
 <script src="tree.js?v=2"></script>
-<script src="food.js?v=6"></script>
-<script src="foodquiz.js?v=5"></script>
-<script src="kitchengames.js?v=1"></script>
+<script src="foodimg.js?v=2"></script>
+<script src="food.js?v=7"></script>
+<script src="foodquiz.js?v=6"></script>
+<script src="kitchengames.js?v=2"></script>
 <script src="fitai.js?v=1"></script>
 <script src="cert.js?v=11"></script>
 <script src="profile.js?v=6"></script>
 <script type="module" src="pose.js?v=65"></script>
+<script type="module" src="handkitchen.js?v=3"></script>
 </body>
 </html>
