@@ -1871,3 +1871,7 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 .vs-row.has { border-color: #7cc79a; background: color-mix(in srgb, #7cc79a 10%, var(--card, #fff)); } .vs-row.rec { border-color: #ef5350; animation: vsRec 1s infinite; } @keyframes vsRec { 50% { box-shadow: 0 0 0 4px rgba(239, 83, 80, .25); } }
 .vs-b { all: unset; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--sub, #f2f2f2); font-size: 1rem; } .vs-b.rec { background: #ffe1df; color: #c62828; } .vs-b:focus-visible { outline: 3px solid #5b8cff; }
 .vs-open { margin-top: 6px; }
+
+/* AR stop button: always tappable while counting down / training / playing */
+.ar-stopbtn { all: unset; cursor: pointer; flex: none; padding: 10px 18px; border-radius: 99px; background: #e53935; color: #fff; font-weight: 800; font-size: 1rem; box-shadow: 0 6px 16px rgba(229, 57, 53, .45); }
+.ar-stopbtn:hover { background: #c62828; } .ar-stopbtn:focus-visible { outline: 3px solid #ffd23f; outline-offset: 2px; }

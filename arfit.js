@@ -26,6 +26,7 @@
     { id: "game", n: "เกม AR", ic: "video_game", sub: "10 เกม เกมละ 60 วินาที", items: ["g:bubble", "g:bird", "g:kick", "g:squat", "g:balance", "g:jack", "g:march", "g:punch", "g:reach", "g:dodge"] },
   ];
 
+  const GAME_LV = [[1, 30, "เริ่มต้น (นั่งเล่นได้)"], [2, 45, "ปานกลาง"], [3, 60, "ท้าทาย"]];
   const S = { phase: "mode", mode: null, ex: null, target: 0, page: 0, cards: [], hover: null, acc: 0, lock: false, slip: 0, sm: null, ptr: null, runner: null, cam: false, evalFn: null, last: null, t0: 0, lastF: 0, reps: 0 };
 
   function shell() {
@@ -43,6 +44,7 @@
           <button type="button" class="hk-x" data-ar="close" aria-label="ปิด AR">✕</button>
           <span class="hk-masc" id="arMasc" aria-hidden="true"></span>
           <div class="hk-title"><b id="arTitle">AR ออกกำลังกาย</b><span id="arSay">กำลังเปิดกล้อง…</span></div>
+          <button type="button" class="ar-stopbtn" id="arStopBtn" data-ar="stop" hidden>⏹ หยุด</button>
           <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button>
         </div>
         <div class="ar-live" id="arLive" hidden>
@@ -70,6 +72,7 @@
     await startCam();
   }
   function close() {
+    if (S.phase === "game") window.PreDMTrack?.arGame.stop(); clearInterval(S.cd); S.phase = "mode"; $("#arStopBtn") && ($("#arStopBtn").hidden = true);
     stopCam(); $("#arModal").hidden = true; document.body.classList.remove("care-open"); M()?.stop();
     $("#arLive").hidden = true; $("#arBig").hidden = true;
   }
@@ -100,7 +103,7 @@
     if (S.phase === "ex") {
       const m = MODES.find((x) => x.id === S.mode); $("#arTitle").textContent = `${m.n} · เลือกท่าที่จะฝึก`;
       say("ชี้นิ้วค้างไว้ที่ท่าที่อยากฝึก");
-      const list = m.items.map((k) => { const [t, id] = k.split(":"); if (t === "ex") { const e = EX[id]; return { id: k, ic: e[1], n: e[0], sub: `AI นับ${e[2]}` }; } const g = G[id]; return g ? { id: k, ic: GAME_IC[id] || "video_game", n: g.name, sub: `เกม 60 วิ · ${g.part}` } : null; }).filter(Boolean);
+      const list = m.items.map((k) => { const [t, id] = k.split(":"); if (t === "ex") { const e = EX[id]; return { id: k, ic: e[1], n: e[0], sub: `AI นับ${e[2]}` }; } const g = G[id]; return g ? { id: k, ic: GAME_IC[id] || "video_game", n: g.name, sub: `เกม AR · ${g.part}` } : null; }).filter(Boolean);
       const per = 7, pages = Math.ceil(list.length / per), view = list.slice(S.page * per, S.page * per + per);
       return [{ id: "back", ic: "left_arrow", n: "ย้อนกลับ" }, ...view, ...(pages > 1 ? [{ id: "page", ic: "glowing_star", n: "ท่าอื่น ๆ", sub: `หน้า ${S.page + 1}/${pages}` }] : [])];
     }
@@ -108,7 +111,11 @@
       const e = EX[S.ex]; $("#arTitle").textContent = `${e[0]} · ตั้งเป้าหมาย`; say(e[5]);
       return [{ id: "back", ic: "left_arrow", n: "ย้อนกลับ" }, ...e[3].map((n, i) => ({ id: "t:" + n, ic: ["bullseye", "stopwatch", "trophy"][i], n: `${n} ${e[2]}`, sub: ["เริ่มต้น", "ปานกลาง", "ท้าทาย"][i], big: i === 1 }))];
     }
-    if (S.phase === "done") return [{ id: "again", ic: "fireworks", n: "ฝึกท่าเดิมอีกครั้ง", big: true }, { id: "menu", ic: "glowing_star", n: "เลือกท่าอื่น" }, { id: "close", ic: "stop_sign", n: "ปิด AR" }];
+    if (S.phase === "gtarget") {
+      const g = (T.games || {})[S.game]; $("#arTitle").textContent = `${g.name} · เลือกระดับ`; say(g.how);
+      return [{ id: "back", ic: "left_arrow", n: "ย้อนกลับ" }, ...GAME_LV.map(([lv, secs, n], i) => ({ id: `gl:${lv}:${secs}`, ic: ["bullseye", "stopwatch", "trophy"][i], n, sub: `${secs} วินาที`, big: i === 0 }))];
+    }
+    if (S.phase === "done") return [{ id: "again", ic: "fireworks", n: S.kind === "game" ? "เล่นเกมนี้อีกครั้ง" : "ฝึกท่าเดิมอีกครั้ง", big: true }, { id: "menu", ic: "glowing_star", n: S.kind === "game" ? "เลือกเกม/ท่าอื่น" : "เลือกท่าอื่น" }, { id: "close", ic: "stop_sign", n: "ปิด AR" }];
     return [];
   }
   function layout() {
@@ -120,44 +127,69 @@
       return `<div class="hk-card ar-card${c.big ? " big" : ""}" data-id="${esc(c.id)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"><span class="hk-ring"></span><span class="hk-pic">${ic(c.ic)}</span><b>${esc(c.n)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</div>`;
     }).join("");
     S.cards = [...box.children]; S.hover = null; S.acc = 0;
-    if (S.spoke !== S.phase && { mode: 1, ex: 1, target: 1 }[S.phase]) { S.spoke = S.phase; speak({ mode: "ar_mode", ex: "ar_ex", target: "ar_target" }[S.phase]); }
+    if (S.spoke !== S.phase && { mode: 1, ex: 1, target: 1, gtarget: 1 }[S.phase]) { S.spoke = S.phase; speak({ mode: "ar_mode", ex: "ar_ex", target: "ar_target", gtarget: "ar_target" }[S.phase]); }
     if (S.phase === "mode") say(S.cam ? "ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก (หรือแตะด้วยเมาส์/นิ้วบนจอ)" : "แตะการ์ดเพื่อเลือกโหมด");
   }
 
   function choose(id, el) {
     M()?.sfx("pick"); if (el) fx(el); $("#arBig").hidden = true;
     if (id === "close") return close();
-    if (id === "back") { S.phase = S.phase === "target" ? "ex" : "mode"; S.page = 0; return layout(); }
+    if (id === "back") { S.phase = S.phase === "target" || S.phase === "gtarget" ? "ex" : "mode"; S.page = 0; return layout(); }
     if (id === "page") { const m = MODES.find((x) => x.id === S.mode); S.page = (S.page + 1) % Math.ceil(m.items.length / 7); return layout(); }
     if (id === "menu") { S.phase = "mode"; return layout(); }
-    if (id === "again") return begin();
+    if (id === "again") return S.kind === "game" ? beginGame() : begin();
     if (id.startsWith("m:")) { S.mode = id.slice(2); S.phase = "ex"; S.page = 0; return layout(); }
-    if (id.startsWith("g:")) { const g = id.slice(2); close(); window.PreDMTrack?.startGame(g); return; }
+    if (id.startsWith("g:")) { S.game = id.slice(2); S.phase = "gtarget"; return layout(); } // AR games play right here
+    if (id.startsWith("gl:")) { const [, lv, secs] = id.split(":"); S.lv = +lv; S.secs = +secs; return beginGame(); }
     if (id.startsWith("ex:")) { S.ex = id.slice(3); S.phase = "target"; return layout(); }
     if (id.startsWith("t:")) { S.target = +id.slice(2); return begin(); }
   }
 
   /* ------------------------------------------------------------ training */
-  function begin() {
-    if (!S.cam) { say("ต้องเปิดกล้องก่อนจึงจะนับท่าได้"); $("#arMsg").hidden = false; $("#arMsg").textContent = "การนับท่าต้องใช้กล้อง กด ✕ แล้วเปิดใหม่ และอนุญาตให้ใช้กล้อง"; return; }
-    const e = EX[S.ex], T = window.PreDMTrack;
-    S.phase = "count"; layout(); S.last = null; S.reps = 0;
-    S.runner.setHands(S.ex === "fist"); // hands only when the exercise needs them (faster)
-    $("#arTitle").textContent = `${e[0]} · เป้าหมาย ${S.target} ${e[2]}`; say(e[5]);
-    $("#arUnit").textContent = e[2]; $("#arGoal").textContent = `เป้าหมาย ${S.target}`; $("#arN").textContent = 0; $("#arBar").style.width = "0%"; $("#arFb").textContent = "เตรียมตัว";
-    let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak("ready");
+  function needCam() { if (S.cam) return false; say("ต้องเปิดกล้องก่อนจึงจะเล่นได้"); $("#arMsg").hidden = false; $("#arMsg").textContent = "ท่าออกกำลังกายและเกม AR ต้องใช้กล้อง กด ✕ แล้วเปิดใหม่ และอนุญาตให้ใช้กล้อง"; return true; }
+  function stopCard() {
+    $("#arStopBtn").hidden = false;
+    $("#arCards").innerHTML = `<div class="hk-card ar-card ar-stop" data-id="stop" style="left:10%;top:24%"><span class="hk-ring"></span><span class="hk-pic">${ic("stop_sign")}</span><b>หยุด</b><small>ชี้ค้าง 2 วินาที</small></div>`;
+    S.cards = [...$("#arCards").children]; S.hover = null; S.acc = 0; S.lock = false; // stop card is far from the old cards and needs a long hold
+  }
+  function countdown(go) {
+    let n = 3; const big = $("#arBig"); big.hidden = false; big.textContent = n; speak("ready"); $("#arStopBtn").hidden = false;
     clearInterval(S.cd);
     S.cd = setInterval(() => {
       n--; if (n > 0) { big.textContent = n; M()?.sfx("hover"); speak(String(n)); return; }
-      clearInterval(S.cd); big.textContent = "เริ่ม!"; speak("go"); M()?.sfx("ok"); setTimeout(() => (big.hidden = true), 700);
-      S.evalFn = T.makeEval(S.ex); S.phase = "train"; S.t0 = performance.now(); $("#arLive").hidden = false; M()?.start();
-      $("#arCards").innerHTML = `<div class="hk-card ar-card ar-stop" data-id="stop" style="left:12%;top:24%"><span class="hk-ring"></span><span class="hk-pic">${ic("stop_sign")}</span><b>หยุด</b><small>ชี้ค้าง 2 วินาที</small></div>`;
-      S.cards = [...$("#arCards").children]; S.hover = null; S.acc = 0; S.lock = false; // stop card is far from the old cards and needs a long hold
+      clearInterval(S.cd); big.textContent = "เริ่ม!"; speak("go"); M()?.sfx("ok"); setTimeout(() => (big.hidden = true), 700); go();
     }, 1000);
+  }
+  function cancelCountdown() { clearInterval(S.cd); $("#arBig").hidden = true; $("#arStopBtn").hidden = true; $("#arLive").hidden = true; S.phase = S.kind === "game" ? "gtarget" : "target"; layout(); }
+  function beginGame() {
+    if (needCam()) return;
+    const T = window.PreDMTrack, g = T.games[S.game]; S.kind = "game"; S.phase = "count"; layout();
+    S.runner.setHands(T.arGame.handy(S.game));
+    $("#arTitle").textContent = `${g.name} · ${S.secs} วินาที`; say(g.how);
+    $("#arUnit").textContent = "คะแนน"; $("#arGoal").textContent = `เหลือ ${S.secs} วินาที`; $("#arN").textContent = 0; $("#arBar").style.width = "100%"; $("#arFb").textContent = g.how; $("#arFb").dataset.state = "idle";
+    countdown(() => { T.arGame.start(S.game, S.lv, S.secs); S.phase = "game"; S.t0 = performance.now(); S.reps = 0; $("#arLive").hidden = false; M()?.start(); stopCard(); });
+  }
+  function finishGame() {
+    const T = window.PreDMTrack, g = T.games[S.game], res = T.arGame.stop();
+    S.phase = "done"; $("#arLive").hidden = true; $("#arStopBtn").hidden = true; M()?.stop(); S.runner.setHands(true);
+    const st = res.score >= 30 ? 3 : res.score >= 15 ? 2 : res.score >= 5 ? 1 : 0; if (st >= 2) { confetti(); M()?.sfx("win"); }
+    const big = $("#arBig"); big.hidden = false;
+    big.innerHTML = `<div class="ar-res"><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div><b>${esc(g.name)} · ${res.score} คะแนน</b><small>${res.record ? "🏆 สถิติใหม่! · " : ""}ดีที่สุด ${res.best}${res.score > 0 ? " · บันทึกลงสมุดแล้ว" : ""}</small></div>`;
+    speak(res.record ? "record" : res.score > 0 ? "gameover" : "retry");
+    layout(); say("ชี้นิ้วค้างไว้ที่การ์ด เพื่อเล่นอีกครั้งหรือเลือกเกมอื่น");
+  }
+  function begin() {
+    if (needCam()) return;
+    const e = EX[S.ex], T = window.PreDMTrack;
+    S.kind = "ex"; S.phase = "count"; layout(); S.last = null; S.reps = 0;
+    S.runner.setHands(S.ex === "fist"); // hands only when the exercise needs them (faster)
+    $("#arTitle").textContent = `${e[0]} · เป้าหมาย ${S.target} ${e[2]}`; say(e[5]);
+    $("#arUnit").textContent = e[2]; $("#arGoal").textContent = `เป้าหมาย ${S.target}`; $("#arN").textContent = 0; $("#arBar").style.width = "0%"; $("#arFb").textContent = "เตรียมตัว";
+    countdown(() => { S.evalFn = T.makeEval(S.ex); S.phase = "train"; S.t0 = performance.now(); $("#arLive").hidden = false; M()?.start(); stopCard(); });
   }
   function finish(early) {
     const e = EX[S.ex], n = S.last?.count || 0, mins = Math.max(1, Math.round((performance.now() - S.t0) / 60000));
-    S.phase = "done"; S.evalFn = null; $("#arLive").hidden = true; M()?.stop();
+    S.phase = "done"; S.evalFn = null; $("#arLive").hidden = true; $("#arStopBtn").hidden = true; M()?.stop();
     S.runner.setHands(true);
     if (n > 0) A()?.addLog?.({ type: e[4], name: `${e[0]} (AR)`, minutes: mins, reps: n });
     const ratio = n / S.target, st = ratio >= 1 ? 3 : ratio >= 0.6 ? 2 : ratio >= 0.3 ? 1 : 0;
@@ -180,6 +212,14 @@
       S.last = r; $("#arN").textContent = r.count; $("#arBar").style.width = `${Math.min(100, (r.count / S.target) * 100)}%`;
       const fb = $("#arFb"); fb.textContent = r.msg || "—"; fb.dataset.state = r.state;
       if (r.count >= S.target) finish(false);
+    } else if (S.phase === "game") {
+      const r = window.PreDMTrack.arGame.frame(lms, ctx, w, h, now, hands);
+      if (r) {
+        if (r.score !== S.reps) { if (r.score > S.reps) bump(); S.reps = r.score; }
+        $("#arN").textContent = r.score; $("#arGoal").textContent = `เหลือ ${r.left} วินาที`; $("#arBar").style.width = `${(100 * r.left) / S.secs}%`;
+        if (r.left <= 3 && r.left > 0 && r.left !== S.lastLeft) { S.lastLeft = r.left; speak(String(r.left)); }
+        if (!r.running) finishGame();
+      }
     } else if (hands && hands.length) window.PreDMTrack.drawHands(ctx, hands, w, h);
     pointerStep(fingertip(lms, hands, w, h));
   }
@@ -213,7 +253,7 @@
       if (!paused) S.acc += dt;
       const need = hit.dataset.id === "stop" ? STOP_DWELL : DWELL, k = Math.min(1, S.acc / need);
       hit.style.setProperty("--p", k); cur.style.setProperty("--p", k);
-      if (k >= 1) { const id = hit.dataset.id; S.hover = null; S.acc = 0; S.lock = true; if (id === "stop") finish(true); else choose(id, hit); }
+      if (k >= 1) { const id = hit.dataset.id; S.hover = null; S.acc = 0; S.lock = true; if (id === "stop") stopNow(); else choose(id, hit); }
     } else cur.style.setProperty("--p", 0);
   }
 
@@ -231,10 +271,16 @@
     layer.appendChild(wrap); setTimeout(() => wrap.remove(), 3200);
   }
 
+  function stopNow() { // stop while counting down, training or playing; results so far are kept
+    if (S.phase === "count") return cancelCountdown();
+    if (S.phase === "train") return finish(true);
+    if (S.phase === "game") return finishGame();
+  }
   function onClick(e) {
     const b = e.target.closest("[data-ar]"); if (b && b.dataset.ar === "close") return close();
+    if (b && b.dataset.ar === "stop") return stopNow();
     const c = e.target.closest(".hk-card"); if (!c) return;
-    S.lock = true; if (c.dataset.id === "stop") return finish(true);
+    S.lock = true; if (c.dataset.id === "stop") return stopNow();
     choose(c.dataset.id, c);
   }
   document.addEventListener("click", (e) => { if (e.target.closest("[data-arfit]")) { e.preventDefault(); open(); } });

@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=117">
+<link rel="stylesheet" href="styles.css?v=118">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -241,6 +241,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
           <label class="switch"><input type="checkbox" id="gHands" checked><span></span>🖐️ MediaPipe Hand (แตะเป้าด้วยปลายนิ้ว)</label>
           <button type="button" class="btn sm vs-open" data-voicestudio>🎙️ อัดเสียงพากย์ด้วยเสียงคนจริง</button>
           <button class="btn primary" id="gStart">เริ่มเกมส์</button>
+          <button class="btn danger" id="gStop" hidden>⏹ หยุดเกม</button>
           <h3>เหรียญรางวัล</h3>
           <div id="badges" class="badges"></div>
         </div>
@@ -635,8 +636,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="fitai.js?v=1"></script>
 <script src="cert.js?v=11"></script>
 <script src="profile.js?v=6"></script>
-<script type="module" src="pose.js?v=67"></script>
+<script type="module" src="pose.js?v=69"></script>
 <script type="module" src="handkitchen.js?v=9"></script>
-<script src="arfit.js?v=5"></script>
+<script src="arfit.js?v=7"></script>
 </body>
 </html>

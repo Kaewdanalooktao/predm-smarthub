@@ -6,15 +6,17 @@ const App = () => window.PreDM;
 const VER = "0.10.14";
 const MODEL = new URL("vendor/models/pose_landmarker_lite.task", location.href).href; // self-hosted: no request leaves our site
 const WASM = new URL("vendor/mediapipe/wasm", location.href).href;
+const MODEL_FULL = new URL("vendor/models/pose_landmarker_full.task", location.href).href;
 
 let landmarker = null;
 async function getLandmarker(msgEl) {
   if (landmarker) return landmarker;
   msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Pose…";
   const fs = await FilesetResolver.forVisionTasks(WASM);
-  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numPoses: 1 });
-  try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU")); }
-  catch { landmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU")); }
+  // GPU: the more accurate "full" model; CPU-only devices: the faster "lite" model. Lower thresholds keep tracking through awkward poses.
+  const opts = (delegate, model) => ({ baseOptions: { modelAssetPath: model, delegate }, runningMode: "VIDEO", numPoses: 1, minPoseDetectionConfidence: 0.4, minPosePresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
+  try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU", MODEL_FULL)); }
+  catch { try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU", MODEL)); } catch { landmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU", MODEL)); } }
   return landmarker;
 }
 // MediaPipe Hand Landmarker (21 points per hand, up to 2 hands) — loaded only when a hand mode / overlay is used
@@ -25,7 +27,7 @@ async function getHandLandmarker(msgEl) {
   if (!handLoading) handLoading = (async () => {
     if (msgEl) msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Hand…";
     const fs = await FilesetResolver.forVisionTasks(WASM);
-    const opts = (delegate) => ({ baseOptions: { modelAssetPath: HAND_MODEL, delegate }, runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+    const opts = (delegate) => ({ baseOptions: { modelAssetPath: HAND_MODEL, delegate }, runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
     try { handLm = await HandLandmarker.createFromOptions(fs, opts("GPU")); }
     catch { handLm = await HandLandmarker.createFromOptions(fs, opts("CPU")); }
     return handLm;
@@ -55,12 +57,17 @@ class Runner {
         const { width: w, height: h } = this.c, ctx = this.ctx;
         ctx.save(); ctx.translate(w, 0); ctx.scale(-1, 1); ctx.drawImage(this.v, 0, 0, w, h); ctx.restore();
         // mirror landmark x so the screen behaves like a mirror
-        const lms = res.landmarks?.[0]?.map((p) => ({ x: 1 - p.x, y: p.y, v: p.visibility ?? 1 })) || null;
+        const raw = res.landmarks?.[0]?.map((p) => ({ x: 1 - p.x, y: p.y, v: p.visibility ?? 1 })) || null;
+        // steadier tracking: light smoothing between frames, and keep the last pose ~0.45 s when a frame is missed
+        let lms = null;
+        if (raw) { this.seen = now; this.sm = this.sm ? raw.map((p, i) => { const q = this.sm[i], a = Math.hypot(p.x - q.x, p.y - q.y) > 0.08 ? 0.85 : 0.55; return { x: q.x + (p.x - q.x) * a, y: q.y + (p.y - q.y) * a, v: q.v + (p.v - q.v) * 0.5 }; }) : raw; lms = this.sm; }
+        else if (this.sm && now - this.seen < 450) lms = this.sm; else this.sm = null;
         let hands = null;
         if (this.hands && handLm) {
           const hr = handLm.detectForVideo(this.v, now), hd = hr.handedness || hr.handednesses || [];
           // camera image is mirrored on screen, so MediaPipe's "Left" is the user's right hand as seen in the mirror view
           hands = (hr.landmarks || []).map((pts, i) => ({ pts: pts.map((q) => ({ x: 1 - q.x, y: q.y })), side: hd[i]?.[0]?.categoryName === "Left" ? "R" : "L", score: hd[i]?.[0]?.score ?? 1 }));
+          if (hands.length) { this.lastHands = hands; this.handsAt = now; } else if (this.lastHands && now - this.handsAt < 300) hands = this.lastHands; // bridge short drop-outs
         }
         onFrame(lms, ctx, w, h, now, hands);
       }
@@ -103,12 +110,18 @@ function angle(a, b, c) {
   const ab = Math.atan2(a.y - b.y, a.x - b.x), cb = Math.atan2(c.y - b.y, c.x - b.x);
   let d = Math.abs((ab - cb) * 180 / Math.PI); return d > 180 ? 360 - d : d;
 }
-const visible = (lms, ids) => ids.every((i) => lms[i].v > 0.5);
+const visible = (lms, ids) => ids.every((i) => lms[i].v > 0.35);
+// knee angle from whichever leg the camera sees clearly (side-on, the far leg is hidden); null if neither leg is visible
+function kneeAngle(lms) {
+  const ok = (a, b, c) => lms[a].v > 0.35 && lms[b].v > 0.35 && lms[c].v > 0.3;
+  const L = ok(23, 25, 27) ? angle(lms[23], lms[25], lms[27]) : null, R = ok(24, 26, 28) ? angle(lms[24], lms[26], lms[28]) : null;
+  return L != null && R != null ? (L + R) / 2 : L ?? R;
+}
 
 /* ---------------- AI tracking engine (tracking page + session player) ----------------
    Skeleton colour: white = still detecting / not judged, red = wrong form, green = correct form. */
 const COLORS = { idle: "#ffffff", ok: "#2ecc71", bad: "#ff4d4d" };
-const NEED = { squat: [23, 24, 25, 26, 27, 28], arm: [11, 12, 13, 14, 15, 16, 23, 24], march: [23, 24, 25, 26], balance: [23, 24, 27, 28], any: [11, 12, 23, 24] };
+const NEED = { squat: null, arm: [11, 12, 13, 14, 15, 16, 23, 24], march: [23, 24, 25, 26], balance: [23, 24, 27, 28], any: [11, 12, 23, 24] };
 const HAND_MODES = new Set(["fist"]);
 function makeEval(mode) {
   const s = { stage: "up", side: null, lastMove: 0, bal: 0, count: 0, seenAt: 0, midSince: 0, partSince: 0, lastT: 0 };
@@ -126,12 +139,12 @@ function makeEval(mode) {
       r.count = s.count; return r;
     }
     if (!lms) { s.seenAt = 0; return { state: "idle", msg: "ไม่พบร่างกาย ถอยห่างจากกล้องให้เห็นทั้งตัว", count: s.count }; }
-    if (!visible(lms, NEED[mode] || NEED.any)) { s.seenAt = 0; return { state: "idle", msg: "ให้กล้องเห็นช่วงตัวที่ใช้ในท่านี้ทั้งหมด", count: s.count }; }
+    if (mode === "squat" ? kneeAngle(lms) == null : !visible(lms, NEED[mode] || NEED.any)) { s.seenAt = 0; return { state: "idle", msg: "ให้กล้องเห็นช่วงตัวที่ใช้ในท่านี้ทั้งหมด", count: s.count }; }
     if (!s.seenAt) s.seenAt = now;
     if (now - s.seenAt < 1000) return { state: "idle", msg: "กำลังจับท่าทาง…", count: s.count };
     const r = { state: "ok", msg: "", count: s.count, rep: false, label: "" };
     if (mode === "squat") {
-      const k = (angle(lms[23], lms[25], lms[27]) + angle(lms[24], lms[26], lms[28])) / 2;
+      const k = kneeAngle(lms);
       r.label = `เข่า ${Math.round(k)}°`;
       if (k < 100) { s.stage = "down"; s.midSince = 0; r.msg = "ดีมาก ดันตัวขึ้น"; }
       else if (k > 160) { if (s.stage === "down") { s.stage = "up"; s.count++; r.rep = true; r.msg = `${s.count} ครั้ง`; } else r.msg = "ยืนตรง พร้อมย่อลง"; s.midSince = 0; }
@@ -496,8 +509,8 @@ const GAME_FRAME = {
     G.objs.forEach((o) => { const age = (now - o.born) / o.life; ctx.globalAlpha = 1 - age * 0.5; star(ctx, o.x * w, o.y * h, 22 + Math.sin(now / 150) * 2, o.gold ? "#f6c55a" : "#7ee08a"); ctx.globalAlpha = 1; });
   },
   squat(lms, ctx, w, h, now, dt, lv) {
-    if (lms && [23, 24, 25, 26, 27, 28].every((i) => lms[i].v > 0.45) && G.running) {
-      const k = (angle(lms[23], lms[25], lms[27]) + angle(lms[24], lms[26], lms[28])) / 2;
+    const k = lms ? kneeAngle(lms) : null;
+    if (k != null && G.running) {
       if (k < (lv === 1 ? 125 : 110)) G.stage = "down";
       else if (k > 160 && G.stage === "down") { G.stage = "up"; G.pumps++; G.score = G.pumps; say(String(G.pumps), true);
         if (G.pumps % 5 === 0) { G.balloons++; G.objs.push({ x: 0.78, y: 0.55, vy: -0.25, col: ["#e9785a", "#5aaae6", "#f6c55a", "#b18cff", "#7ee08a"][G.balloons % 5] }); say("ลูกโป่งลอยแล้ว", false); } }
@@ -516,7 +529,7 @@ const GAME_FRAME = {
     let up = false;
     if (lms && lms[27].v > 0.4 && lms[28].v > 0.4) up = Math.abs(lms[27].y - lms[28].y) > (lv === 1 ? 0.035 : 0.05);
     if (G.running && up) { G.hold += dt; G.score = Math.floor(G.hold); }
-    const elapsed = 60 - Math.max(0, (G.end - now) / 1000);
+    const elapsed = (G.dur || 60) - Math.max(0, (G.end - now) / 1000);
     if (G.running && elapsed >= G.nextSwitch) { G.nextSwitch += 15; say("สลับขา", true); G.pops.push({ x: 0.4, y: 0.3, v: 0, t: now, text: "สลับขา!" }); }
     ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 3;
     for (let i = 0; i < 6; i++) { const y = h * (0.15 + i * 0.12), x = ((now / (6 - lv) + i * 140) % (w + 200)) - 100; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 40, y - 12, x + 90, y); ctx.stroke(); }
@@ -535,29 +548,36 @@ function gameFrame(lms, ctx, w, h, now, hands) {
   if (G.id !== "balance") popText(ctx, w, h, now);
   if (G.running) { const left = Math.max(0, Math.ceil((G.end - now) / 1000)); $("#gTime").textContent = left; $("#gScore").textContent = G.score; if (left <= 3 && left > 0 && left !== G.spoken) { G.spoken = left; say(String(left), true); } if (left === 0) finishGame(); }
 }
+function resetGame() { Object.assign(G, { objs: [], pops: [], score: 0, bird: { y: 0.5, vy: 0 }, flapUp: false, stage: G.id === "jack" ? "in" : "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0, lastT: 0, spoken: null, flaps: 0, legUp: {}, lastSide: null, speed: 0, dist: 0, px: 0.5 }); }
 function finishGame() {
-  G.running = false; G.runner.stop(); $("#gStart").disabled = false;
+  G.running = false; G.runner.stop(); $("#gStart").disabled = false; $("#gStop").hidden = true;
   const b = bests(), prev = b[G.id] || 0, g = GAMES[G.id];
   if (G.score > prev) { b[G.id] = G.score; App().store.set("bestScores", b); }
   if (G.id === "bubble" && G.score > App().store.get("bestScore", 0)) App().store.set("bestScore", G.score);
   $("#gMsg").textContent = `จบเกมส์ ${g.name}! ได้ ${G.score} คะแนน${G.score > prev ? " · สถิติใหม่!" : ""} กดเริ่มเพื่อเล่นอีกครั้ง หรือเลือกเกมส์อื่น`;
   say(`จบเกมส์ ได้ ${G.score} คะแนน${G.score > prev ? " สถิติใหม่" : ""}`, true);
-  App().addLog({ type: g.type, name: g.name, minutes: 1, score: G.score });
+  if (G.score > 0) App().addLog({ type: g.type, name: g.name, minutes: 1, score: G.score }); // a game stopped with no points is not logged
   App().renderBadges(); renderPick(); selectGame(G.id);
 }
 function initGame() {
   G.runner = new Runner($("#gVideo"), $("#gCanvas"), $("#gMsg"));
   renderPick(); selectGame("bubble");
   $("#gamePick").addEventListener("click", (e) => { const c = e.target.closest(".gcard"); if (c) selectGame(c.dataset.game); });
+  $("#gStop").addEventListener("click", () => { // end early: keeps the score so far
+    clearInterval(G.cd);
+    if (G.running) return finishGame();
+    G.runner.stop(); $("#gStart").disabled = false; $("#gStop").hidden = true; $("#gMsg").hidden = false; $("#gMsg").textContent = "หยุดแล้ว กดเริ่มเพื่อเล่นใหม่";
+  });
   $("#gStart").addEventListener("click", async () => {
     $("#gStart").disabled = true;
     G.runner.hands = !!$("#gHands")?.checked; // MediaPipe Hand: draw the fingers and let fingertips touch targets
-    Object.assign(G, { objs: [], pops: [], score: 0, bird: { y: 0.5, vy: 0 }, flapUp: false, stage: G.id === "jack" ? "in" : "up", pumps: 0, balloons: 0, hold: 0, nextSwitch: 15, milestone: 0, lastT: 0, spoken: null, flaps: 0, legUp: {}, lastSide: null, speed: 0, dist: 0, px: 0.5 });
+    resetGame(); G.dur = 60;
     $("#gScore").textContent = 0;
     try {
       await G.runner.start(gameFrame);
       let n = 3; $("#gMsg").hidden = false; $("#gMsg").textContent = `${GAMES[G.id].name} · เตรียมตัว… ${n}`; say(`${GAMES[G.id].name} เตรียมตัว`, true);
-      const iv = setInterval(() => { n--; if (n > 0) { $("#gMsg").textContent = `${GAMES[G.id].name} · เตรียมตัว… ${n}`; say(String(n), true); } else { clearInterval(iv); $("#gMsg").hidden = true; G.end = performance.now() + 60000; G.last = 0; G.running = true; say("เริ่ม", true); } }, 1000);
+      $("#gStop").hidden = false;
+      const iv = G.cd = setInterval(() => { n--; if (n > 0) { $("#gMsg").textContent = `${GAMES[G.id].name} · เตรียมตัว… ${n}`; say(String(n), true); } else { clearInterval(iv); $("#gMsg").hidden = true; G.end = performance.now() + 60000; G.last = 0; G.running = true; say("เริ่ม", true); } }, 1000);
     } catch (e) { $("#gMsg").textContent = "เปิดกล้องไม่ได้: " + (e.message || e); $("#gStart").disabled = false; }
   });
 }
@@ -565,17 +585,38 @@ function initGame() {
 // Stop the camera when the user leaves the page section.
 window.addEventListener("predm:view", (e) => {
   if (e.detail !== "tracking" && T.runner?.on) $("#tStop").click();
-  if (e.detail !== "game" && G.runner?.on) { G.running = false; G.runner.stop(); $("#gStart").disabled = false; }
+  if (e.detail !== "game" && G.runner?.on) { clearInterval(G.cd); G.running = false; G.runner.stop(); $("#gStart").disabled = false; $("#gStop").hidden = true; }
 });
 
 initTracking(); initGame();
 // shared with the AR exercise picker (arfit.js)
-Object.assign(window.PreDMTrack, { Runner, makeEval, drawSkeleton, drawHands, COLORS, modes: MODES, games: GAMES,
+const HAND_GAMES = new Set(["bubble", "reach"]); // games where fingertips can touch targets
+const arGame = {
+  handy: (id) => HAND_GAMES.has(id),
+  start(id, lv, secs) { G.id = id; resetGame(); G.arLv = lv; G.dur = secs; G.end = performance.now() + secs * 1000; G.last = 0; G.running = true; G.ar = true; },
+  frame(lms, ctx, w, h, now, hands) {
+    if (!G.ar) return null;
+    const dt = G.lastT ? Math.min(0.05, (now - G.lastT) / 1000) : 0; G.lastT = now; G.hands = hands || null;
+    if (lms) drawSkeleton(ctx, lms, w, h, "rgba(63,191,133,.7)");
+    if (hands) drawHands(ctx, hands, w, h);
+    GAME_FRAME[G.id](lms, ctx, w, h, now, dt, G.arLv);
+    if (G.id !== "balance") popText(ctx, w, h, now);
+    const left = Math.max(0, Math.ceil((G.end - now) / 1000)); if (left === 0) G.running = false;
+    return { score: G.score, left, running: G.running };
+  },
+  stop() { // save best score + exercise log, like the games page
+    const g = GAMES[G.id], score = G.score, b = bests(), prev = b[G.id] || 0, mins = Math.max(1, Math.round((G.dur - Math.max(0, (G.end - performance.now()) / 1000)) / 60));
+    G.running = false; G.ar = false; G.objs = [];
+    if (score > prev) { b[G.id] = score; App().store.set("bestScores", b); }
+    if (score > 0) { App().addLog({ type: g.type, name: g.name + " (AR)", minutes: mins, score }); App().renderBadges(); }
+    return { score, best: Math.max(prev, score), record: score > prev && prev > 0 };
+  },
+};
+Object.assign(window.PreDMTrack, { Runner, makeEval, drawSkeleton, drawHands, COLORS, modes: MODES, games: GAMES, arGame,
   startGame(id) { location.hash = "game"; setTimeout(() => { selectGame(id); $("#gStart").click(); }, 350); } });
 window.dispatchEvent(new Event("predm:track-ready"));
 
 /* ---------------- still-photo pose detection (AI Body Transformation) ---------------- */
-const MODEL_FULL = new URL("vendor/models/pose_landmarker_full.task", location.href).href;
 let imageLandmarker = null;
 async function getImageLandmarker() {
   if (imageLandmarker) return imageLandmarker;
