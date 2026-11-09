@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PRE-DM. Overview (แพลตฟอร์มอ่อนหวานวิทยา)</title>
+<meta name="description" content="Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · Know Your Risk. Shape Your Future. ภาพรวมระบบ ฟีเจอร์ และเส้นทางการดูแล 6 เดือน">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Anuphan:wght@300;400;500;600;700&display=swap">
+<style>
+/* Near-black editorial overview: giant outlined English display over Thai body text, one blue accent,
+   a draggable member badge on a lanyard, a feature carousel and a numbered 6-month journey. */
+:root {
+  --bg: #0b0d10; --panel: #13161b; --ink: #f2f3f5; --muted: #8b919b; --dim: #555b66; --line: rgba(255,255,255,.08);
+  --blue: #5b8cff; --blue2: #3a5fd9; --salmon: #f2a891;
+  --display: "Archivo", "Anuphan", system-ui, sans-serif; --body: "Anuphan", "Archivo", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.7 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 6px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 700 .7rem var(--display); letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 12px var(--blue); }
+.dot { color: var(--blue); }
+.outline { color: transparent; -webkit-text-stroke: 1.5px var(--blue); }
+
+header.top { position: fixed; z-index: 50; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); background: rgba(11,13,16,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+.brand { font: 900 1.15rem var(--display); letter-spacing: -.01em; text-decoration: none; }
+header nav { display: flex; align-items: center; gap: 30px; }
+header nav a { font: 700 .72rem var(--display); letter-spacing: .16em; text-decoration: none; color: #c9ccd2; }
+header nav a:hover { color: #fff; }
+.orb { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; background: var(--panel); }
+.orb::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); }
+
+/* hero */
+.hero { position: relative; min-height: 100vh; padding-top: 66px; display: flex; align-items: center; overflow: hidden; }
+.hero-word { position: absolute; left: -2vw; top: 50%; transform: translateY(-50%); font: 900 clamp(8rem, 26vw, 24rem)/0.8 var(--display); letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.07); white-space: nowrap; pointer-events: none; user-select: none; }
+.hero .wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 30px; align-items: center; width: 100%; }
+.hero h1 { margin: 18px 0 0; font: 900 clamp(3.2rem, 8vw, 6.6rem)/0.92 var(--display); letter-spacing: -.04em; text-transform: uppercase; }
+.hero .th { margin: 18px 0 0; font: 600 clamp(1.3rem, 2.4vw, 1.75rem)/1.3 var(--body); }
+.hero p.lead { color: var(--muted); max-width: 46ch; margin: 14px 0 0; font-weight: 300; }
+.actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 99px; font: 700 .9rem var(--body); text-decoration: none; border: 1px solid rgba(255,255,255,.2); transition: transform .2s, background .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.solid { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 10px 30px -10px var(--blue); }
+
+/* lanyard badge */
+.hero h1.tag { font-size: clamp(2.6rem, 5.6vw, 4.8rem); line-height: .98; word-spacing: .18em; letter-spacing: -.03em; }
+.ov-pillars { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.ov-pillars span { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); font: 700 .74rem var(--display); letter-spacing: .06em; color: #d3d6dc; }
+.ov-pillars span:first-child { border-color: var(--blue); color: #fff; }
+.lanyard { position: relative; height: 560px; touch-action: none; }
+.lanyard svg.strap { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.badge { position: absolute; left: 50%; top: 150px; width: 260px; margin-left: -130px; border-radius: 20px; padding: 18px 18px 16px; background: linear-gradient(160deg, #24357c, #172150 55%, #10173a); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 40px 60px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.12); cursor: grab; user-select: none; transform-origin: 50% 0; will-change: transform; }
+.badge:active { cursor: grabbing; }
+.badge .slot { width: 46px; height: 7px; border-radius: 99px; background: #0b0d10; margin: -4px auto 12px; box-shadow: inset 0 1px 2px rgba(0,0,0,.8); }
+.badge .row { display: flex; justify-content: space-between; font: 700 .58rem var(--display); letter-spacing: .14em; color: #aab6e8; }
+.badge .ava { margin: 14px auto 10px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 40%, #5b8cff, #2a3d8f); }
+.badge .name { font: 700 1.5rem/1.1 var(--body); }
+.badge .meta { font-size: .78rem; color: #aab6e8; margin-top: 2px; }
+.badge .mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; }
+.badge .mini div { background: rgba(255,255,255,.07); border-radius: 10px; padding: 6px 4px; text-align: center; }
+.badge .mini b { display: block; font: 800 1rem var(--display); }
+.badge .mini small { font-size: .6rem; color: #aab6e8; }
+.barcode { height: 30px; background: repeating-linear-gradient(90deg, #fff 0 2px, transparent 2px 4px, #fff 4px 5px, transparent 5px 8px, #fff 8px 11px, transparent 11px 13px); opacity: .85; border-radius: 3px; }
+.drag-hint { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: .76rem; color: var(--dim); }
+
+section.s { padding-block: 120px; border-top: 1px solid var(--line); }
+h2.title { font: 900 clamp(2.6rem, 7vw, 5.4rem)/0.95 var(--display); letter-spacing: -.04em; margin: 16px 0 0; text-transform: uppercase; }
+h2.th-title { font: 700 clamp(2.2rem, 4.6vw, 3.6rem)/1.15 var(--body); margin: 16px 0 0; }
+
+/* about */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 60px; align-items: start; }
+.about p { color: #b9bdc6; font-weight: 300; margin: 18px 0 0; max-width: 54ch; }
+.nums { display: flex; gap: 34px; margin-top: 36px; }
+.nums div + div { border-left: 1px solid var(--line); padding-left: 34px; }
+.nums b { font: 800 3.2rem/1 var(--display); letter-spacing: -.03em; display: block; }
+.nums span { font-size: .82rem; color: var(--muted); }
+.toolkit { background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: 28px; }
+.toolkit h3 { margin: 0 0 18px; font: 800 1.1rem var(--display); }
+.tchips { display: flex; flex-wrap: wrap; gap: 10px; }
+.tchips span { padding: 8px 16px; border-radius: 99px; border: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: .88rem; color: #d3d6dc; transition: border-color .2s, color .2s; }
+.tchips span:hover { border-color: var(--blue); color: #fff; }
+
+/* carousel */
+.feat-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+.feat-head a { font-weight: 600; text-decoration: none; color: #c9ccd2; }
+.car { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 36px; margin-top: 44px; align-items: center; }
+.car-vis { position: relative; border-radius: 26px; overflow: hidden; aspect-ratio: 16 / 11; background: var(--panel); border: 1px solid var(--line); max-width: 100%; }
+.car-vis .slide { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; }
+.car-vis .slide.on { opacity: 1; }
+.car-vis svg { width: 100%; height: 100%; display: block; }
+.car-vis .tag { position: absolute; left: 18px; bottom: 18px; font: 700 .66rem var(--display); letter-spacing: .14em; background: rgba(0,0,0,.5); padding: 6px 12px; border-radius: 99px; }
+.car-txt small { font: 700 .72rem var(--display); letter-spacing: .16em; color: var(--blue); }
+.car-txt h3 { font: 700 2.2rem/1.2 var(--body); margin: 10px 0 0; }
+.car-txt p { color: #b9bdc6; font-weight: 300; margin: 14px 0 0; }
+.car-txt .tchips { margin-top: 18px; }
+.car-nav { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+.car-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: #fff; cursor: pointer; font-size: 1.1rem; }
+.car-nav button:hover { border-color: var(--blue); }
+.dots { display: flex; gap: 6px; margin-left: 8px; }
+.dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--dim); transition: width .3s, background .3s; }
+.dots i.on { width: 26px; background: var(--blue); }
+
+/* stages */
+.stages-head { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.stages { margin-top: 56px; border-top: 1px solid var(--line); }
+.stage { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.3fr); gap: 30px; align-items: start; padding: 32px 18px; border-bottom: 1px solid var(--line); border-radius: 18px; transition: background .3s; }
+.stage:hover { background: var(--panel); }
+.stage .n { font: 900 3.4rem/1 var(--display); color: transparent; -webkit-text-stroke: 1.2px var(--dim); transition: -webkit-text-stroke-color .3s; }
+.stage:hover .n { -webkit-text-stroke-color: var(--blue); }
+.stage h3 { margin: 0; font: 700 1.4rem/1.3 var(--body); }
+.stage h3 small { display: block; font: 700 .72rem var(--display); letter-spacing: .16em; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.stage p { margin: 0; color: #b9bdc6; font-weight: 300; }
+.stage .out { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.stage .out span { font-size: .86rem; padding-left: 14px; position: relative; color: #d3d6dc; }
+.stage .out span::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+
+/* contact */
+.contact h2 { font: 900 clamp(3.6rem, 12vw, 10rem)/0.88 var(--display); letter-spacing: -.05em; margin: 18px 0 0; }
+.cgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 56px; }
+.cgrid div { border-top: 1px solid var(--line); padding-top: 18px; }
+.cgrid h4 { margin: 0 0 10px; font: 700 .7rem var(--display); letter-spacing: .16em; color: var(--muted); }
+.cgrid a { display: block; text-decoration: none; color: #d3d6dc; margin: 4px 0; }
+.cgrid a.hot { color: #ff6b5e; font: 800 1.6rem var(--display); }
+.foot { margin-top: 70px; padding-block: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .8rem; color: var(--dim); }
+.sos { position: fixed; z-index: 40; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); width: 60px; height: 60px; border-radius: 50%; background: #d63a2f; color: #fff; text-decoration: none; display: grid; place-content: center; text-align: center; line-height: 1.05; box-shadow: 0 10px 26px -8px rgba(214,58,47,.8); }
+.sos b { font: 800 .95rem var(--display); } .sos small { font-size: .6rem; }
+.reveal { transition: opacity .8s, transform .8s; }
+.js .reveal:not(.in) { opacity: 0; transform: translateY(24px); }
+
+@media (max-width: 900px) {
+  header nav a { display: none; }
+  .hero .wrap, .about, .car { grid-template-columns: 1fr; }
+  .lanyard { height: 520px; }
+  .stage { grid-template-columns: 70px minmax(0, 1fr); }
+  .stage > p, .stage > div.d { grid-column: 2; }
+  .stage .n { font-size: 2.4rem; }
+  .cgrid { grid-template-columns: 1fr; }
+  .nums { gap: 20px; } .nums div + div { padding-left: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .reveal { transition: none; } .js .reveal:not(.in) { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">PRE-DM<span class="dot">.</span></a>
+    <nav aria-label="เมนูหลัก">
+      <a href="#about">ABOUT</a><a href="#features">FEATURES</a><a href="#stages">STAGES</a><a href="#contact">CONTACT</a>
+      <a class="orb" href="#top" aria-label="กลับขึ้นบนสุด"></a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-word" aria-hidden="true">PREVENT</div>
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span>
+        <h1 class="tag">Know your risk<span class="dot">.</span><br><span class="outline">Shape</span> your future<span class="dot">.</span></h1>
+        <p class="th">รู้ความเสี่ยง แล้วออกแบบอนาคตสุขภาพของคุณ</p>
+        <div class="ov-pillars"><span>Smart Screening</span><span>Body Composition</span><span>AI Exercise</span><span>AI Body Transformation</span></div>
+        <p class="lead">กลุ่มเสี่ยงเบาหวานฝึกตามโปรแกรม 4 แบบได้ทุกวัน AI นับท่าผ่านกล้องโทรศัพท์ อสม. และ รพ.สต. ติดตามต่อเนื่อง 6 เดือน พร้อมปุ่ม 1669 ทุกหน้า</p>
+        <div class="actions"><a class="btn" href="#features">ดูฟีเจอร์</a><a class="btn solid" href="index.html">เข้าสู่ระบบ →</a></div>
+      </div>
+      <div class="lanyard" id="lanyard">
+        <svg class="strap" id="strap" aria-hidden="true"></svg>
+        <div class="badge" id="badge" role="img" aria-label="บัตรสมาชิกตัวอย่าง คุณสมชาย กลุ่มภาวะก่อนเบาหวาน สัปดาห์ที่ 5 จาก 24">
+          <div class="slot"></div>
+          <div class="row"><span>PRE-DM SMART HUB</span><span>MEMBER ID</span></div>
+          <div class="ava" id="ava"></div>
+          <div class="name">คุณสมชาย<span class="dot">.</span></div>
+          <div class="meta">Prediabetes · FPG 112 · สัปดาห์ 5/24</div>
+          <div class="mini"><div><b>12</b><small>Risk /17</small></div><div><b>55</b><small>นาที/สัปดาห์</small></div><div><b>−3.2</b><small>กก.</small></div></div>
+          <div class="barcode"></div>
+        </div>
+        <span class="drag-hint">ลากบัตรได้</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="about">
+    <div class="wrap about">
+      <div class="reveal">
+        <span class="eyebrow">About</span>
+        <h2 class="th-title">ป้องกันอย่าง<br>มีเป้าหมาย<span class="dot">.</span></h2>
+        <p>ภาวะก่อนเบาหวานคือช่วงเวลาที่ยังย้อนกลับได้ แต่ส่วนใหญ่ไม่รู้ตัว และขาดแรงจูงใจที่จะออกกำลังกายอย่างสม่ำเสมอ</p>
+        <p>Pre-DM รวมการประเมินความเสี่ยง โปรแกรมออกกำลังกายตามแนวทาง ADA/ACSM การนับท่าด้วย AI เกมส์กระตุ้นการออกกำลังกาย และการติดตามโดย อสม. ใกล้บ้านไว้ในที่เดียว</p>
+        <div class="nums"><div><b>58%</b><span>ความเสี่ยงที่ลดลงได้</span></div><div><b>150</b><span>นาที/สัปดาห์</span></div></div>
+      </div>
+      <div class="toolkit reveal">
+        <h3>Toolkit</h3>
+        <div class="tchips"><span>MediaPipe Pose</span><span>AI นับครั้งและบอกท่า</span><span>Thai Diabetes Risk Score</span><span>FPG · HbA1c</span><span>Senior Fitness Test</span><span>Body Composition</span><span>เกมส์ Bubble Pop</span><span>แชทบอทโค้ช</span><span>ตารางฝึก 1 สัปดาห์</span><span>เหรียญรางวัล</span><span>อสม. · รพ.สต.</span><span>ปุ่ม 1669</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="features">
+    <div class="wrap">
+      <div class="feat-head reveal"><div><span class="eyebrow">Recent features</span><h2 class="title">Features<span class="dot">.</span></h2></div><a href="index.html">เปิดแอปต้นแบบ ↗</a></div>
+      <div class="car reveal" id="car">
+        <div class="car-vis" id="carVis"></div>
+        <div class="car-txt" aria-live="polite">
+          <small id="cNum"></small><h3 id="cTitle"></h3><p id="cDesc"></p><div class="tchips" id="cTags"></div>
+          <div class="car-nav"><button type="button" id="prev" aria-label="ฟีเจอร์ก่อนหน้า">←</button><button type="button" id="next" aria-label="ฟีเจอร์ถัดไป">→</button><div class="dots" id="dots"></div><a class="btn" id="cTry" href="index.html" style="margin-left:auto;padding:10px 18px">ลองใช้งาน</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="stages">
+    <div class="wrap">
+      <div class="stages-head reveal"><span class="eyebrow">6-month journey</span><h2 class="title">Stages of <span class="outline">care</span><span class="dot">.</span></h2></div>
+      <div class="stages" id="stageList"></div>
+    </div>
+  </section>
+
+  <section class="s contact" id="contact">
+    <div class="wrap">
+      <span class="eyebrow">Contact</span>
+      <h2>Shape your<br>future<span class="dot">.</span></h2>
+      <div class="cgrid">
+        <div><h4>ฉุกเฉิน</h4><a class="hot" href="tel:1669">1669</a><a href="tel:1330">สปสช. 1330</a><a href="tel:1422">กรมควบคุมโรค 1422</a></div>
+        <div><h4>หน้าอื่น</h4><a href="index.html">แอป · เข้าสู่ระบบ</a><a href="landing.html">หน้า Landing</a><a href="#stages">เส้นทางการดูแล 6 เดือน</a></div>
+        <div><h4>หมายเหตุ</h4><p style="margin:0;color:var(--muted);font-size:.9rem">ต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์ ข้อมูลเก็บในเบราว์เซอร์ของผู้ใช้เท่านั้น</p></div>
+      </div>
+      <div class="foot"><span>© 2569 Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span><span>Diabetes Prevention Platform</span></div>
+    </div>
+  </section>
+</main>
+<a class="sos" href="tel:1669" aria-label="โทรฉุกเฉิน 1669"><b>1669</b><small>ฉุกเฉิน</small></a>
+
+<script src="art.js?v=4"></script>
+<script>
+(function () {
+  document.documentElement.classList.add("js");
+  const $ = (s) => document.querySelector(s);
+  const { P } = window.PreArt;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- badge avatar (bust portrait) ----------
+  $("#ava").innerHTML = `<svg viewBox="0 0 150 150" aria-hidden="true">
+    <path d="M18 150c4-34 26-50 57-50s53 16 57 50z" fill="#f2a891"/><path d="M58 104l17 18 17-18" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="64" y="82" width="22" height="24" rx="8" fill="#c98a62"/>
+    <ellipse cx="75" cy="66" rx="27" ry="31" fill="#e0a07a"/>
+    <path d="M47 62c-2-22 12-34 29-34 18 0 31 11 28 33-4-9-10-14-16-15-9 6-24 8-41 16z" fill="#1d1612"/>
+    <circle cx="65" cy="70" r="2.6" fill="#2a1f1b"/><circle cx="86" cy="70" r="2.6" fill="#2a1f1b"/>
+    <path d="M67 84c5 4 12 4 17 0" fill="none" stroke="#8a4b33" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="58" cy="79" r="5" fill="#f08a7a" opacity=".45"/><circle cx="93" cy="79" r="5" fill="#f08a7a" opacity=".45"/>
+    <g fill="none" stroke="#1f2550" stroke-width="2.6"><rect x="54" y="62" width="18" height="14" rx="5"/><rect x="79" y="62" width="18" height="14" rx="5"/><path d="M72 68h7"/></g></svg>`;
+
+  // ---------- lanyard physics ----------
+  const box = $("#lanyard"), badge = $("#badge"), strap = $("#strap");
+  let x = 0, y = 0, vx = 0, vy = 0, drag = null, last = performance.now();
+  function draw() {
+    const W = box.clientWidth, ax = W / 2, top = badge.offsetTop;
+    const bx = ax + x, by = top + y + 4, sag = Math.min(60, Math.abs(x) * 0.25 + 10);
+    const mx = (ax + bx) / 2 - x * 0.12, my = (by) / 2 + sag * 0.3;
+    strap.innerHTML = `<defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a5fd9"/><stop offset=".5" stop-color="#5b8cff"/><stop offset="1" stop-color="#3a5fd9"/></linearGradient>
+      <pattern id="sp" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(${(x * 0.05).toFixed(1)})"><rect width="18" height="18" fill="url(#sg)"/><rect width="18" height="4" fill="#ffffff" opacity=".12"/></pattern></defs>
+      <path d="M${ax} -40 Q${mx} ${my} ${bx} ${by - 20}" fill="none" stroke="url(#sp)" stroke-width="22" stroke-linecap="butt"/>
+      <rect x="${bx - 14}" y="${by - 24}" width="28" height="14" rx="4" fill="#c9ccd2"/><rect x="${bx - 8}" y="${by - 12}" width="16" height="10" rx="3" fill="#8b919b"/>`;
+    const rot = (x * 0.06 + vx * 0.02);
+    badge.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${Math.max(-25, Math.min(25, rot)).toFixed(2)}deg)`;
+  }
+  function tick(now) {
+    const dt = Math.min(0.032, (now - last) / 1000); last = now;
+    if (!drag) {
+      const k = 90, c = 9;
+      vx += (-k * x - c * vx) * dt; vy += (-k * y - c * vy) * dt;
+      x += vx * dt * 1; y += vy * dt * 1;
+      if (Math.abs(x) < 0.05 && Math.abs(y) < 0.05 && Math.abs(vx) < 0.05 && Math.abs(vy) < 0.05) { x = y = vx = vy = 0; }
+    }
+    draw(); requestAnimationFrame(tick);
+  }
+  badge.addEventListener("pointerdown", (e) => { badge.setPointerCapture(e.pointerId); drag = { sx: e.clientX - x, sy: e.clientY - y, lx: e.clientX, lt: performance.now() }; });
+  badge.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const nx = e.clientX - drag.sx, ny = e.clientY - drag.sy, now = performance.now(), dt = Math.max(1, now - drag.lt) / 1000;
+    vx = (nx - x) / dt * 0.02; vy = (ny - y) / dt * 0.02;
+    x = Math.max(-220, Math.min(220, nx)); y = Math.max(-120, Math.min(260, ny)); drag.lt = now;
+  });
+  const end = () => { if (drag) { drag = null; vx *= 50; vy *= 50; } };
+  badge.addEventListener("pointerup", end); badge.addEventListener("pointercancel", end);
+  if (!reduce) { x = 60; vx = -40; } // a small swing on load
+  requestAnimationFrame(tick);
+
+  // ---------- feature carousel ----------
+  const vis = (a, b, inner) => `<svg viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="v${a.slice(1)}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="640" height="440" fill="url(#v${a.slice(1)})"/>
+    <g stroke="#fff" stroke-opacity=".06">${[...Array(16)].map((_, i) => `<path d="M${i * 40} 0v440M0 ${i * 40}h640"/>`).join("")}</g>${inner}</svg>`;
+  const sk = () => { const j = P.squat.map(([px, py]) => [200 + px * 2.8, 40 + py * 2.8]); const B = [[1, 2], [1, 3], [3, 4], [2, 7], [7, 8]];
+    return `<g stroke="#9fc0ff" stroke-width="4" stroke-linecap="round">${B.map(([a, b]) => `<line x1="${j[a][0]}" y1="${j[a][1]}" x2="${j[b][0]}" y2="${j[b][1]}"/>`).join("")}</g><circle cx="${j[0][0]}" cy="${j[0][1]}" r="17" fill="none" stroke="#9fc0ff" stroke-width="4"/>${[1, 2, 3, 4, 7, 8].map((i) => `<circle cx="${j[i][0]}" cy="${j[i][1]}" r="7" fill="#0b0d10" stroke="#9fc0ff" stroke-width="3"/>`).join("")}<text x="${j[7][0] + 26}" y="${j[7][1] - 22}" font-size="46" font-weight="800" fill="#fff" font-family="Archivo">92°</text>`; };
+  const F = [
+    ["AI POSE", "ตรวจท่าด้วย AI", "นับครั้ง วัดองศาเข่าและแขน และบอกท่าที่ถูกต้องทันที รองรับสควอท ยกแขน ย่ำเท้า และยืนขาเดียว ประมวลผลในเครื่อง", ["MediaPipe Pose", "4 ท่า", "ไม่ส่งภาพออก"], "index.html#tracking", vis("#1b2a6b", "#0f1530", sk())],
+    ["GAME", "เกมส์ Bubble Pop", "ขยับแขนแตะฟองภายใน 60 วินาที เลือกระดับได้ 3 ระดับ ระดับเริ่มต้นนั่งเล่นได้ ฟองน้ำตาลห้ามแตะ", ["60 วินาที", "3 ระดับ", "เหรียญรางวัล"], "index.html#game",
+      vis("#2a1650", "#0f1530", [[150, 140, 46, "#5aaae6"], [300, 90, 34, "#f0b440"], [470, 160, 52, "#5aaae6"], [380, 260, 40, "#e05246"], [200, 290, 30, "#5aaae6"], [520, 320, 28, "#f0b440"]].map(([cx, cy, r, c]) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c}" fill-opacity=".5" stroke="${c}" stroke-width="3"/>`).join("") + `<text x="320" y="70" font-size="40" font-weight="800" fill="#ffd45c" font-family="Archivo">+3</text>`)],
+    ["RISK SCORE", "ประเมินความเสี่ยง", "Thai Diabetes Risk Score 6 ข้อ คะแนน 0–17 แปลผล FPG และ HbA1c พร้อมคำแนะนำและนัดตรวจตามระดับความเสี่ยง", ["0–17 คะแนน", "FPG · HbA1c", "บันทึกย้อนหลัง"], "index.html#risk",
+      vis("#123a5a", "#0f1530", `<path d="M170 300a150 150 0 0 1 300 0" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="32" stroke-linecap="round"/><path d="M170 300a150 150 0 0 1 300 0" fill="none" stroke="#5b8cff" stroke-width="32" stroke-linecap="round" stroke-dasharray="333 480"/><text x="320" y="290" text-anchor="middle" font-size="84" font-weight="800" fill="#fff" font-family="Archivo">12</text>`)],
+    ["BODY COMPOSITION", "ติดตามองค์ประกอบร่างกาย", "บันทึกน้ำหนัก ไขมัน มวลกล้ามเนื้อ รอบเอว ไขมันช่องท้องหลายครั้ง เทียบกราฟและดูความคืบหน้าสู่เป้าหมาย 5–7%", ["WHtR", "กราฟแนวโน้ม", "เทียบทุกครั้ง"], "index.html#body",
+      vis("#0f3a44", "#0f1530", `<path d="M90 130C200 140 240 200 330 220S480 290 560 310" fill="none" stroke="#4fd8f0" stroke-width="6" stroke-linecap="round"/>${[[90, 130], [330, 220], [560, 310]].map(([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r="11" fill="#0b0d10" stroke="#4fd8f0" stroke-width="4"/>`).join("")}<text x="420" y="250" font-size="38" font-weight="800" fill="#7ee08a" font-family="Archivo">−3.2 kg</text>`)],
+    ["FITNESS TEST", "ประเมินสมรรถภาพกาย", "6 รายการ ลุก-นั่ง 30 วินาที ยกเข่า 2 นาที นั่งเอื้อมแตะเท้า TUG ยืนขาเดียว และแรงบีบมือ แปลผลและเทียบครั้งก่อน", ["6 รายการ", "ทุก 4–8 สัปดาห์", "เทียบผล"], "index.html#fitness",
+      vis("#3a1f3f", "#0f1530", `<circle cx="320" cy="240" r="120" fill="none" stroke="#fff" stroke-opacity=".15" stroke-width="18"/><circle cx="320" cy="240" r="120" fill="none" stroke="#f2a891" stroke-width="18" stroke-linecap="round" stroke-dasharray="520 760" transform="rotate(-90 320 240)"/><path d="M300 92h40M320 92v28" stroke="#fff" stroke-width="10" stroke-linecap="round"/><text x="320" y="262" text-anchor="middle" font-size="64" font-weight="800" fill="#fff" font-family="Archivo">0:30</text>`)],
+  ];
+  const carVis = $("#carVis");
+  carVis.innerHTML = F.map((f, i) => `<div class="slide ${i ? "" : "on"}">${f[5]}<span class="tag">0${i + 1} · ${f[0]}</span></div>`).join("");
+  $("#dots").innerHTML = F.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("");
+  let cur = 0, timer;
+  function show(i) {
+    cur = (i + F.length) % F.length; const f = F[cur];
+    [...carVis.children].forEach((s, k) => s.classList.toggle("on", k === cur));
+    [...$("#dots").children].forEach((d, k) => d.classList.toggle("on", k === cur));
+    $("#cNum").textContent = `0${cur + 1} / 0${F.length} · ${f[0]}`; $("#cTitle").textContent = f[1]; $("#cDesc").textContent = f[2];
+    $("#cTags").innerHTML = f[3].map((t) => `<span>${t}</span>`).join(""); $("#cTry").href = f[4];
+  }
+  const auto = () => { clearInterval(timer); if (!reduce) timer = setInterval(() => show(cur + 1), 6000); };
+  $("#prev").addEventListener("click", () => { show(cur - 1); auto(); });
+  $("#next").addEventListener("click", () => { show(cur + 1); auto(); });
+  $("#car").addEventListener("mouseenter", () => clearInterval(timer)); $("#car").addEventListener("mouseleave", auto);
+  show(0); auto();
+
+  // ---------- stages ----------
+  const S = [
+    ["คัดกรองความเสี่ยง", "Screening", "ประเมิน Thai Diabetes Risk Score และตรวจ FPG หรือ HbA1c จัดกลุ่มเสี่ยง และตรวจความพร้อมก่อนออกกำลังกาย ภายในสัปดาห์แรก"],
+    ["ตั้งเป้าหมายร่วมกัน", "Goal setting", "ตั้งเป้าลดน้ำหนัก 5–7% และแอโรบิก 150 นาที/สัปดาห์ ประเมินสมรรถภาพกายและ Body Composition ครั้งแรกเป็นค่าตั้งต้น"],
+    ["ฝึกที่บ้านทุกวัน", "Home training", "ฝึกตามโปรแกรม 4 แบบ AI นับท่าและบอกท่าที่ถูกต้อง เล่นเกมส์สะสมเหรียญ และเดินหลังอาหารทุกมื้อ"],
+    ["อสม. ติดตามใกล้บ้าน", "Community follow-up", "อสม. ดูผลการออกกำลังกายรายสัปดาห์ โทรหรือเยี่ยมบ้านทุก 2 สัปดาห์ ให้กำลังใจและช่วยปรับเป้าหมาย"],
+    ["ประเมินซ้ำทุก 3 เดือน", "Quarterly review", "วัด Body Composition และสมรรถภาพกายซ้ำ เทียบกับค่าตั้งต้น ปรับความหนักและรูปแบบการออกกำลังกาย"],
+    ["ครบ 6 เดือน", "The outcome", "ตรวจ FPG หรือ HbA1c ซ้ำเพื่อสรุปผลและวางแผนต่อ", [["#7ee08a", "กลับสู่ปกติ · ติดตามปีละครั้ง"], ["#f6c55a", "ยังอยู่ในภาวะก่อนเบาหวาน · ต่อโปรแกรมอีก 6 เดือน"], ["#ff6b5e", "เข้าเกณฑ์เบาหวาน · ส่งต่อ รพ. เพื่อรักษา"]]],
+  ];
+  $("#stageList").innerHTML = S.map(([t, en, d, out], i) => `<div class="stage reveal"><span class="n">0${i + 1}</span><h3>${t}<small>${en}</small></h3><div class="d"><p>${d}</p>${out ? `<div class="out">${out.map(([c, o]) => `<span style="--c:${c}">${o}</span>`).join("")}</div>` : ""}</div></div>`).join("");
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -80px 0px" });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  } else document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+})();
+</script>
+</body>
+</html>

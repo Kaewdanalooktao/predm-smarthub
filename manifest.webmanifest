@@ -1,0 +1,17 @@
+{
+  "name": "Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)",
+  "short_name": "Pre-DM",
+  "description": "ส่งเสริมการออกกำลังกายสำหรับกลุ่มเสี่ยงเบาหวาน ประเมินความเสี่ยง AI นับท่า และน้องอ่อนหวานผู้ช่วยโค้ชสุขภาพ",
+  "lang": "th",
+  "start_url": "index.html#home",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2f4aa0",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

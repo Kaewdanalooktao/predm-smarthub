@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f4aa0">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pre-DM">
+<title>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · Know Your Risk. Shape Your Future.</title>
+<meta name="description" content="Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · Know Your Risk. Shape Your Future. Smart Screening, Body Composition, AI Exercise และ AI Body Transformation สำหรับกลุ่มเสี่ยงเบาหวาน">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700;800;900&family=Anuphan:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Night-navy marketing page: pill nav, scroll-reveal hero (night -> morning), ticker, glass cards, expanding gallery. */
+:root {
+  --bg: #0f1430; --bg2: #151b3d; --ink: #ffffff; --muted: #a9b0cf; --dim: #6b7298;
+  --line: rgba(255,255,255,.1); --glass: rgba(255,255,255,.05);
+  --blue: #5b8cff; --violet: #9d6bff; --cyan: #4fd8f0; --pink: #f07ab8; --amber: #f6c55a; --red: #e0453a;
+  --grad: linear-gradient(90deg, #7fb2ff, #b18cff 55%, #f2a4d8);
+  --display: "Prompt", "Anuphan", system-ui, sans-serif; --body: "Anuphan", "Outfit", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.65 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+::selection { background: rgba(91,140,255,.35); }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 10px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 15px; border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); color: #fff; font: 700 .72rem var(--display); letter-spacing: .18em; text-transform: uppercase; }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h2.big { font-size: clamp(2.2rem, 5.2vw, 3.8rem); font-weight: 800; line-height: 1.12; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 99px; background: #fff; color: #10142e; font: 700 .95rem var(--body); text-decoration: none; border: 0; cursor: pointer; transition: transform .2s, box-shadow .2s; box-shadow: 0 0 20px rgba(255,255,255,.18); }
+.btn:hover { transform: scale(1.05); box-shadow: 0 0 34px rgba(255,255,255,.3); }
+.btn:active { transform: scale(.96); }
+.btn.ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.3); box-shadow: none; }
+
+/* nav */
+.nav { position: fixed; z-index: 50; top: calc(18px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 32px)); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 10px 10px 22px; border-radius: 99px; border: 1px solid var(--line); background: rgba(13,17,42,.82); border-color: rgba(255,255,255,.16); box-shadow: 0 12px 34px -12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(var(--nav-b, 12px)); -webkit-backdrop-filter: blur(var(--nav-b, 12px)); transition: border-radius .3s; }
+.logo { display: flex; flex-direction: column; text-decoration: none; line-height: 1; }
+.logo b { font: 700 1.55rem/1 "Outfit", sans-serif; letter-spacing: -.03em; display: flex; align-items: center; color: #fff; text-shadow: 0 2px 12px rgba(91,140,255,.35); }
+.logo b i { width: .82em; height: .82em; display: inline-grid; margin: 0 .03em; }
+.logo small { font: 600 .56rem "Outfit", sans-serif; letter-spacing: .2em; color: #c3c9ea; margin-top: 4px; }
+.nav .logo { flex: none; } .nav .logo small { white-space: nowrap; }
+.nav { width: min(900px, calc(100% - 32px)); } .nav ul { gap: 18px; } .nav ul a, .nav > a:last-child { white-space: nowrap; }
+@media (max-width: 1020px) { .nav .logo small { display: none; } .nav ul { gap: 13px; } .nav ul a { font-size: .84rem; } }
+.nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+.nav ul a { position: relative; text-decoration: none; font-size: .9rem; color: #dfe3f5; padding: 4px 0; }
+.nav ul a span { position: absolute; left: 0; bottom: -2px; height: 2px; width: 0; background: var(--grad); transition: width .3s; }
+.nav ul a:hover span { width: 100%; }
+.nav .btn { padding: 9px 18px; font-size: .86rem; }
+.menu-btn { display: none; background: none; border: 0; color: #fff; padding: 8px; cursor: pointer; }
+
+/* hero */
+.hero { height: 300vh; position: relative; }
+.hero-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.layer { position: absolute; inset: 0; }
+.layer svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+#night svg.scene { transform: scale(var(--zoom, 1)); transform-origin: 50% 80%; }
+#day { clip-path: circle(var(--r, 0%) at 50% 62%); }
+.hero-copy { position: absolute; left: 0; right: 0; top: 17vh; text-align: center; padding: 0 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.hero h1, .hero .h1 { font-size: clamp(2.8rem, 8.6vw, 6.4rem); font-weight: 900; line-height: 1.08; }
+.hero-copy p { margin: 0; max-width: 48ch; text-wrap: balance; font-size: clamp(1rem, 1.7vw, 1.2rem); padding: 8px 18px; border-radius: 16px; }
+#night .hero-copy p { background: rgba(15,20,48,.55); backdrop-filter: blur(6px); color: #e6e9fb; }
+#night .hero-copy p b { color: var(--amber); font-weight: 600; }
+#day .h1 { color: #fff; -webkit-text-stroke: 0; text-shadow: 0 4px 0 #1f2550, 0 10px 30px rgba(31,37,80,.35); }
+#day .h1 .y { color: #ffd45c; }
+#day .hero-copy p { background: rgba(31,37,80,.72); color: #fff; }
+#day .eyebrow { background: #1f2550; border-color: transparent; color: #fff; }
+#crowd { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.hero.has3d .flat-people { display: none; }
+.hero h1.tag, .hero .h1.tag { font-size: clamp(2.6rem, 6.6vw, 5.4rem); letter-spacing: -.02em; line-height: 1.05; }
+.pillars { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 760px; }
+.pillar { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: 99px; background: rgba(13,17,42,.72); border: 1px solid rgba(255,255,255,.22); color: #fff; font: 600 .84rem "Outfit", var(--body); text-decoration: none; backdrop-filter: blur(6px); transition: transform .2s, background .2s; }
+.pillar svg { width: 16px; height: 16px; fill: none; stroke: #8fc0ff; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.pillar:hover { transform: translateY(-2px); background: rgba(31,40,96,.9); }
+#day .pillar { background: rgba(31,37,80,.8); }
+#day .pillar svg { stroke: #ffd45c; }
+.foot-tag { font: 700 1.05rem "Outfit", sans-serif; margin: 14px 0 0; color: #fff; }
+.foot-tag span { color: #8fc0ff; }
+.lcards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.lcard { border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; background: linear-gradient(170deg, color-mix(in srgb, var(--tint) 20%, #1a2152), #151b42 70%); border: 1px solid color-mix(in srgb, var(--tint) 45%, transparent); box-shadow: 0 24px 50px -26px rgba(0,0,0,.75); transition: transform .3s, border-color .3s; }
+.lcard:hover { transform: translateY(-4px); border-color: var(--tint); }
+.lart { position: relative; height: 210px; background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--tint) 55%, #fff) 0 38%, color-mix(in srgb, var(--tint) 30%, #1a2152) 39%); }
+.lart.photo { background: #fff; }
+.lart.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lart .fr { position: absolute; inset: 0; display: grid; place-items: end center; opacity: 0; transition: opacity .35s; }
+.lart .fr.on { opacity: 1; }
+.lart svg { height: 200px; }
+.lart .count { position: absolute; top: 14px; left: 14px; padding: 4px 12px; border-radius: 99px; background: rgba(13,17,42,.8); font: 700 .8rem "Outfit", var(--body); }
+.lbody { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.lbody small.k { font: 700 .74rem var(--display); letter-spacing: .14em; color: color-mix(in srgb, var(--tint) 70%, #fff); }
+.lbody h3 { font-size: 1.5rem; font-weight: 800; }
+.lbody p { margin: 0; color: #dde1f5; }
+.lbody .src { font-size: .76rem; color: #aab2d6; }
+.lbody .btn { align-self: flex-start; margin-top: auto; padding: 10px 20px; font-size: .88rem; }
+@media (max-width: 960px) { .lcards { grid-template-columns: 1fr; } }
+.scroll-hint { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; font-size: .72rem; color: #dfe3f5; z-index: 3; }
+.scroll-hint svg { animation: bounce 1.6s infinite; }
+@keyframes bounce { 50% { transform: translateY(5px); } }
+
+/* sections */
+section.s { padding-block: 112px; position: relative; }
+#services, #about { background: linear-gradient(180deg, #0f1430, #171f4b 18%, #171f4b 82%, #0f1430); }
+#services::before, #about::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(127,178,255,.35), transparent); }
+#about { overflow: hidden; }
+.reveal { transition: opacity .8s ease, transform .8s ease; }
+.js .reveal:not(.in) { opacity: 0; transform: translateY(20px); }
+.ticker-wrap { position: relative; overflow: hidden; margin-top: 26px; }
+.ticker-wrap::before, .ticker-wrap::after { content: ""; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none; }
+.ticker-wrap::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+.ticker-wrap::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+.ticker { display: flex; gap: 46px; width: max-content; animation: tick 40s linear infinite; }
+.ticker span { display: inline-flex; align-items: center; gap: 10px; font: 600 1.05rem var(--display); color: #e6e9fa; white-space: nowrap; }
+.ticker svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+@keyframes tick { to { transform: translateX(-50%); } }
+.built { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; color: #c9cee9; font-size: .92rem; }
+
+.sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
+.sec-head p { color: #c9cee9; max-width: 44ch; margin: 14px 0 0; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.pcard { position: relative; overflow: hidden; border-radius: 28px; background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 22%, #1a2152), #151b42 72%); border: 1px solid color-mix(in srgb, var(--tint) 45%, transparent); box-shadow: 0 24px 50px -26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.08); padding: 92px 30px 30px; display: flex; flex-direction: column; gap: 10px; transition: border-color .3s, transform .3s; }
+.pcard:hover { border-color: var(--tint); transform: translateY(-4px); box-shadow: 0 30px 60px -26px color-mix(in srgb, var(--tint) 45%, #000); }
+.pcard .q { position: absolute; top: 0; right: 0; width: 120px; height: 120px; border-bottom-left-radius: 120px; display: grid; place-items: center; padding: 0 0 18px 18px; }
+.pcard .q svg { width: 34px; height: 34px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pcard small { font: 700 .76rem var(--display); letter-spacing: .14em; color: color-mix(in srgb, var(--tint) 70%, #fff); }
+.pcard h3 { font-size: 1.7rem; font-weight: 800; }
+.pcard p { margin: 0; color: #dde1f5; font-weight: 400; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chips span { font-size: .8rem; padding: 4px 12px; border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); color: #fff; }
+
+/* gallery */
+.gallery { display: flex; gap: 12px; height: 430px; }
+.gitem { position: relative; flex: .8; min-width: 0; border-radius: 28px; overflow: hidden; border: 1px solid rgba(255,255,255,.18); box-shadow: 0 24px 50px -28px rgba(0,0,0,.8); cursor: pointer; transition: flex .6s cubic-bezier(.25,1,.5,1); outline: none; }
+.gitem.active { flex: 4; }
+.gitem .art { position: absolute; inset: 0; transition: transform 1s; }
+.gitem:hover .art { transform: scale(1.05); }
+.gitem .art svg { width: 100%; height: 100%; }
+.gitem .shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(8,10,28,.9), rgba(8,10,28,.1) 60%); }
+.gitem .vt { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%) rotate(180deg); writing-mode: vertical-rl; font: 700 1.02rem var(--display); white-space: nowrap; transition: opacity .3s; }
+.gitem .detail { position: absolute; left: 28px; right: 28px; bottom: 26px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transform: translateY(10px); transition: opacity .4s .15s, transform .4s .15s; pointer-events: none; }
+.gitem.active .vt { opacity: 0; }
+.gitem.active .detail { opacity: 1; transform: none; pointer-events: auto; }
+.detail small { font: 700 .72rem var(--display); letter-spacing: .16em; color: var(--cyan); }
+.detail h3 { font-size: 1.9rem; font-weight: 800; }
+.detail p { margin: 0; color: #d6daf0; max-width: 46ch; font-weight: 300; }
+.detail .btn { align-self: flex-start; margin-top: 6px; padding: 10px 20px; font-size: .88rem; }
+
+/* about */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.about-blob { position: absolute; left: 50%; top: 50%; width: min(560px, 90vw); height: min(560px, 90vw); transform: translate(-50%, -50%); border-radius: 50%; background: rgba(157,107,255,.09); filter: blur(120px); pointer-events: none; }
+.about p { color: #dde1f5; font-weight: 400; margin: 0 0 16px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 30px; margin-top: 26px; border-top: 1px solid var(--line); padding-top: 26px; }
+.stats b { display: block; font: 800 2.6rem/1 "Outfit", sans-serif; }
+.stats span { font-size: .85rem; color: var(--muted); }
+
+/* footer */
+footer { padding-block: 100px 40px; border-top: 1px solid var(--line); background: linear-gradient(180deg, var(--bg), #0b0f26); }
+.cta h2 { font-size: clamp(3rem, 9vw, 6.6rem); font-weight: 900; line-height: 1.04; }
+.fgrid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 30px; margin-top: 80px; }
+.fgrid h4 { margin: 0 0 14px; font: 600 .74rem var(--display); letter-spacing: .16em; color: var(--muted); }
+.fgrid ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.fgrid a { text-decoration: none; color: #d6daf0; }
+.fgrid a:hover { color: #fff; }
+.fgrid p { color: var(--muted); font-size: .9rem; margin: 12px 0 0; max-width: 34ch; }
+.hot { display: inline-block; background: var(--red); color: #fff !important; padding: 5px 14px; border-radius: 99px; font-weight: 700; }
+.bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--dim); }
+.bottom a { color: var(--dim); text-decoration: none; margin-left: 18px; }
+.sos { position: fixed; z-index: 40; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); width: 62px; height: 62px; border-radius: 50%; background: var(--red); color: #fff; text-decoration: none; display: grid; place-content: center; text-align: center; line-height: 1.05; box-shadow: 0 10px 26px -8px rgba(224,69,58,.8); }
+.sos b { font: 700 1rem "Outfit"; } .sos small { font-size: .6rem; }
+
+@media (max-width: 860px) {
+  .nav ul { display: none; }
+  .nav.open { border-radius: 26px; flex-wrap: wrap; }
+  .nav.open ul { display: flex; flex-direction: column; width: 100%; gap: 12px; padding: 10px 4px 6px; order: 3; }
+  .menu-btn { display: block; }
+  .nav .btn.login { display: none; }
+  .cards, .about { grid-template-columns: 1fr; }
+  .gallery { flex-direction: column; height: 760px; }
+  .gitem .vt { writing-mode: horizontal-tb; transform: translateX(-50%); bottom: 50%; translate: 0 50%; }
+  .fgrid { grid-template-columns: 1fr 1fr; }
+  .ticker-wrap::before, .ticker-wrap::after { width: 50px; }
+}
+@media (prefers-reduced-motion: reduce) { .ticker { animation: none; } .reveal { transition: none; } .js .reveal:not(.in) { opacity: 1; transform: none; } .scroll-hint svg { animation: none; } }
+
+/* ---------- mobile app mockup ---------- */
+#mobile { overflow: hidden; }
+.mob { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; max-width: 1240px; }
+@media (max-width: 900px) { .mob { grid-template-columns: 1fr; } }
+.mob-lede { color: #c6cbe6; font-size: 1.05rem; line-height: 1.7; margin: 18px 0 22px; max-width: 520px; }
+.mob-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.mob-tabs button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 99px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); color: #e6e9f7; font-weight: 600; font-size: .92rem; transition: background .2s, transform .15s; }
+.mob-tabs button:hover { background: rgba(255,255,255,.16); transform: translateY(-1px); }
+.mob-tabs button[aria-selected="true"] { background: #fff; color: #151b3d; border-color: #fff; }
+.mob-tabs button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.mob-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 24px; }
+.mob-btn { display: inline-flex; padding: 13px 24px; border-radius: 99px; background: linear-gradient(135deg, #5b8cff, #8f6bff); color: #fff; text-decoration: none; font-weight: 700; box-shadow: 0 12px 30px rgba(91,140,255,.35); }
+.mob-cta small { color: #a9b0cf; }
+.mob-stage { position: relative; display: grid; place-items: center; min-height: 760px; }
+.mob-glow { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, rgba(143,107,255,.45), rgba(91,140,255,.15) 45%, transparent 70%); filter: blur(10px); }
+.phone { --w: 340px; --s: .8103; position: relative; width: var(--w); height: calc(var(--w) * 2.07); padding: 12px; border-radius: 54px; background: linear-gradient(145deg, #3a3f52, #12141c 40%, #2a2e3c); box-shadow: 0 0 0 2px #4a5066, 0 40px 80px rgba(0,0,0,.55), inset 0 0 0 2px rgba(255,255,255,.08); transform: rotate(-3deg); transition: transform .5s; }
+.phone:hover { transform: rotate(0deg) translateY(-6px); }
+.phone-btn { position: absolute; width: 4px; border-radius: 3px; background: #2a2e3c; }
+.phone-btn.b1 { left: -4px; top: 150px; height: 34px; } .phone-btn.b2 { left: -4px; top: 200px; height: 60px; } .phone-btn.b3 { right: -4px; top: 210px; height: 90px; }
+.phone-screen { position: relative; width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: #eceeee; }
+.phone-island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 104px; height: 30px; border-radius: 20px; background: #050608; z-index: 2; pointer-events: none; }
+.phone-screen iframe { position: absolute; top: 0; left: 0; width: 390px; height: calc(100% / var(--s)); border: 0; transform-origin: 0 0; transform: scale(var(--s)); background: #eceeee; }
+.mob-float { position: absolute; z-index: 3; padding: 10px 16px; border-radius: 16px; background: rgba(255,255,255,.95); color: #151b3d; font-weight: 700; font-size: .9rem; box-shadow: 0 14px 30px rgba(0,0,0,.3); animation: mobFloat 5s ease-in-out infinite; white-space: nowrap; }
+.mob-float.f1 { top: 14%; left: 2%; } .mob-float.f2 { top: 46%; right: 0; animation-delay: -1.6s; } .mob-float.f3 { bottom: 12%; left: 4%; animation-delay: -3.2s; }
+@keyframes mobFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@media (max-width: 520px) { .phone { --w: 290px; --s: .682; } .mob-stage { min-height: 640px; } .mob-float { font-size: .78rem; padding: 8px 12px; } .mob-float.f2 { right: -6px; } }
+@media (prefers-reduced-motion: reduce) { .mob-float { animation: none; } .phone { transform: none; } }
+
+/* ---------- น้องอ่อนหวาน on the homepage ---------- */
+.own { position: fixed; z-index: 45; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
+.own > * { pointer-events: auto; }
+.own-av { all: unset; box-sizing: border-box; cursor: pointer; order: -1; width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle at 50% 38%, #fff, #ffe3ea); box-shadow: 0 14px 30px -10px rgba(255, 125, 159, .7), 0 0 0 3px rgba(255, 255, 255, .9); display: grid; place-items: center; padding: 8px; transition: transform .2s; }
+.own-av:hover { transform: translateY(-3px) scale(1.04); } .own-av:focus-visible { outline: 3px solid #8fc0ff; outline-offset: 3px; }
+.own-bubble { position: relative; width: min(300px, calc(100vw - 140px)); padding: 14px 16px; border-radius: 20px 20px 20px 6px; background: #fff; color: #1c2140; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, .55); animation: ownIn .35s ease-out; }
+.own-bubble[hidden] { display: none; }
+@keyframes ownIn { from { opacity: 0; transform: translateY(8px); } }
+.own-bubble b { display: block; font-size: 1rem; margin-right: 22px; } .own-bubble p { margin: 6px 0 10px; font-size: .86rem; line-height: 1.5; color: #4a5070; }
+.own-acts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; } .own-acts .btn { padding: 8px 16px; font-size: .86rem; }
+.own-link { color: #3f6fd8; font-weight: 700; font-size: .84rem; text-decoration: none; } .own-link:hover { text-decoration: underline; }
+.own-x { all: unset; cursor: pointer; position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: #8a8fa8; } .own-x:hover { background: #f1f2f8; } .own-x:focus-visible { outline: 3px solid #5b8cff; }
+.own .mz-eyes { transform-origin: 60px 77px; animation: mzBlink 4.2s infinite; } @keyframes mzBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.own .mz-wave { transform-origin: 28px 78px; animation: mzWave 2.6s ease-in-out infinite; } @keyframes mzWave { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-18deg); } 80% { transform: rotate(10deg); } 90% { transform: rotate(-12deg); } }
+.own .mz-lift { transform-origin: 93px 82px; animation: mzLift 2.2s ease-in-out infinite; } @keyframes mzLift { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-14deg); } }
+.own .mz { width: 100%; height: 100%; display: block; overflow: visible; }
+@media (prefers-reduced-motion: reduce) { .own .mz-eyes, .own .mz-wave, .own .mz-lift, .own-bubble { animation: none; } }
+@media (max-width: 640px) { .own-av { width: 70px; height: 70px; padding: 6px; } .own-bubble { width: calc(100vw - 120px); } }
+.own-acts .btn { background: #1c2140; color: #fff; }
+/* น้องอ่อนหวาน sits on the right, above the 1669 button */
+.own { left: auto; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); flex-direction: row-reverse; }
+.own-av { order: -1; } /* first in a row-reverse row = right edge */
+.own-bubble { border-radius: 20px 20px 6px 20px; }
+@media (max-width: 640px) { .own { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); } }
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav" id="nav" aria-label="เมนูหลัก">
+    <a class="logo" href="#top" aria-label="Pre-DM หน้าแรก"><b>pre<i aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#8fc0ff" stroke-width="5.5"/><path d="M20 9c4 5.5 7.5 9 7.5 13.5a7.5 7.5 0 0 1-15 0C12.5 18 16 14.5 20 9z" fill="#f2a891"/></svg></i>dm</b><small>SMART HUB · DIABETES PREVENTION</small></a>
+    <ul>
+      <li><a href="#services">บริการ<span></span></a></li>
+      <li><a href="#local">ภูมิปัญญา<span></span></a></li>
+      <li><a href="#work">ฟีเจอร์<span></span></a></li>
+      <li><a href="#mobile">แอปมือถือ<span></span></a></li>
+      <li><a href="#about">แนวคิด<span></span></a></li>
+      <li><a href="manual.html">คู่มือ<span></span></a></li>
+      <li><a href="#contact">ติดต่อ<span></span></a></li>
+    </ul>
+    <a class="btn login" href="index.html">เข้าสู่ระบบ</a>
+    <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู" aria-expanded="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero" aria-label="แนะนำ Pre-DM">
+    <div class="hero-sticky">
+      <div class="layer" id="night">
+        <div id="nightArt"></div>
+        <div class="hero-copy">
+          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span>
+          <h1 class="tag">Know Your <span class="g">Risk.</span></h1>
+          <p>รู้ความเสี่ยงเบาหวานของคุณก่อน แล้วขยับร่างกาย<b>วันละ 30 นาที</b> ลดความเสี่ยงได้ถึง<b>ครึ่งหนึ่ง</b></p>
+          <nav class="pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#transform"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
+        </div>
+      </div>
+      <div class="layer" id="day" aria-hidden="true">
+        <div id="dayArt"></div>
+        <div class="hero-copy">
+          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span>
+          <p class="h1 tag" style="background:none;padding:0;max-width:none;font-family:var(--display);font-weight:900">Shape Your <span class="y">Future.</span></p>
+          <p>ออกแบบอนาคตสุขภาพของคุณ ด้วย AI ช่วยฝึก ติดตาม Body Composition และเห็นการเปลี่ยนแปลงของร่างกาย</p>
+          <nav class="pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#body" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
+        </div>
+      </div>
+      <canvas id="crowd" aria-hidden="true"></canvas>
+      <div class="scroll-hint" aria-hidden="true">เลื่อนลง<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+  </section>
+
+  <section class="s" style="padding-block:72px" aria-label="แนวทางอ้างอิง">
+    <div class="wrap reveal"><div class="built"><span class="eyebrow">Built on</span> ออกแบบตามแนวทางที่ใช้จริงในระบบสุขภาพไทย</div></div>
+    <div class="ticker-wrap reveal"><div class="ticker" id="ticker"></div></div>
+  </section>
+
+  <section class="s" id="services">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">Programs</span><h2 class="big" style="margin-top:16px">โปรแกรมออกกำลังกาย<br><span class="g">ครบทั้ง 4 แบบ</span></h2>
+        <p>ปริมาณ ความหนัก และข้อควรระวัง อ้างอิงแนวทาง ADA Standards of Care และ ACSM สำหรับผู้มีภาวะก่อนเบาหวาน</p></div>
+      </div>
+      <div class="cards" id="cards"></div>
+    </div>
+  </section>
+
+  <section class="s" id="local">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">Local Wisdom</span><h2 class="big" style="margin-top:16px">ออกกำลังกายแบบภูมิปัญญา<br><span class="g">สนุก ทำได้ทุกวัย</span></h2>
+        <p>ชุดท่าจากวิถีชีวิตไทยและอีสาน ไม่ต้องใช้อุปกรณ์ราคาแพง ทำได้ที่บ้านหรือรวมกลุ่มในชุมชน พร้อมภาพเคลื่อนไหวทุกท่าในแอป</p></div>
+      </div>
+      <div class="lcards" id="lcards"></div>
+    </div>
+  </section>
+
+  <section class="s" id="work">
+    <div class="wrap" style="max-width:1400px">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">Features</span><h2 class="big" style="margin-top:16px">ทุกอย่างที่ต้องใช้<br><span class="g">ในแอปเดียว</span></h2></div>
+        <a href="index.html" style="color:#dfe3f5;text-decoration:none;font-weight:600">เปิดแอปต้นแบบ ↗</a>
+      </div>
+      <div class="gallery reveal" id="gallery"></div>
+    </div>
+  </section>
+
+  <section class="s" id="mobile">
+    <div class="wrap mob">
+      <div class="mob-copy reveal">
+        <span class="eyebrow">Mobile App</span>
+        <h2 class="big" style="margin-top:16px">พกโค้ชสุขภาพ<br><span class="g">ไว้ในมือถือ</span></h2>
+        <p class="mob-lede">ทุกฟีเจอร์ออกแบบมาให้ใช้บนโทรศัพท์ เปิดกล้องให้ AI นับท่า ถ่ายรูปอาหารอีสาน ดูต้นไม้สุขภาพโต และคอลกับนักกายภาพได้ทุกที่ ลองแตะใช้งานในโทรศัพท์ด้านข้างได้เลย</p>
+        <div class="mob-tabs" role="tablist" aria-label="เลือกหน้าจอตัวอย่าง">
+          <button type="button" role="tab" aria-selected="true" data-screen="home"><span>🏠</span>หน้าหลัก</button>
+          <button type="button" role="tab" aria-selected="false" data-screen="ex-rx"><span>🏃</span>ออกกำลังกาย</button>
+          <button type="button" role="tab" aria-selected="false" data-screen="tracking"><span>🎯</span>AI Tracking</button>
+          <button type="button" role="tab" aria-selected="false" data-screen="food"><span>🍙</span>อาหารอีสาน</button>
+          <button type="button" role="tab" aria-selected="false" data-screen="tree"><span>🌳</span>ต้นไม้ของฉัน</button>
+          <button type="button" role="tab" aria-selected="false" data-screen="consult"><span>🩺</span>ปรึกษานักกายภาพ</button>
+        </div>
+        <div class="mob-cta"><a class="mob-btn" href="index.html">เปิดแอปเต็ม ↗</a><small>โทรศัพท์ด้านข้างคือแอปจริงในโหมดตัวอย่าง แตะเลื่อนได้</small></div>
+      </div>
+      <div class="mob-stage reveal" aria-label="ตัวอย่างแอปบนโทรศัพท์">
+        <div class="mob-glow" aria-hidden="true"></div>
+        <span class="mob-float f1" aria-hidden="true">🔥 ฝึกต่อเนื่อง 4 วัน</span>
+        <span class="mob-float f2" aria-hidden="true">🎯 AI นับได้ 12 ครั้ง</span>
+        <span class="mob-float f3" aria-hidden="true">🍙 ข้าวเหนียว 1 ปั้น · ดีมาก</span>
+        <div class="phone">
+          <span class="phone-btn b1" aria-hidden="true"></span><span class="phone-btn b2" aria-hidden="true"></span><span class="phone-btn b3" aria-hidden="true"></span>
+          <div class="phone-screen">
+            <span class="phone-island" aria-hidden="true"></span>
+            <iframe id="mobFrame" title="ตัวอย่างแอป Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) บนโทรศัพท์" data-src="index.html?demo=1&v=89#home"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="about">
+    <div class="about-blob"></div>
+    <div class="wrap about">
+      <h2 class="big reveal" style="font-size:clamp(2rem,4.2vw,3.3rem)">การป้องกันเบาหวาน<br>ไม่ใช่แค่ออกกำลังกาย<br><span class="g">แต่คือการได้ใช้ชีวิต</span></h2>
+      <div class="reveal">
+        <p>คนไทยวัยทำงานจำนวนมากอยู่ในภาวะก่อนเบาหวานโดยไม่รู้ตัว ช่วงนี้คือโอกาสสำคัญที่สุด เพราะการปรับพฤติกรรมยังพาระดับน้ำตาลกลับสู่ปกติได้</p>
+        <p>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) ช่วยให้ฝึกเองที่บ้านได้อย่างปลอดภัย AI นับครั้งและบอกท่าที่ถูกต้อง เกมส์ช่วยให้ทำต่อเนื่อง และ อสม. เห็นผลเพื่อติดตามได้ทันที พร้อมปุ่ม 1669 ทุกหน้า</p>
+        <div class="stats">
+          <div><b>58%</b><span>ความเสี่ยงที่ลดลง (Diabetes Prevention Program)</span></div>
+          <div><b>150</b><span>นาที/สัปดาห์ แอโรบิกความหนักปานกลาง</span></div>
+          <div><b>5–7%</b><span>น้ำหนักที่ควรลดใน 6 เดือน</span></div>
+          <div><b>4</b><span>แบบการออกกำลังกายที่ AI ช่วยฝึก</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="cta reveal">
+      <h2>มาเริ่ม<span class="g">ขยับ</span><br>ไปด้วยกัน</h2>
+      <a class="btn" href="index.html" style="margin-top:30px">เริ่มใช้งานต้นแบบ →</a>
+    </div>
+    <div class="fgrid">
+      <div><a class="logo" href="#top"><b style="font-size:1.6rem">pre<i aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#8fc0ff" stroke-width="5.5"/><path d="M20 9c4 5.5 7.5 9 7.5 13.5a7.5 7.5 0 0 1-15 0C12.5 18 16 14.5 20 9z" fill="#f2a891"/></svg></i>dm</b><small>SMART HUB · DIABETES PREVENTION</small></a>
+        <p class="foot-tag">Know Your Risk. <span>Shape Your Future.</span></p><p>ระบบส่งเสริมการออกกำลังกายสำหรับกลุ่มเสี่ยงเบาหวาน: ภาวะก่อนเบาหวาน น้ำหนักเกิน ความดันสูง และผู้มีประวัติครอบครัว</p></div>
+      <div><h4>เมนู</h4><ul><li><a href="#services">บริการ</a></li><li><a href="#work">ฟีเจอร์</a></li><li><a href="#about">แนวคิด</a></li><li><a href="index.html">เข้าสู่ระบบ</a></li><li><a href="manual.html">คู่มือการใช้งาน</a></li><li><a href="overview.html">หน้าภาพรวม Overview</a></li></ul></div>
+      <div><h4>บริการ</h4><ul><li><a href="index.html#risk">ประเมินความเสี่ยง</a></li><li><a href="index.html#tracking">AI นับท่า</a></li><li><a href="index.html#game">เกมส์กระตุ้นการออกกำลังกาย</a></li><li><a href="index.html#body">Body Composition</a></li><li><a href="index.html#ex-isan">ออกกำลังกายสไตล์อีสาน</a></li><li><a href="index.html#ex-pakhaoma">ผ้าขาวม้าพาฟิต</a></li><li><a href="index.html#ex-thai">สไตล์ไทย</a></li></ul></div>
+      <div><h4>ฉุกเฉิน</h4><ul><li><a class="hot" href="tel:1669">โทร 1669</a></li><li><a href="tel:1330">สปสช. 1330</a></li><li><a href="tel:1422">กรมควบคุมโรค 1422</a></li></ul></div>
+    </div>
+    <div class="bottom"><span>© 2569 Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · ต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์</span><span><a href="#contact">นโยบายความเป็นส่วนตัว</a><a href="#contact">ข้อกำหนดการใช้งาน</a></span></div>
+  </div>
+</footer>
+<aside class="own" id="own" aria-label="น้องอ่อนหวานทักทาย">
+  <div class="own-bubble" id="ownBubble" role="status">
+    <button type="button" class="own-x" id="ownX" aria-label="ซ่อนข้อความ">✕</button>
+    <b>สวัสดีค่ะ หนูชื่อน้องอ่อนหวาน 💗</b>
+    <p>ผู้ช่วยโค้ชสุขภาพของ Pre-DM Smart Hub มาเริ่มดูแลสุขภาพ ป้องกันเบาหวานไปด้วยกันนะคะ</p>
+    <div class="own-acts"><a class="btn" href="index.html">เริ่มใช้งาน</a><a class="own-link" href="manual.html">📘 อ่านคู่มือการใช้งาน</a></div>
+  </div>
+  <button type="button" class="own-av" id="ownAv" aria-label="น้องอ่อนหวาน แตะเพื่อดูข้อความ" aria-expanded="true" aria-controls="ownBubble"></button>
+</aside>
+<a class="sos" href="tel:1669" aria-label="โทรฉุกเฉิน 1669"><b>1669</b><small>ฉุกเฉิน</small></a>
+<script src="mascot.js?v=3"></script>
+<script>
+(function () { // น้องอ่อนหวาน greets visitors on the public homepage
+  const av = document.getElementById("ownAv"), bub = document.getElementById("ownBubble");
+  if (!av || !window.PreDMMascot) return;
+  av.innerHTML = PreDMMascot.svg({ wave: true });
+  const set = (open) => { bub.hidden = !open; av.setAttribute("aria-expanded", String(open)); };
+  let closed = false; try { closed = sessionStorage.getItem("predm.ownClosed") === "1"; } catch { /* storage blocked */ }
+  set(false); if (!closed) setTimeout(() => set(true), 1200);
+  av.addEventListener("click", () => set(bub.hidden));
+  document.getElementById("ownX").addEventListener("click", () => { set(false); try { sessionStorage.setItem("predm.ownClosed", "1"); } catch { /* */ } av.focus(); });
+})();
+</script>
+
+<script src="art.js?v=4"></script>
+<script>
+(function () {
+  document.documentElement.classList.add("js");
+  const { fig, P } = window.PreArt;
+  const $ = (s) => document.querySelector(s);
+  const nest = (svg, x, y, s) => svg.replace("<svg ", `<svg x="${x}" y="${y}" width="${s}" height="${s}" `);
+  const RUN = [[58, 12], [55, 22], [50, 50], [64, 32], [72, 22], [42, 36], [34, 44], [64, 66], [58, 90], [40, 68], [26, 80]];
+  const WAVE = [[50, 12], [50, 22], [50, 52], [62, 14], [66, 2], [40, 38], [42, 50], [46, 74], [44, 94], [54, 74], [56, 94]];
+  let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+
+  // ---------- night scene ----------
+  // ---------- night scene ----------
+  function buildings(day) {
+    const B = [[40, 470, 150, 330], [205, 400, 120, 400], [340, 520, 160, 280], [1080, 430, 140, 370], [1235, 360, 120, 440], [1370, 480, 190, 320], [520, 560, 110, 240], [960, 540, 110, 260]];
+    const fills = ["#f6c9b5", "#c9e4f2", "#f7e3a0", "#d8d0f2", "#bfe3cf", "#f4d2e6", "#cfe0f7", "#f6dcc0"];
+    return B.map((b, i) => [b, i]).filter(([[x]]) => x !== 340 && x !== 520).map(([[x, y, w, h], i]) => {
+      let win = "";
+      for (let wy = y + 24; wy < 760 - 30; wy += 38) for (let wx = x + 18; wx < x + w - 22; wx += 30) {
+        const lit = rnd() > 0.45;
+        win += day ? `<rect x="${wx}" y="${wy}" width="14" height="20" rx="2" fill="#ffffff" opacity=".8"/>` : `<rect x="${wx}" y="${wy}" width="14" height="20" rx="2" fill="${lit ? "#f6d27a" : "#2b3470"}" opacity="${lit ? 0.9 : 0.8}"/>`;
+      }
+      return day ? `<rect x="${x}" y="${y}" width="${w}" height="${760 - y}" rx="6" fill="${fills[i]}"/>${win}<rect x="${x - 6}" y="${y - 8}" width="${w + 12}" height="10" rx="4" fill="#ffffff" opacity=".7"/>`
+        : `<rect x="${x}" y="${y}" width="${w}" height="${760 - y}" rx="4" fill="#1b2255" stroke="#7f8bd6" stroke-opacity=".55" stroke-width="2"/>${win}`;
+    }).join("");
+  }
+  // โรงเรียนอ่อนหวานวิทยา — 2-storey Thai school building with a name board and flag pole
+  function school(day) {
+    const x0 = 330, w = 300, top = 596, gy = 760, wall = day ? "#fff8ec" : "#1b2255", line = day ? "#d9cdb8" : "#7f8bd6";
+    const roof = day ? "#c4472f" : "#2a3270", trim = day ? "#f2c14e" : "#8b95d8";
+    let win = "";
+    for (let r = 0; r < 2; r++) for (let i = 0; i < 6; i++) {
+      const wx = x0 + 20 + i * 46, wy = top + 22 + r * 78;
+      if (r === 1 && (i === 2 || i === 3)) continue; // main door
+      const lit = !day && (i + r) % 3 !== 0;
+      win += `<path d="M${wx} ${wy + 40}V${wy + 10}a13 13 0 0 1 26 0V${wy + 40}z" fill="${day ? "#9fd3ec" : lit ? "#f6d27a" : "#2b3470"}" stroke="${day ? "#7a5a3a" : "#7f8bd6"}" stroke-opacity="${day ? 0.5 : 0.5}" stroke-width="2"/>`;
+    }
+    const door = `<path d="M${x0 + 128} ${gy}V${top + 112}a22 22 0 0 1 44 0V${gy}z" fill="${day ? "#8a5a3a" : "#2b3470"}" stroke="${trim}" stroke-width="3"/>`;
+    const rail = `<rect x="${x0}" y="${top + 72}" width="${w}" height="8" fill="${day ? "#e8dcc8" : "#232b63"}"/>${Array.from({ length: 21 }, (_, i) => `<rect x="${x0 + 6 + i * 14}" y="${top + 62}" width="3" height="12" fill="${line}"/>`).join("")}`;
+    const board = `<rect x="${x0 + 34}" y="${top - 44}" width="${w - 68}" height="34" rx="6" fill="${day ? "#ffffff" : "#f6d27a"}" stroke="${trim}" stroke-width="3"/>
+      <text x="${x0 + w / 2}" y="${top - 20}" text-anchor="middle" font-family="Anuphan, sans-serif" font-weight="700" font-size="19" fill="${day ? "#1f3b6e" : "#1b2255"}">โรงเรียนอ่อนหวานวิทยา</text>`;
+    const pole = (px) => `<path d="M${px} ${gy}V${top - 70}" stroke="${day ? "#9aa3b2" : "#8b95d8"}" stroke-width="5" stroke-linecap="round"/><circle cx="${px}" cy="${top - 72}" r="5" fill="${trim}"/>
+      <g class="flag" transform="translate(${px - 61} ${top - 66})">${[["#e0322f", 0, 6], ["#ffffff", 6, 6], ["#2d2a7a", 12, 12], ["#ffffff", 24, 6], ["#e0322f", 30, 6]].map(([c, y, h]) => `<rect x="0" y="${y}" width="58" height="${h}" fill="${c}"/>`).join("")}</g>
+      <rect x="${px - 14}" y="${gy - 10}" width="28" height="10" rx="2" fill="${day ? "#d9cdb8" : "#2b3370"}"/>`;
+    return `<g class="school">
+      <rect x="${x0}" y="${top}" width="${w}" height="${gy - top}" rx="4" fill="${wall}" stroke="${line}" stroke-width="2"/>
+      ${win}${rail}${door}
+      <path d="M${x0 - 16} ${top + 2}L${x0 + 28} ${top - 52}H${x0 + w - 28}L${x0 + w + 16} ${top + 2}z" fill="${roof}" stroke="${trim}" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M${x0 + w / 2 - 60} ${top - 52}L${x0 + w / 2} ${top - 92}L${x0 + w / 2 + 60} ${top - 52}z" fill="${roof}" stroke="${trim}" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="${x0 + w / 2}" cy="${top - 66}" r="9" fill="${trim}"/>
+      ${board}
+      <rect x="${x0 - 10}" y="${gy - 34}" width="${w + 20}" height="34" fill="${day ? "#f0e6d4" : "#1f2760"}" opacity=".9"/>
+      ${pole(x0 + 16)}
+    </g>`;
+  }
+  function lamp(x, day) {
+    return `${day ? "" : `<path d="M${x - 8} 520L${x - 120} 812H${x + 120}L${x + 8} 520z" fill="url(#cone)"/><ellipse cx="${x}" cy="812" rx="130" ry="16" fill="#f6d27a" opacity=".16"/>`}
+      <path d="M${x} 812V520" stroke="${day ? "#5a6378" : "#8b95d8"}" stroke-width="7" stroke-linecap="round"/><path d="M${x - 22} 518h44l-8-20h-28z" fill="${day ? "#5a6378" : "#8b95d8"}"/>
+      <circle cx="${x}" cy="520" r="9" fill="${day ? "#dfe5ee" : "#fff4c2"}"/>`;
+  }
+  function people(day) {
+    const list = day
+      ? [[40, RUN, 0], [380, P.reach, 2], [700, RUN, 1], [1060, P.march, 3], [1340, RUN, 2]]
+      : [[40, P.walk, 3], [380, P.walk, 0], [700, P.walk, 1], [1060, WAVE, 2], [1340, P.walk, 0]];
+    return `<g class="flat-people">${list.map(([x, pose, v]) => nest(fig(pose, "", v, { noBlob: true }), x, 600, 230)).join("")}</g>`;
+  }
+  function sceneNight() {
+    seed = 7;
+    let stars = ""; for (let i = 0; i < 70; i++) stars += `<circle cx="${(rnd() * 1600).toFixed(0)}" cy="${(rnd() * 420).toFixed(0)}" r="${(rnd() * 1.8 + 0.5).toFixed(1)}" fill="#fff" opacity="${(rnd() * 0.6 + 0.2).toFixed(2)}"/>`;
+    return `<svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs><linearGradient id="nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121839"/><stop offset="1" stop-color="#262f68"/></linearGradient>
+        <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d27a" stop-opacity=".32"/><stop offset="1" stop-color="#f6d27a" stop-opacity="0"/></linearGradient>
+        <radialGradient id="glow"><stop offset="0" stop-color="#f6e3a1" stop-opacity=".35"/><stop offset="1" stop-color="#f6e3a1" stop-opacity="0"/></radialGradient></defs>
+      <rect width="1600" height="900" fill="url(#nsky)"/>${stars}
+      <circle cx="1300" cy="230" r="150" fill="url(#glow)"/><circle cx="1300" cy="230" r="58" fill="#f6e3a1"/><circle cx="1324" cy="212" r="52" fill="#1a2150"/>
+      <path d="M180 190c10-24 46-28 60-8 20-14 52-2 50 22h-120z" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2.5"/>
+      <path d="M1380 290c10-22 40-26 54-8 18-12 46 0 44 20h-108z" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2.5"/>
+      ${buildings(false)}${school(false)}
+      <path d="M640 760V600h320v160" fill="#1b2255" stroke="#7f8bd6" stroke-opacity=".55" stroke-width="2"/><path d="M610 600l190-80 190 80z" fill="#1b2255" stroke="#7f8bd6" stroke-opacity=".55" stroke-width="2"/>
+      <rect y="756" width="1600" height="60" fill="#2b3370"/><rect y="812" width="1600" height="88" fill="#171c42"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<rect x="${i * 200 + 30}" y="852" width="110" height="6" rx="3" fill="#fff" opacity=".35"/>`).join("")}
+      ${[260, 620, 980, 1340].map((x) => lamp(x, false)).join("")}
+      ${people(false)}</svg>`;
+  }
+  function sceneDay() {
+    seed = 7;
+    const tree = (x, s = 1) => `<g transform="translate(${x} 760) scale(${s})"><rect x="-7" y="-80" width="14" height="80" rx="5" fill="#8a6a4f"/><circle cx="0" cy="-110" r="52" fill="#7cc276"/><circle cx="-34" cy="-86" r="34" fill="#6ab565"/><circle cx="34" cy="-90" r="36" fill="#8fd087"/></g>`;
+    const cloud = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})" fill="#fff"><ellipse cx="0" cy="0" rx="70" ry="26"/><circle cx="-26" cy="-14" r="28"/><circle cx="22" cy="-22" r="34"/></g>`;
+    return `<svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs><linearGradient id="dsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ec3ec"/><stop offset="1" stop-color="#dff3fa"/></linearGradient></defs>
+      <rect width="1600" height="900" fill="url(#dsky)"/>
+      <circle cx="1300" cy="230" r="110" fill="#fff3c4" opacity=".55"/><circle cx="1300" cy="230" r="68" fill="#ffe08a"/>
+      ${cloud(230, 190, 1.1)}${cloud(1450, 300, 0.9)}${cloud(620, 120, 0.7)}
+      ${buildings(true)}${school(true)}
+      <g transform="translate(800 760)">
+        <rect x="-150" y="-26" width="300" height="26" fill="#e8dcc8"/>
+        ${[-120, -40, 40, 120].map((x) => `<rect x="${x - 7}" y="-150" width="14" height="124" fill="#b8473a"/>`).join("")}
+        <path d="M-190 -150L0 -250 190 -150z" fill="#d9573f"/><path d="M-130 -200L0 -290 130 -200z" fill="#e8703f"/>
+        <path d="M-190 -150L0 -250 190 -150" fill="none" stroke="#f2c14e" stroke-width="7" stroke-linejoin="round"/><path d="M-130 -200L0 -290 130 -200" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M0 -290v-26" stroke="#f2c14e" stroke-width="6" stroke-linecap="round"/><path d="M-190 -150c-14 0-22-10-24-22M190 -150c14 0 22-10 24-22" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      ${tree(560, 0.9)}${tree(1040, 1)}${tree(1530, 0.8)}${tree(60, 0.85)}
+      <rect y="740" width="1600" height="22" fill="#94cf7f"/>
+      <rect y="756" width="1600" height="60" fill="#efe4d2"/><rect y="812" width="1600" height="88" fill="#6c7487"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<rect x="${i * 200 + 30}" y="852" width="110" height="6" rx="3" fill="#fff" opacity=".85"/>`).join("")}
+      ${[260, 620, 980, 1340].map((x) => lamp(x, true)).join("")}
+      ${people(true)}</svg>`;
+  }
+
+  // ---------- mobile mockup: live app in demo mode inside the phone ----------
+  (() => {
+    const fr = document.getElementById("mobFrame"); if (!fr) return;
+    const load = () => { if (!fr.src) fr.src = fr.dataset.src; };
+    if ("IntersectionObserver" in window) new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { load(); ob.disconnect(); } }, { rootMargin: "300px" }).observe(fr); else load();
+    document.querySelectorAll(".mob-tabs [data-screen]").forEach((b) => b.addEventListener("click", () => {
+      document.querySelectorAll(".mob-tabs [data-screen]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+      load(); const go = () => { try { fr.contentWindow.location.hash = b.dataset.screen; fr.contentWindow.scrollTo(0, 0); } catch { fr.src = "index.html?demo=1&v=89#" + b.dataset.screen; } };
+      if (fr.contentWindow && fr.contentWindow.location.href !== "about:blank") go(); else fr.addEventListener("load", go, { once: true });
+    }));
+  })();
+  $("#nightArt").innerHTML = sceneNight();
+  $("#dayArt").innerHTML = sceneDay();
+
+  // ---------- scroll: nav blur + hero reveal ----------
+  const nav = $("#nav"), hero = $("#hero"), night = $("#night"), day = $("#day");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function onScroll() {
+    const y = scrollY, t = Math.min(1, y / 50);
+    nav.style.setProperty("--nav-a", (0.03 + t * 0.06).toFixed(3));
+    nav.style.setProperty("--nav-b", (8 + t * 16).toFixed(1) + "px");
+    const total = hero.offsetHeight - innerHeight, p = Math.min(1, Math.max(0, (y - hero.offsetTop) / total));
+    day.style.setProperty("--r", (reduce ? (p > 0.4 ? 150 : 0) : Math.min(150, Math.max(0, (p - 0.08) / 0.8) * 150)).toFixed(2) + "%");
+    night.style.setProperty("--zoom", (1 + p * 0.15).toFixed(4));
+  }
+  addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll); onScroll();
+
+  // ---------- mobile menu ----------
+  $("#menuBtn").addEventListener("click", () => { const o = nav.classList.toggle("open"); $("#menuBtn").setAttribute("aria-expanded", o); });
+  nav.querySelectorAll("ul a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("open"); $("#menuBtn").setAttribute("aria-expanded", false); }));
+
+  // ---------- ticker ----------
+  const ic = { doc: '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>', drop: '<path d="M12 3c3.5 4.8 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 11 8.5 7.8 12 3z"/>', pose: '<circle cx="12" cy="5" r="2"/><path d="M12 7v7l-4 6M12 14l4 6M6 10l6-2 6 2"/>', heart: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/>', home: '<path d="M3 11l9-8 9 8v9h-6v-6H9v6H3z"/>', phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>' };
+  const T = [["doc", "Thai Diabetes Risk Score"], ["doc", "ADA Standards of Care 2025"], ["heart", "ACSM Exercise Guidelines"], ["drop", "FPG · HbA1c"], ["pose", "MediaPipe Pose"], ["home", "รพ.สต. · อสม."], ["heart", "Diabetes Prevention Program"], ["phone", "1669"]];
+  const one = T.map(([k, t]) => `<span><svg viewBox="0 0 24 24">${ic[k]}</svg>${t}</span>`).join("");
+  $("#ticker").innerHTML = one + one;
+
+  // ---------- program cards ----------
+  const PROG = [
+    ["01 · แอโรบิก", "Aerobic", "เดินเร็ว ปั่นจักรยาน ย่ำเท้า สะสม 150 นาที/สัปดาห์ เดินหลังอาหาร 10–15 นาทีช่วยลดน้ำตาลหลังมื้อ", ["เดินเร็ว", "ย่ำเท้ายกเข่า", "ปั่นจักรยาน"], "linear-gradient(135deg,#4f8bff,#9d6bff)", '<path d="M3 12h4l2.2-5 4.3 10 2.2-5H21"/>'],
+    ["02 · เสริมสร้างความแข็งแรง", "Strength", "สควอทกับเก้าอี้ วิดพื้นกับผนัง ดึงยางยืด 2–3 วัน/สัปดาห์ เพิ่มมวลกล้ามเนื้อซึ่งใช้กลูโคสมากที่สุด", ["สควอท", "วิดพื้นกับผนัง", "ยางยืด"], "linear-gradient(135deg,#9d6bff,#f07ab8)", '<path d="M6 6v12M18 6v12M3 9.5v5M21 9.5v5M6 12h12"/>'],
+    ["03 · ยืดเหยียดกล้ามเนื้อ", "Flexibility", "ยืดน่อง ต้นขาหลัง อก ไหล่ ค้างท่าละ 10–30 วินาที เพิ่มพิสัยข้อต่อและลดการบาดเจ็บ", ["ยืดน่อง", "ยืดต้นขาหลัง", "ยืดอก"], "linear-gradient(135deg,#4fd8f0,#4f8bff)", '<circle cx="12" cy="4.5" r="1.6"/><path d="M4.5 8.5l7.5 2 7.5-2M12 10.5v4.5l-4 6M12 15l4 6"/>'],
+    ["04 · การทรงตัว", "Balance", "ยืนขาเดียว ยืนต่อเท้า ถ่ายน้ำหนัก ลดความเสี่ยงหกล้ม AI จับเวลาเฉพาะช่วงที่ยืนขาเดียวได้จริง", ["ยืนขาเดียว", "ยืนต่อเท้า", "ไทชิ"], "linear-gradient(135deg,#f07ab8,#f6a35a)", '<circle cx="12" cy="4.5" r="1.6"/><path d="M5 9.5h14M12 9.5v5.5l-1 6M12 15l4.5 2.5"/>'],
+  ];
+  const TINT = ["#5b8cff", "#b18cff", "#4fd8f0", "#f07ab8"];
+  $("#cards").innerHTML = PROG.map(([n, t, d, chips, g, i], k) => `<article class="pcard reveal" style="--tint:${TINT[k]}"><span class="q" style="background:${g}"><svg viewBox="0 0 24 24">${i}</svg></span><small>${n}</small><h3>${t}</h3><p>${d}</p><div class="chips">${chips.map((c) => `<span>${c}</span>`).join("")}</div></article>`).join("");
+
+  // ---------- feature gallery ----------
+  let gid = 0; const bg = (a, b) => { gid++; return `<rect width="600" height="430" fill="url(#gg${gid})"/><defs><linearGradient id="gg${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>`; };
+  const ART = [
+    () => { const j = P.squat.map(([x, y]) => [180 + x * 2.6, 40 + y * 2.6]); const B = [[1, 2], [1, 3], [3, 4], [2, 7], [7, 8]];
+      return `<svg viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice">${bg("#2a3a9a", "#5b2ea6")}<g stroke="#ffffff" stroke-opacity=".08">${[...Array(12)].map((_, i) => `<path d="M${i * 50} 0v430M0 ${i * 40}h600"/>`).join("")}</g>
+        <g stroke="#7ef0d8" stroke-width="4" stroke-linecap="round">${B.map(([a, b]) => `<line x1="${j[a][0]}" y1="${j[a][1]}" x2="${j[b][0]}" y2="${j[b][1]}"/>`).join("")}</g><circle cx="${j[0][0]}" cy="${j[0][1]}" r="16" fill="none" stroke="#7ef0d8" stroke-width="4"/>
+        ${[1, 2, 3, 4, 7, 8].map((i) => `<circle cx="${j[i][0]}" cy="${j[i][1]}" r="7" fill="#fff"/>`).join("")}<text x="${j[7][0] + 24}" y="${j[7][1] - 20}" font-size="44" font-weight="700" fill="#fff" font-family="Outfit">92°</text></svg>`; },
+    () => { seed = 3; let b = ""; for (let i = 0; i < 14; i++) { const c = ["#5aaae6", "#f0b440", "#5aaae6", "#e05246"][i % 4]; b += `<circle cx="${(rnd() * 560 + 20).toFixed(0)}" cy="${(rnd() * 300 + 30).toFixed(0)}" r="${(rnd() * 26 + 16).toFixed(0)}" fill="${c}" fill-opacity=".55" stroke="${c}" stroke-width="3"/>`; }
+      return `<svg viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice">${bg("#3a1f6e", "#7a2a6a")}${b}<text x="420" y="110" font-size="40" font-weight="800" fill="#ffd45c" font-family="Outfit">+3</text></svg>`; },
+    () => `<svg viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice">${bg("#1d4f7a", "#2a3a9a")}<path d="M160 280a140 140 0 0 1 280 0" fill="none" stroke="#ffffff" stroke-opacity=".15" stroke-width="30" stroke-linecap="round"/>
+        <path d="M160 280a140 140 0 0 1 280 0" fill="none" stroke="url(#rg)" stroke-width="30" stroke-linecap="round" stroke-dasharray="310 440"/><defs><linearGradient id="rg"><stop offset="0" stop-color="#7ee08a"/><stop offset=".5" stop-color="#f6c55a"/><stop offset="1" stop-color="#f07a5a"/></linearGradient></defs>
+        <text x="300" y="270" text-anchor="middle" font-size="76" font-weight="700" fill="#fff" font-family="Outfit">12</text><text x="300" y="306" text-anchor="middle" font-size="20" fill="#c6cbe6" font-family="Outfit">/ 17</text></svg>`,
+    () => `<svg viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice">${bg("#123f4f", "#1d4f7a")}<g stroke="#fff" stroke-opacity=".1">${[1, 2, 3, 4, 5].map((i) => `<path d="M60 ${i * 60 + 20}h480"/>`).join("")}</g>
+        <path d="M80 110C180 120 220 170 300 190S440 250 520 270" fill="none" stroke="#4fd8f0" stroke-width="6" stroke-linecap="round"/>${[[80, 110], [300, 190], [520, 270]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10" fill="#fff" stroke="#4fd8f0" stroke-width="4"/>`).join("")}
+        <text x="430" y="230" font-size="34" font-weight="700" fill="#7ee08a" font-family="Outfit">-3.2 kg</text></svg>`,
+    () => `<svg viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice">${bg("#4a2a7a", "#2a3a9a")}<rect x="110" y="90" width="300" height="70" rx="35" fill="#ffffff" fill-opacity=".14"/><rect x="200" y="190" width="300" height="70" rx="35" fill="#9d6bff"/><rect x="110" y="290" width="240" height="70" rx="35" fill="#ffffff" fill-opacity=".14"/>
+        <g fill="#fff">${[150, 180, 210].map((x) => `<circle cx="${x}" cy="325" r="7"/>`).join("")}</g></svg>`,
+  ];
+  const FEAT = [["01 · AI POSE", "ตรวจท่าด้วย AI", "นับครั้ง วัดองศาเข่าและแขน บอกท่าที่ถูกต้องทันที ประมวลผลในเครื่อง ไม่ส่งภาพออก", "index.html#tracking"],
+    ["02 · GAME", "เกมส์ Bubble Pop", "ใช้มือแตะฟองภายใน 60 วินาที ฟองทอง +3 ฟองน้ำตาล −2 เก็บเหรียญรางวัลและสถิติต่อเนื่อง", "index.html#game"],
+    ["03 · RISK SCORE", "ประเมินความเสี่ยง", "Thai Diabetes Risk Score 0–17 คะแนน แปลผล FPG และ HbA1c พร้อมคำแนะนำตามระดับความเสี่ยง", "index.html#risk"],
+    ["04 · BODY COMPOSITION", "ติดตามองค์ประกอบร่างกาย", "บันทึกน้ำหนัก ไขมัน กล้ามเนื้อ รอบเอว หลายครั้ง เทียบกราฟและเป้าหมายลดน้ำหนัก 5–7%", "index.html#body"],
+    ["05 · COACH", "แชทบอทโค้ช", "ถามเรื่องการออกกำลังกาย ชีพจรเป้าหมาย อาการที่ต้องหยุด ได้ตลอด 24 ชั่วโมง", "index.html#chat"]];
+  const gal = $("#gallery");
+  gal.innerHTML = FEAT.map(([n, t, d, href], i) => `<div class="gitem ${i === 0 ? "active" : ""}" tabindex="0" role="button" aria-label="${t}" aria-expanded="${i === 0}"><div class="art">${ART[i]()}</div><div class="shade"></div><span class="vt">${t}</span>
+    <div class="detail"><small>${n}</small><h3>${t}</h3><p>${d}</p><a class="btn" href="${href}">ลองใช้งาน</a></div></div>`).join("");
+  const items = [...gal.children];
+  const activate = (el) => items.forEach((x) => { x.classList.toggle("active", x === el); x.setAttribute("aria-expanded", x === el); });
+  items.forEach((el) => { el.addEventListener("mouseenter", () => activate(el)); el.addEventListener("focus", () => activate(el)); el.addEventListener("click", () => activate(el)); });
+
+
+  // ---------- local wisdom cards (frames cycle like the app) ----------
+  const A = window.PreArt;
+  const LOCAL = [
+    ["isan", "#f6a35a", "ISAN STYLE", "สไตล์อีสาน", "7 ท่า", "เคลื่อนไหวตามจังหวะกลองและแคน ท่าเซิ้งแตะศอก แตะไหล่ ซ้อนกุ้ง แหย่ไข่มดแดง สนุก ได้เหงื่อ และสืบสานวัฒนธรรม",
+      ["เป่ามนต์", "ฟักลาบ", "เซิ้งแตะไหล่", "ซ้อนกุ้ง"], "ชุมชนบ้านกลาง ต.คำพี้ อ.นาแก จ.นครพนม · รพ.นาแก · สสส.",
+      [["isFwd", A.sash], ["isShoulder", A.sash], ["isShL", A.sash]], 3],
+    ["pakhaoma", "#5b8cff", "WAISTCLOTH FIT", "ผ้าขาวม้าพาฟิต", "22 ท่า", "ใช้ผ้าขาวม้าผืนเดียวช่วยดึง ดัน และยืดกล้ามเนื้ออย่างช้า ๆ ไม่มีแรงกระแทก เหมาะกับทุกวัยโดยเฉพาะผู้สูงอายุ ครบชุด 10–15 นาที",
+      ["กางแขนบิดตัว", "ยกเหยียด", "ยืดหลัง", "ยิงธนู"], "สสส. · พัฒนาท่าโดย อ.วิชิต ชี้เชิญ ครูภูมิปัญญาไทย",
+      [["pk07", A.cloth("M21 27L50 22L79 27M21 28v13M79 28v13")], ["pk10", A.cloth("M43 2h14M43 3v15M57 3v15")], ["pk22", A.cloth("M80 20L52 30M52 31l-2 14")]], 1],
+    ["thai", "#b18cff", "THAI STYLE", "สไตล์ไทย", "12 ท่า", "ท่าบริหารร่างกายจากวิถีไทย สวัสดี บัวตูมบัวบาน ไผ่ลู่ลม ชกมวย แจวเรือ ดำนา ทำต่อเนื่องเกิน 10 นาทีช่วยเผาผลาญพลังงาน",
+      ["สวัสดี", "นกขมิ้น", "ชกมวย", "ดำนา"], "สสส. · ลดพุง ลดโรค — 12 ท่าบริหารร่างกายสไตล์ไทย",
+      [["wai", ""], ["lotus", ""], ["bird", ""], ["boxing", ""]], 2],
+  ];
+  const PHOTO = { isan: "ท่าเป่ามนต์ ท่าซ้อนกุ้ง และท่าแหย่ไข่มดแดง ชุดออกกำลังกายสไตล์อีสาน", thai: "12 ท่าบริหารร่างกายสไตล์ไทย ภาพจาก สสส.", pakhaoma: "ขาวม้าพาฟิต เหยียดยืดร่างกายด้วยผ้าขาวม้า ภาพจาก สสส." };
+  $("#lcards").innerHTML = LOCAL.map(([k, tint, key, title, count, desc, chips, src, frames, v]) => `<article class="lcard reveal" style="--tint:${tint}">
+      <div class="lart${PHOTO[k] ? " photo" : ""}">${PHOTO[k] ? `<img src="assets/${k}/00.jpg" alt="${PHOTO[k]}" loading="lazy">` : frames.map(([pz, fx], i) => `<div class="fr${i ? "" : " on"}">${A.fig(A.P[pz], "", v, { noBlob: true, front: fx || undefined })}</div>`).join("")}<span class="count">${count}</span></div>
+      <div class="lbody"><small class="k">${key}</small><h3>${title}</h3><p>${desc}</p><div class="chips">${chips.map((c) => `<span>${c}</span>`).join("")}</div>
+        <span class="src">ที่มา: ${src}</span><a class="btn" href="index.html#ex-${k}">ดูท่าทั้งหมด</a></div></article>`).join("");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(() => document.querySelectorAll(".lart").forEach((box) => {
+    const fr = [...box.querySelectorAll(".fr")], i = fr.findIndex((x) => x.classList.contains("on")); if (i < 0) return; fr[i].classList.remove("on"); fr[(i + 1) % fr.length].classList.add("on");
+  }), 1200);
+  // ---------- entrance reveals ----------
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -100px 0px" });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  } else document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+/* 3D chibi exercisers on the hero sidewalk: squats, jumping jacks, high-knee march, waistcloth side-bend,
+   one-leg balance, plus joggers and walkers. Jointed limbs (knee, elbow), toon shading, light follows the night -> morning reveal. */
+import * as THREE from "three";
+const hero = document.getElementById("hero"), cv = document.getElementById("crowd");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { cv.remove(); throw e; }
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+const scene = new THREE.Scene();
+const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -4000, 4000); cam.position.z = 1500;
+const hemi = new THREE.HemisphereLight(0x9aa8ff, 0x1a1f44, 1.15); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffe7a8, 1.2); sun.position.set(-300, 500, 600); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.75); fill.position.set(0, 150, 900); scene.add(fill);
+const M = (c) => new THREE.MeshToonMaterial({ color: c });
+const SK = [0xf1c6a2, 0xe2ae8a, 0xc98d68, 0xa8704c];
+
+const tc = document.createElement("canvas"); tc.width = tc.height = 64; const tx = tc.getContext("2d");
+tx.fillStyle = "#2f6fd0"; tx.fillRect(0, 0, 64, 64); tx.fillStyle = "rgba(255,255,255,.75)";
+for (let i = 0; i < 64; i += 16) { tx.fillRect(i, 0, 6, 64); tx.fillRect(0, i, 64, 6); }
+tx.fillStyle = "#e9785a"; tx.fillRect(28, 0, 4, 64);
+const clothTex = new THREE.CanvasTexture(tc); clothTex.wrapS = clothTex.wrapT = THREE.RepeatWrapping; clothTex.repeat.set(4, 1); clothTex.colorSpace = THREE.SRGBColorSpace;
+
+const cap = (r, len, m) => new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 12), m);
+const ball = (r, m) => new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), m);
+function seg(parent, x, y, r, len, m) { const g = new THREE.Group(); g.position.set(x, y, 0); const c = cap(r, len, m); c.position.y = -(len / 2 + r); g.add(c); parent.add(g); return g; }
+
+function makeChar(o) {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const skin = M(o.skin), shirt = M(o.shirt), shorts = M(o.shorts), shoe = M(o.shoe || 0xf4f4f4), sole = M(0x2a2e33), hair = M(o.hair || 0x1d1a18);
+  // legs: thigh -> knee -> shin -> shoe
+  const legs = [0.1, -0.1].map((x) => {
+    const thigh = seg(body, x, 0.62, 0.088, 0.15, shorts);
+    const knee = seg(thigh, 0, -0.32, 0.075, 0.15, o.leggings ? shorts : skin);
+    const sh = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.08, 0.24), shoe); sh.position.set(0, -0.33, 0.05); knee.add(sh);
+    const so = new THREE.Mesh(new THREE.BoxGeometry(0.155, 0.025, 0.25), sole); so.position.set(0, -0.375, 0.05); knee.add(so);
+    return { thigh, knee };
+  });
+  const hip = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.2, 0.15, 18), shorts); hip.position.y = 0.66; body.add(hip);
+  // upper body pivots at the hip so squats and side-bends tilt the whole trunk
+  const upper = new THREE.Group(); upper.position.y = 0.62; body.add(upper);
+  const torso = cap(0.2, 0.25, shirt); torso.position.y = 0.28; upper.add(torso);
+  if (o.stripe) { const t = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.025, 8, 28), M(o.stripe)); t.rotation.x = Math.PI / 2; t.position.y = 0.3; upper.add(t); }
+  const arms = [0.27, -0.27].map((x) => {
+    const sh = seg(upper, x, 0.44, 0.065, 0.12, skin); sh.add(ball(0.095, shirt));
+    const el = seg(sh, 0, -0.2, 0.058, 0.1, skin); const hand = ball(0.07, skin); hand.position.y = -0.22; el.add(hand);
+    if (o.dumbbell) { const d = new THREE.Group(); d.position.y = -0.24; const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.24, 8), M(0x555b66)); bar.rotation.z = Math.PI / 2; d.add(bar); [0.1, -0.1].forEach((xx) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.05, 14), M(0xe0453a)); w.rotation.z = Math.PI / 2; w.position.x = xx; d.add(w); }); el.add(d); }
+    return { sh, el };
+  });
+  const head = new THREE.Group(); head.position.y = 0.82; upper.add(head);
+  head.add(ball(0.31, skin));
+  const hc = new THREE.Mesh(new THREE.SphereGeometry(0.325, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.5), o.white ? M(0xe8e8ea) : hair); hc.rotation.x = -0.35; head.add(hc);
+  if (o.pony) { const p = cap(0.08, 0.2, hair); p.position.set(0, 0.05, -0.33); p.rotation.x = 0.5; head.add(p); const t = ball(0.1, hair); t.position.set(0, 0.2, -0.27); head.add(t); }
+  if (o.band) { const t = new THREE.Mesh(new THREE.TorusGeometry(0.315, 0.04, 8, 28), M(o.band)); t.rotation.x = Math.PI / 2 - 0.3; t.position.y = 0.1; head.add(t); }
+  if (o.capHat) { const c = new THREE.Mesh(new THREE.SphereGeometry(0.33, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.45), M(o.capHat)); c.rotation.x = -0.2; head.add(c); const b = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.03, 20, 1, false, -Math.PI / 2, Math.PI), M(o.capHat)); b.position.set(0, 0.1, 0.22); b.rotation.x = 0.15; head.add(b); }
+  [0.1, -0.1].forEach((x) => { const e = ball(0.045, M(0x1d1a18)); e.position.set(x, -0.02, 0.29); head.add(e); const c = ball(0.045, M(0xf08a7a)); c.position.set(x * 1.6, -0.1, 0.25); c.scale.z = 0.4; head.add(c); });
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.013, 8, 16, Math.PI), M(0x8a3b2b)); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.1, 0.295); head.add(mouth);
+  if (o.skirt) { const sk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.31, 0.3, 20, 1, true), M(o.skirt)); sk.material.side = THREE.DoubleSide; sk.position.y = 0.52; body.add(sk); }
+  if (o.bag) { const bg = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.4, 0.16), M(o.bag)); bg.position.set(0, 0.3, -0.27); upper.add(bg); const fl = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.03), M(0xffffff)); fl.position.set(0, 0.22, -0.36); upper.add(fl);
+    [0.12, -0.12].forEach((sx) => { const st = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.4, 0.04), M(0x2a2e33)); st.position.set(sx, 0.32, 0.18); upper.add(st); }); }
+  if (o.bow) { [0.06, -0.06].forEach((bx) => { const b = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.1, 10), M(o.bow)); b.rotation.z = bx > 0 ? -Math.PI / 2 : Math.PI / 2; b.position.set(bx, 0.5, 0.2); upper.add(b); }); }
+  if (o.badge) { const bd = new THREE.Mesh(new THREE.CircleGeometry(0.04, 16), M(o.badge)); bd.position.set(-0.1, 0.38, 0.205); upper.add(bd); }
+  let cloth = null;
+  if (o.cloth) { cloth = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.12, 0.02), new THREE.MeshToonMaterial({ map: clothTex })); cloth.position.set(0, 1.27, 0.02); upper.add(cloth); }
+  if (o.cane) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 8), M(0x8a6a4f)); c.position.set(0, -0.5, 0.04); arms[0].el.add(c); }
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.45, 24), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.16, depthWrite: false }));
+  shadow.scale.y = 0.16; shadow.position.z = -0.6; root.add(shadow);
+  return { root, body, upper, head, legs, arms, cloth, o, ph: Math.random() * 6 };
+}
+
+// ---------- poses ----------
+function reset(c) {
+  c.body.position.set(0, 0, 0); c.upper.rotation.set(0, 0, 0); c.head.rotation.set(0, 0, 0);
+  c.legs.forEach((l) => { l.thigh.rotation.set(0, 0, 0); l.knee.rotation.set(0, 0, 0); });
+  c.arms.forEach((a) => { a.sh.rotation.set(0, 0, 0); a.el.rotation.set(0, 0, 0); });
+}
+const [L, R] = [0, 1];
+const POSE = {
+  walk(c, ph, amp = 0.5) {
+    const s = Math.sin(ph);
+    c.legs[L].thigh.rotation.x = s * amp; c.legs[R].thigh.rotation.x = -s * amp;
+    c.legs[L].knee.rotation.x = Math.max(0, s) * amp * 1.3; c.legs[R].knee.rotation.x = Math.max(0, -s) * amp * 1.3;
+    c.arms[L].sh.rotation.x = -s * amp * 0.9; c.arms[R].sh.rotation.x = s * amp * 0.9;
+    c.arms.forEach((a) => (a.el.rotation.x = -0.35)); c.body.position.y = Math.abs(s) * 0.035;
+  },
+  jog(c, ph) {
+    POSE.walk(c, ph, 0.85); c.arms.forEach((a) => (a.el.rotation.x = -1.5)); c.upper.rotation.x = 0.12; c.body.position.y = Math.abs(Math.sin(ph)) * 0.09;
+  },
+  curlwalk(c, ph) {
+    POSE.walk(c, ph, 0.5); const s = Math.sin(ph * 0.5);
+    c.arms[L].sh.rotation.x = 0; c.arms[R].sh.rotation.x = 0;
+    c.arms[L].el.rotation.x = -(0.25 + Math.max(0, s) * 1.9); c.arms[R].el.rotation.x = -(0.25 + Math.max(0, -s) * 1.9);
+  },
+  student(c, ph) { POSE.walk(c, ph, 0.42); c.arms.forEach((a) => { a.sh.rotation.x = -0.35; a.el.rotation.x = -1.35; }); c.body.position.y = Math.abs(Math.sin(ph)) * 0.03; },
+  cane(c, ph) { POSE.walk(c, ph, 0.3); c.arms[L].sh.rotation.x = -0.25; c.arms[L].el.rotation.x = -0.2; c.upper.rotation.x = 0.14; },
+  squat(c, ph) {
+    const d = (1 - Math.cos(ph)) / 2, th = d * 1.25;
+    c.legs.forEach((l) => { l.thigh.rotation.x = -th; l.knee.rotation.x = th * 1.2; });
+    c.body.position.y = -0.32 * (1 - Math.cos(th)) - 0.03 * d; c.body.position.z = -0.25 * Math.sin(th);
+    c.upper.rotation.x = th * 0.5; c.arms.forEach((a) => { a.sh.rotation.x = -d * 1.45 - th * 0.5; a.el.rotation.x = 0; });
+  },
+  jack(c, ph) {
+    const d = (1 - Math.cos(ph)) / 2;
+    c.arms[L].sh.rotation.z = 0.15 + d * 2.75; c.arms[R].sh.rotation.z = -(0.15 + d * 2.75);
+    c.legs[L].thigh.rotation.z = d * 0.32; c.legs[R].thigh.rotation.z = -d * 0.32;
+    c.legs[L].knee.rotation.z = -d * 0.2; c.legs[R].knee.rotation.z = d * 0.2;
+    c.body.position.y = Math.sin(ph) ** 2 * 0.08;
+  },
+  march(c, ph) {
+    const s = Math.sin(ph), l = Math.max(0, s), r = Math.max(0, -s);
+    c.legs[L].thigh.rotation.x = -l * 1.45; c.legs[L].knee.rotation.x = l * 1.6;
+    c.legs[R].thigh.rotation.x = -r * 1.45; c.legs[R].knee.rotation.x = r * 1.6;
+    c.arms[L].sh.rotation.x = -r * 1.1 + l * 0.4; c.arms[R].sh.rotation.x = -l * 1.1 + r * 0.4;
+    c.arms.forEach((a) => (a.el.rotation.x = -1.3)); c.body.position.y = (l + r) * 0.04;
+  },
+  sidebend(c, ph) {
+    c.arms[L].sh.rotation.z = 2.78; c.arms[R].sh.rotation.z = -2.78;
+    c.arms.forEach((a) => (a.el.rotation.z = 0)); c.upper.rotation.z = Math.sin(ph * 0.6) * 0.42; c.head.rotation.z = Math.sin(ph * 0.6) * 0.15;
+  },
+  tree(c, ph) { // tree pose cycle: lift one foot to the knee, arms rise overhead, hold with a gentle sway, lower, switch legs
+    const T2 = Math.PI * 2, side = Math.floor(ph / T2) % 2 ? L : R, sg = side === R ? -1 : 1, u = (ph % T2) / T2;
+    const ez = (t) => t * t * (3 - 2 * t), e = u < 0.28 ? ez(u / 0.28) : u < 0.72 ? 1 : ez((1 - u) / 0.28);
+    const armT = Math.max(0, Math.min(1, (e - 0.25) / 0.75));
+    c.legs[side].thigh.rotation.z = sg * 1.05 * e; c.legs[side].thigh.rotation.x = -0.35 * e; c.legs[side].knee.rotation.x = 2.1 * e;
+    c.arms[L].sh.rotation.z = 0.15 + armT * 2.7; c.arms[R].sh.rotation.z = -(0.15 + armT * 2.7);
+    c.arms[L].el.rotation.z = -0.3 * armT; c.arms[R].el.rotation.z = 0.3 * armT;
+    c.arms.forEach((a) => (a.el.rotation.x = -1.2 * (1 - armT) * Math.min(1, e * 3)));
+    const sway = Math.sin(ph * 3) * 0.045 * e;
+    c.upper.rotation.z = sway; c.head.rotation.z = -sway * 0.6; c.body.position.x = -sg * 0.035 * e + sway * 0.15; c.body.position.y = -0.015 * (1 - e);
+  },
+};
+
+// ---------- cast ----------
+const STATIC = [ // [pose, fraction of width (desktop), fraction (phone) or null, speed, look]
+  ["squat", -0.37, -0.31, 3.2, { skin: SK[1], shirt: 0xe9785a, shorts: 0x26323b, band: 0xffffff }],
+  ["jack", -0.19, 0, 4.2, { skin: SK[0], shirt: 0x5b8cff, shorts: 0x1f2a52, leggings: 1, pony: 1, hair: 0x3b2a20 }],
+  ["march", 0.0, null, 5.2, { skin: SK[2], shirt: 0xf6c55a, shorts: 0x3d84a8, capHat: 0x2c3238 }],
+  ["sidebend", 0.19, 0.31, 2.0, { skin: SK[3], shirt: 0x5fa86b, shorts: 0x2c3238, cloth: 1 }],
+  ["tree", 0.37, null, 1.5, { skin: SK[0], shirt: 0xb18cff, shorts: 0x26323b, leggings: 1, pony: 1, white: 0, hair: 0x15110e }],
+];
+const MOVING = [ // [pose, pace, dir, lane, start, look]
+  ["jog", 1.9, 1, 0, 0.05, { skin: SK[1], shirt: 0xf07ab8, shorts: 0x26323b, band: 0xe0453a }],
+  ["curlwalk", 1.0, 1, 0, 0.64, { skin: SK[0], shirt: 0x4fd8f0, shorts: 0x1f2a52, leggings: 1, pony: 1, dumbbell: 1, hair: 0x3b2a20 }],
+  ["cane", 0.6, -1, 1, 0.3, { skin: SK[0], shirt: 0x9b87d8, shorts: 0x4a4f58, white: 1, cane: 1, leggings: 1 }],
+  ["jog", 1.35, -1, 1, 0.75, { skin: SK[3], shirt: 0xffffff, shorts: 0x3d84a8, capHat: 0xe0453a, stripe: 0x3d84a8 }],
+  // นักเรียนโรงเรียนอ่อนหวานวิทยา — white shirt, navy shorts/skirt, black shoes, backpack
+  ["student", 0.75, 1, 0, 0.30, { skin: SK[1], shirt: 0xffffff, shorts: 0x1f2a52, shoe: 0x22252a, bag: 0xe0453a, badge: 0x2d5bd1, hair: 0x15110e }],
+  ["student", 0.75, 1, 0, 0.375, { skin: SK[0], shirt: 0xffffff, shorts: 0x1f2a52, skirt: 0x1f2a52, shoe: 0x22252a, bag: 0x4f8bff, bow: 0x1f2a52, badge: 0x2d5bd1, pony: 1, hair: 0x2a1d16 }],
+  ["jog", 1.5, -1, 1, 0.02, { skin: SK[2], shirt: 0xffffff, shorts: 0x1f2a52, shoe: 0x22252a, badge: 0x2d5bd1, hair: 0x15110e }],
+];
+const statics = STATIC.map(([p, fx, fm, sp, o]) => { const c = makeChar(o); c.pose = p; c.fx = fx; c.fm = fm; c.sp = sp; scene.add(c.root); return c; });
+const movers = MOVING.map(([p, pace, dir, lane, at, o]) => { const c = makeChar(o); Object.assign(c, { pose: p, pace, dir, lane, at }); scene.add(c.root); return c; });
+
+let W = 1, H = 1, S = 1, U = 1, pos = [];
+const yAt = (svgY) => H / 2 - (H - 900 * S + svgY * S);
+function layout() {
+  const box = hero.querySelector(".hero-sticky"); W = box.clientWidth; H = box.clientHeight;
+  renderer.setSize(W, H, false);
+  cam.left = -W / 2; cam.right = W / 2; cam.top = H / 2; cam.bottom = -H / 2; cam.updateProjectionMatrix();
+  S = Math.max(W / 1600, H / 900);
+  U = 180 * S / 1.75 * (W < 700 ? 0.62 : 0.92);
+  const span = W + 300; pos = movers.map((c, i) => pos[i] ?? (c.at * span - span / 2));
+  const phone = W < 700;
+  statics.forEach((c, i) => {
+    const f = phone ? c.fm : c.fx; c.root.visible = f !== null;
+    c.root.scale.setScalar(U); c.root.position.set(f * W, yAt(i % 2 ? 786 : 792), 100); c.root.rotation.x = 0.16;
+    c.body.rotation.y = (i % 2 ? -1 : 1) * 0.28;
+  });
+}
+const N = { sky: new THREE.Color(0x9aa8ff), gnd: new THREE.Color(0x1a1f44), sun: new THREE.Color(0xffe2a0), hi: 1.15, si: 1.1 };
+const D = { sky: new THREE.Color(0xffffff), gnd: new THREE.Color(0x9aa37f), sun: new THREE.Color(0xffffff), hi: 1.5, si: 1.7 };
+function light() {
+  const total = hero.offsetHeight - innerHeight, p = Math.min(1, Math.max(0, (scrollY - hero.offsetTop) / total));
+  const t = Math.min(1, Math.max(0, (p - 0.15) / 0.5));
+  hemi.color.copy(N.sky).lerp(D.sky, t); hemi.groundColor.copy(N.gnd).lerp(D.gnd, t); hemi.intensity = N.hi + (D.hi - N.hi) * t;
+  sun.color.copy(N.sun).lerp(D.sun, t); sun.intensity = N.si + (D.si - N.si) * t;
+}
+let last = performance.now(), visible = true;
+new IntersectionObserver((e) => { visible = e[0].isIntersecting; if (visible) { last = performance.now(); requestAnimationFrame(frame); } }).observe(hero);
+function frame(now) {
+  const dt = reduce ? 0 : Math.min(0.05, (now - last) / 1000); last = now;
+  const span = W + 300;
+  statics.forEach((c) => { if (!c.root.visible) return; c.ph += dt * c.sp; reset(c); POSE[c.pose](c, c.ph); });
+  const gap = U * 1.25, near = (a, b) => { let d = Math.abs(pos[a] - pos[b]); return Math.min(d, span - d); };
+  // a line is free for walker i if nobody in its lane is on (or moving onto) that line nearby
+  const free = (i, line) => movers.every((o, j) => j === i || o.lane !== movers[i].lane || (Math.abs(o.offT - line) > 0.5 && Math.abs(o.off - line) > 0.5) || near(i, j) > gap * 1.35);
+  movers.forEach((c, i) => {
+    if (c.v == null) { c.v = c.pace; c.off = 0; c.offT = 0; }
+    // nearest walker ahead in the same lane (positions wrap around the screen)
+    let block = null, bd = Infinity;
+    movers.forEach((o, j) => { if (j === i || o.lane !== c.lane || Math.abs(o.off - c.off) > 0.7) return; const d = ((((pos[j] - pos[i]) * c.dir) % span) + span) % span; if (d < bd) { bd = d; block = o; } });
+    let want = c.pace;
+    if (block && bd < gap * 1.8) {
+      const sameLine = Math.abs(c.offT - block.offT) < 0.5;
+      const side = block.offT === 0 ? -1 : 0;
+      if (sameLine && !c.passing && c.pace > block.v + 0.08 && free(i, side)) { c.offT = side; c.passing = block; } // faster: step aside to overtake (only if that line is clear)
+      if (Math.abs(c.off - block.off) < 0.7) want = Math.min(want, block.v * (bd < gap ? 0.8 : 1)); // wait until clear of them
+    }
+    if (c.passing) { // stay on the passing line until clearly ahead of the person being overtaken
+      const k = movers.indexOf(c.passing), ahead = ((((pos[i] - pos[k]) * c.dir) % span) + span) % span;
+      if (ahead < span / 2 && ahead > gap * 1.25 && !(block && bd < gap * 1.8) && free(i, 0)) { c.offT = 0; c.passing = null; }
+    } else if (c.offT !== 0 && !(block && bd < gap * 1.8) && free(i, 0)) c.offT = 0;
+    c.v += (want - c.v) * Math.min(1, dt * 3); if (block && bd < gap) c.v = Math.min(c.v, block.v * 0.9); // never walk into someone
+    c.off += (c.offT - c.off) * Math.min(1, dt * 2.5);
+  });
+  movers.forEach((c, i) => {
+    pos[i] += c.dir * 58 * S * c.v * dt; if (pos[i] > span / 2) pos[i] -= span; if (pos[i] < -span / 2) pos[i] += span;
+    c.ph += dt * (c.pose === "jog" ? 11 : 6.5) * Math.max(0.7, c.pace) * Math.max(0.25, c.v / c.pace); reset(c); POSE[c.pose](c, c.ph);
+    c.root.scale.setScalar(U * (c.lane ? 0.92 : 1) * (1 + c.off * 0.03)); c.root.position.set(pos[i], yAt((c.lane ? 774 : 814) + c.off * 16), (c.lane ? 0 : 300) + c.off * 70); c.root.rotation.x = 0.16;
+    c.body.rotation.y = c.dir * (Math.PI / 2 - 0.55);
+  });
+  light(); renderer.render(scene, cam);
+  if (visible && !reduce) requestAnimationFrame(frame);
+}
+addEventListener("resize", () => { layout(); if (reduce) frame(performance.now()); });
+addEventListener("scroll", () => { if (reduce) frame(performance.now()); }, { passive: true });
+layout(); hero.classList.add("has3d"); requestAnimationFrame(frame);
+</script>
+
+</body>
+</html>

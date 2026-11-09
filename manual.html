@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f4aa0">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pre-DM">
+<title>คู่มือการใช้งาน · Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</title>
+<meta name="description" content="คู่มือการใช้งาน Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) สำหรับผู้ใช้ ญาติ อสม. นักกายภาพบำบัด และผู้ดูแลระบบ">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Anuphan:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #f6f7fb; --card: #fff; --ink: #1c2140; --muted: #5b6180; --line: #e3e6ef; --sub: #f1f3f9;
+  --pink: #ff7d9f; --pink-ink: #c8396a; --blue: #3f6fd8; --green: #22a06b; --amber: #c9860a; --red: #d43a3a;
+  --tint-blue: #e8f0ff; --tint-green: #e3f6ec; --tint-amber: #fff4dc; --tint-red: #ffe7e7; --tint-pink: #fff0f4;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12152a; --card: #1b1f3a; --ink: #eef0fa; --muted: #a8aed0; --line: #2d3256; --sub: #232848;
+  --tint-blue: #1f2c52; --tint-green: #183a2c; --tint-amber: #3a2f16; --tint-red: #3e1d22; --tint-pink: #3a1f2b; --blue: #8fb2ff; --pink-ink: #ff9cb8; } }
+:root[data-theme="dark"] {
+  --bg: #12152a; --card: #1b1f3a; --ink: #eef0fa; --muted: #a8aed0; --line: #2d3256; --sub: #232848;
+  --tint-blue: #1f2c52; --tint-green: #183a2c; --tint-amber: #3a2f16; --tint-red: #3e1d22; --tint-pink: #3a1f2b; --blue: #8fb2ff; --pink-ink: #ff9cb8; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.65 "Anuphan", system-ui, sans-serif; }
+a { color: var(--blue); }
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .in { max-width: 1180px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.brand { font: 800 1.15rem "Outfit", sans-serif; color: var(--ink); text-decoration: none; letter-spacing: -.02em; } .brand small { font: 500 .78rem "Anuphan", sans-serif; color: var(--muted); margin-left: 6px; }
+.top .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: 600 .86rem "Anuphan", sans-serif; text-decoration: none; cursor: pointer; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #5b8cff; outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; }
+.hero { grid-column: 1 / -1; display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; align-items: center; background: linear-gradient(120deg, var(--tint-pink), var(--card) 70%); border: 1px solid var(--line); border-radius: 28px; padding: 22px 26px; }
+.hero .av { width: 150px; height: 150px; }
+.hero h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 3.4vw, 2.2rem); line-height: 1.25; }
+.hero p { margin: 0; color: var(--muted); }
+.hero .say { margin-top: 12px; display: inline-block; padding: 8px 14px; border-radius: 16px 16px 16px 4px; background: var(--card); border: 1px solid var(--line); font-weight: 600; color: var(--pink-ink); }
+.who { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; } .who span { padding: 3px 10px; border-radius: 99px; background: var(--sub); font-size: .8rem; color: var(--muted); }
+nav.toc { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px; }
+nav.toc b { display: block; font-size: .82rem; color: var(--muted); margin: 4px 6px 8px; }
+nav.toc ol { margin: 0; padding: 0; list-style: none; counter-reset: t; }
+nav.toc li { counter-increment: t; }
+nav.toc a { display: flex; gap: 8px; padding: 6px 8px; border-radius: 10px; color: var(--ink); text-decoration: none; font-size: .88rem; line-height: 1.35; }
+nav.toc a::before { content: counter(t); flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--sub); display: grid; place-items: center; font: 700 .7rem "Outfit", sans-serif; color: var(--muted); }
+nav.toc a:hover, nav.toc a.on { background: var(--tint-pink); } nav.toc a.on::before { background: var(--pink); color: #fff; }
+main { min-width: 0; display: grid; gap: 18px; }
+section.ch { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 22px 24px; }
+section.ch > h2 { margin: 0 0 4px; font-size: 1.35rem; display: flex; align-items: center; gap: 10px; }
+section.ch > h2 .n { flex: none; width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: var(--tint-pink); color: var(--pink-ink); font: 800 1rem "Outfit", sans-serif; }
+section.ch > .lead { margin: 0 0 14px; color: var(--muted); }
+h3 { margin: 18px 0 8px; font-size: 1.05rem; }
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 8px; }
+ol.steps > li { counter-increment: s; position: relative; padding: 10px 12px 10px 48px; border-radius: 14px; background: var(--sub); }
+ol.steps > li::before { content: counter(s); position: absolute; left: 12px; top: 10px; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font: 700 .8rem "Outfit", sans-serif; }
+ul.dots { margin: 0; padding-left: 20px; } ul.dots li { margin: 3px 0; }
+.ui { display: inline-block; padding: 0 8px; border-radius: 8px; background: var(--tint-blue); color: var(--blue); font-weight: 700; font-size: .9em; white-space: nowrap; }
+.tip, .warn, .note { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; padding: 12px 14px; border-radius: 16px; font-size: .92rem; }
+.tip { background: var(--tint-pink); } .tip .mini { flex: none; width: 40px; height: 40px; }
+.warn { background: var(--tint-red); } .warn::before { content: "⚠️"; } .note { background: var(--tint-amber); } .note::before { content: "💡"; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; } th { color: var(--muted); font-weight: 600; font-size: .84rem; }
+.chip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+details { background: var(--sub); border-radius: 14px; padding: 2px 14px; margin-top: 8px; } details[open] { padding-bottom: 10px; }
+summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.box { background: var(--sub); border-radius: 14px; padding: 12px 14px; } .box b { display: block; margin-bottom: 2px; }
+footer { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: .84rem; padding-top: 10px; }
+.mz { width: 100%; height: 100%; display: block; overflow: visible; }
+.mz-eyes { transform-origin: 60px 77px; animation: mzBlink 4.2s infinite; } @keyframes mzBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.mz-wave { transform-origin: 28px 78px; animation: mzWave 2.6s ease-in-out infinite; } @keyframes mzWave { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-18deg); } 80% { transform: rotate(10deg); } 90% { transform: rotate(-12deg); } }
+.mz-lift { transform-origin: 93px 82px; animation: mzLift 2.2s ease-in-out infinite; } @keyframes mzLift { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-14deg); } }
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } nav.toc { position: static; max-height: none; } nav.toc ol { columns: 2; column-gap: 10px; } }
+@media (max-width: 600px) { .hero { grid-template-columns: 1fr; text-align: center; padding: 18px; } .hero .av { width: 110px; height: 110px; margin: 0 auto; } .who { justify-content: center; } nav.toc ol { columns: 1; } section.ch { padding: 18px 16px; } .grid2 { grid-template-columns: 1fr; } .brand small { display: none; } }
+@media print {
+  .top, nav.toc, .noprint { display: none !important; } body { background: #fff; color: #000; font-size: 12pt; }
+  .wrap { display: block; padding: 0; } section.ch, .hero { border: 1px solid #ccc; break-inside: avoid-page; margin-bottom: 12px; box-shadow: none; } .mz * { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="brand" href="landing.html">pre·DM <small>คู่มือการใช้งาน</small></a>
+  <div class="acts"><button class="btn noprint" type="button" id="printBtn">🖨️ พิมพ์ / บันทึก PDF</button><a class="btn primary" href="index.html">เปิดแอป →</a></div>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="av" data-mascot="wave"></div>
+    <div>
+      <h1>คู่มือการใช้งาน Pre-DM Smart Hub<br><small style="font-size:.6em;color:var(--muted)">(แพลตฟอร์มอ่อนหวานวิทยา)</small></h1>
+      <p>ระบบส่งเสริมการออกกำลังกายสำหรับกลุ่มเสี่ยงเบาหวาน ประเมินความเสี่ยง ออกกำลังกายตามแนวทาง ADA/ACSM ให้ AI ช่วยนับท่า บันทึกผล และปรึกษานักกายภาพบำบัด</p>
+      <span class="say">สวัสดีค่ะ หนูน้องอ่อนหวาน จะพาไปดูวิธีใช้งานทีละขั้นนะคะ 💗</span>
+      <div class="who"><span>👤 ผู้ใช้ / ผู้ป่วย</span><span>👪 ญาติ</span><span>🧑‍⚕️ อสม. / เจ้าหน้าที่</span><span>🩺 นักกายภาพบำบัด</span><span>🔐 ผู้ดูแลระบบ</span></div>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="สารบัญ"><b>สารบัญ</b><ol id="toc"></ol></nav>
+
+  <main>
+    <section class="ch" id="start"><h2><span class="n"></span>เริ่มต้นใช้งาน</h2>
+      <p class="lead">ใช้ได้บนโทรศัพท์ แท็บเล็ต และคอมพิวเตอร์ ผ่านเบราว์เซอร์ (แนะนำ Chrome หรือ Safari รุ่นล่าสุด) ไม่ต้องติดตั้งแอป</p>
+      <h3>ติดตั้งไว้บนหน้าจอโทรศัพท์ (ไม่บังคับ)</h3>
+      <div class="grid2">
+        <div class="box"><b>Android (Chrome)</b>เปิดเว็บ → แตะเมนู ⋮ → <span class="ui">เพิ่มลงในหน้าจอหลัก</span></div>
+        <div class="box"><b>iPhone (Safari)</b>เปิดเว็บ → แตะปุ่มแชร์ ⬆️ → <span class="ui">เพิ่มไปยังหน้าจอโฮม</span></div>
+      </div>
+      <p>หรือกดปุ่ม <span class="ui">📲 ติดตั้งแอป</span> ที่มุมบนของหน้าหลัก (หรือ “ติดตั้งเป็นแอปบนโทรศัพท์” ในหน้าเข้าสู่ระบบ) เมื่อติดตั้งแล้วจะมีไอคอนน้องอ่อนหวานบนหน้าจอ เปิดเต็มจอเหมือนแอป และเปิดหน้าที่เคยโหลดไว้ได้แม้ไม่มีอินเทอร์เน็ต</p>
+      <h3>เข้าสู่ระบบ</h3>
+      <ol class="steps">
+        <li>จากหน้าแรก กด <span class="ui">เริ่มใช้งาน</span> หรือ <span class="ui">เข้าสู่ระบบ</span></li>
+        <li>เลือกประเภทผู้ใช้ <span class="ui">ผู้ใช้ / ญาติ</span> หรือ <span class="ui">อสม. / เจ้าหน้าที่</span></li>
+        <li><b>ลองใช้งาน:</b> กดชื่อในรายการ “บัญชีทดลอง” ระบบจะกรอกเบอร์ให้ ใส่ PIN <b>1234</b> แล้วกด <span class="ui">เข้าสู่ระบบ</span> (ข้อมูลเก็บในเครื่องนี้เท่านั้น)</li>
+        <li><b>ใช้งานจริง:</b> ที่กล่อง <span class="ui">☁️ บัญชีจริง</span> เลือก <span class="ui">สมัครบัญชีใหม่</span> กรอกชื่อ เบอร์โทร อีเมล รหัสผ่าน (อย่างน้อย 8 ตัว) และติ๊กยินยอมตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล ข้อมูลจะซิงก์ขึ้นฐานข้อมูล ใช้ได้ทุกเครื่อง และรับโปรแกรมจากนักกายภาพอัตโนมัติ</li>
+      </ol>
+      <div class="note">ลืมรหัสผ่านบัญชีจริง? กรอกอีเมลในกล่อง “บัญชีจริง” แล้วกด <span class="ui">ลืมรหัสผ่าน?</span> ระบบจะส่งลิงก์ไปที่อีเมล กดลิงก์แล้วตั้งรหัสผ่านใหม่ได้ทันที</div>
+      <div class="tip"><span class="mini" data-mascot="1"></span><span>ครั้งแรกที่เข้าหน้าหลัก หนูจะขึ้นมาแนะนำวิธีใช้งานสั้น ๆ ให้ค่ะ ปิดแล้วเปิดดูใหม่ได้ที่ปุ่ม <span class="ui">📖 วิธีใช้งาน</span> ในหน้าต่างแชทของหนู</span></div>
+      <h3>ออกจากระบบ</h3>
+      <p>กด <span class="ui">ออกจากระบบ</span> ที่เมนูด้านซ้าย (หรือเมนูล่างบนมือถือ) บัญชีจริงจะซิงก์ข้อมูลล่าสุดก่อน แล้วล้างข้อมูลออกจากเครื่อง เหมาะกับเครื่องที่ใช้ร่วมกัน</p>
+    </section>
+
+    <section class="ch" id="home"><h2><span class="n"></span>หน้าหลัก</h2>
+      <p class="lead">ภาพรวมสุขภาพและการออกกำลังกายของคุณในหน้าเดียว</p>
+      <ul class="dots">
+        <li><b>ต้นไม้สุขภาพ</b> — ระดับการเติบโตตามความต่อเนื่องในการฝึก</li>
+        <li><b>ความท้าทายวันนี้</b> — ภารกิจสั้น ๆ เช่น สควอท 30 ครั้งกับโค้ช AI</li>
+        <li><b>เลือกประเภทการออกกำลังกาย</b> — ทางลัดไปยังแต่ละโปรแกรม</li>
+        <li><b>กิจกรรมสัปดาห์นี้</b> — นาทีแอโรบิกสะสม (เป้าหมาย 150 นาที/สัปดาห์) วันที่ออกกำลังกายต่อเนื่อง และวันฝึกเสริมแรง</li>
+        <li><b>ความเสี่ยงเบาหวาน น้ำหนัก BMI รอบเอว</b> และ <b>บันทึกการออกกำลังกายล่าสุด</b></li>
+      </ul>
+    </section>
+
+    <section class="ch" id="risk"><h2><span class="n"></span>ประเมินความเสี่ยงเบาหวาน</h2>
+      <p class="lead">ใช้แบบประเมิน Thai Diabetes Risk Score ใช้เวลาไม่ถึง 1 นาที</p>
+      <ol class="steps">
+        <li>ไปที่เมนู <span class="ui">ประเมินความเสี่ยง</span></li>
+        <li>กรอกอายุ เพศ น้ำหนัก ส่วนสูง รอบเอว และตอบเรื่องความดันโลหิตสูง และประวัติเบาหวานในครอบครัว</li>
+        <li>กด <span class="ui">ประเมิน</span> ระบบแสดงคะแนน (เต็ม 17) ระดับความเสี่ยง และโอกาสเป็นเบาหวานใน 12 ปี พร้อมคำแนะนำ</li>
+      </ol>
+      <h3>ระดับความเสี่ยงและสีบัตรสมาชิก</h3>
+      <table><thead><tr><th>คะแนน</th><th>ระดับ</th><th>สีบัตรสมาชิก</th></tr></thead><tbody>
+        <tr><td>0–2</td><td>ความเสี่ยงต่ำ</td><td><span class="chip" style="background:#22a06b"></span>เขียว</td></tr>
+        <tr><td>3–5</td><td>ความเสี่ยงปานกลาง</td><td><span class="chip" style="background:#d4950f"></span>เหลืองทอง</td></tr>
+        <tr><td>6–8</td><td>ความเสี่ยงสูง</td><td><span class="chip" style="background:#e8692c"></span>ส้ม</td></tr>
+        <tr><td>9 ขึ้นไป</td><td>ความเสี่ยงสูงมาก</td><td><span class="chip" style="background:#d43a3a"></span>แดง</td></tr>
+      </tbody></table>
+      <div class="note">ประเมินซ้ำได้ทุกเมื่อ เช่น ทุก 3 เดือน เพื่อดูการเปลี่ยนแปลง ผลนี้เป็นการคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัย ควรตรวจน้ำตาลในเลือดกับสถานพยาบาล</div>
+    </section>
+
+    <section class="ch" id="exercise"><h2><span class="n"></span>โปรแกรมออกกำลังกาย</h2>
+      <p class="lead">ท่าออกกำลังกายตามแนวทาง ADA / ACSM สำหรับกลุ่มเสี่ยงเบาหวาน ทุกท่ามีภาพประกอบ ขั้นตอน และปริมาณที่แนะนำ</p>
+      <table><thead><tr><th>หมวด</th><th>เหมาะกับ</th></tr></thead><tbody>
+        <tr><td>แอโรบิก</td><td>เดินเร็ว เดินหลังอาหาร ย่ำเท้ายกเข่า ปั่นจักรยาน · มีเครื่องคำนวณ <b>ชีพจรสูงสุด (HRmax)</b> และ <b>โซนการออกกำลังกาย</b></td></tr>
+        <tr><td>เสริมสร้างความแข็งแรง</td><td>สควอทโดยใช้เก้าอี้ วิดพื้นกับผนัง ดึงยางยืด เขย่งปลายเท้า ยกสะโพก นั่งแตะเข่า</td></tr>
+        <tr><td>ยืดเหยียด / การทรงตัว</td><td>ลดอาการตึง ป้องกันการหกล้ม (ท่าการทรงตัวจาก ม.มหิดล)</td></tr>
+        <tr><td>สไตล์อีสาน / ไทย / ผ้าขาวม้าพาฟิต</td><td>ท่าจากภูมิปัญญาท้องถิ่น มีเพลงหรือวิดีโอประกอบ ทำเป็นกลุ่มในชุมชนได้</td></tr>
+      </tbody></table>
+      <h3>แบบคัดกรองความพร้อมก่อนออกกำลังกาย (PAR-Q+)</h3>
+      <p>ก่อนฝึกครั้งแรก ระบบจะให้ตอบคำถาม 7 ข้อเรื่องโรคหัวใจ ความดัน อาการเจ็บหน้าอก เวียนศีรษะ โรคเรื้อรัง ยาที่ใช้ และปัญหากระดูกข้อต่อ (ทำปีละครั้ง ทำใหม่ได้ที่ปุ่ม <span class="ui">ทำใหม่</span> ด้านบนหน้าโปรแกรม)</p>
+      <ul class="dots"><li><b>ตอบ “ไม่ใช่” ทุกข้อ</b> — พร้อมออกกำลังกายตามโปรแกรม</li><li><b>มีข้อที่ตอบ “ใช่”</b> — ระบบแนะนำให้ปรึกษาแพทย์ก่อนเพิ่มความหนัก ฝึกได้แบบเบา ๆ (Zone 1–2) หลังกดยืนยันว่าเข้าใจคำแนะนำ</li></ul>
+      <h3>ฝึกตามโปรแกรม</h3>
+      <ol class="steps">
+        <li>เลือกแท็บหมวดที่ต้องการ อ่านกล่อง <b>FITT</b> (ความถี่ ความหนัก เวลา ชนิด)</li>
+        <li>เลือกโหมด <span class="ui">Auto</span> (ระบบนับเวลาให้) หรือ <span class="ui">Manual</span> (กดเองเมื่อทำเสร็จ) เปิด/ปิด <span class="ui">เสียงบรรยาย</span> และ <span class="ui">AI Tracking (กล้อง)</span> ได้</li>
+        <li>กด <span class="ui">▶ ฝึกท่านี้</span> หรือ <span class="ui">▶ เริ่มฝึกทั้งโปรแกรม</span> ทำตามภาพและเสียง ระบบพักให้ระหว่างเซต</li>
+        <li>จบแล้วระบบบันทึกให้อัตโนมัติ หรือกด <span class="ui">บันทึกว่าทำแล้ว</span></li>
+      </ol>
+      <h3>ชีพจรและโซนการออกกำลังกาย (แท็บแอโรบิก)</h3>
+      <p>กรอกอายุ ระบบคำนวณ HRmax (สูตร 208 − 0.7 × อายุ หรือ 220 − อายุ) และแบ่ง 5 โซน กลุ่มเสี่ยงเบาหวานควรอยู่ใน <b>Zone 2–3</b> (ความหนักปานกลาง 64–76% ของ HRmax) วิธีวัด: จับชีพจรที่ข้อมือ 15 วินาที แล้วคูณ 4</p>
+      <h3>โปรแกรมจากนักกายภาพ และโปรแกรมของฉัน</h3>
+      <ul class="dots"><li><span class="ui">🩺 จากนักกายภาพ</span> — โปรแกรมที่นักกายภาพกำหนดให้คุณโดยเฉพาะ (บัญชีจริงได้รับอัตโนมัติ)</li><li><span class="ui">★ โปรแกรมของฉัน</span> — จัดชุดท่าเอง เลือกจำนวนครั้ง เวลา และเวลาพัก</li></ul>
+      <div class="warn">หยุดออกกำลังกายทันทีถ้าเจ็บหน้าอก ใจสั่นผิดปกติ หน้ามืด หายใจไม่ทัน หรือปวดข้อมาก และโทร <b>1669</b> หากอาการไม่ดีขึ้น · ถ้าใช้ยาลดน้ำตาลหรืออินซูลิน ควรตรวจน้ำตาลก่อน-หลังออกกำลังกาย และพกลูกอมติดตัว</div>
+    </section>
+
+    <section class="ch" id="remind"><h2><span class="n"></span>ตารางนัดฝึกและการแจ้งเตือน</h2>
+      <p class="lead">ตั้งวันและเวลาฝึกให้เป็นนิสัย แนะนำอย่างน้อย 3–5 วัน/สัปดาห์ ไม่เว้นเกิน 2 วันติดกัน</p>
+      <ol class="steps">
+        <li>ไปที่ <span class="ui">โปรไฟล์ของฉัน</span> เลื่อนลงมาที่ <b>⏰ ตารางนัดฝึกและการแจ้งเตือน</b></li>
+        <li>แตะเลือกวัน (จ. อ. พ. …) และตั้งเวลาฝึก ติ๊กเตือน “เดินหลังอาหาร” ได้ถ้าต้องการ</li>
+        <li>กด <span class="ui">🔔 เปิดการแจ้งเตือน</span> เพื่อให้แอปเตือนบนเครื่อง (ทำงานเมื่อเปิดแอปค้างไว้)</li>
+        <li>กด <span class="ui">📅 เพิ่มลงปฏิทินในโทรศัพท์</span> แล้วเปิดไฟล์ที่ดาวน์โหลด ปฏิทินจะเตือนตามเวลาแม้ปิดแอป (แนะนำ)</li>
+      </ol>
+      <p>หน้าหลักจะแสดง “วันนี้มีนัดฝึก” หรือ “นัดฝึกครั้งถัดไป” และขึ้น ✅ เมื่อวันนั้นออกกำลังกายแล้ว</p>
+    </section>
+
+    <section class="ch" id="ai"><h2><span class="n"></span>AI Tracking นับท่าด้วยกล้อง</h2>
+      <p class="lead">AI (MediaPipe) ตรวจจับท่าทางจากกล้องในเครื่องของคุณ ภาพไม่ถูกส่งออกไปที่ใด</p>
+      <ol class="steps">
+        <li>ไปที่เมนู <span class="ui">AI Tracking</span> เลือกท่า เช่น สควอท ยกแขน ย่ำเท้า หรือยืนทรงตัว</li>
+        <li>กด <span class="ui">เปิดกล้อง</span> และอนุญาตให้เบราว์เซอร์ใช้กล้อง</li>
+        <li>วางโทรศัพท์ห่าง 2–3 เมตร ให้เห็นทั้งตัว (ศีรษะถึงเท้า) ในที่แสงสว่างพอ</li>
+        <li>ทำท่าตามคำแนะนำ ระบบนับครั้งและบอกถ้าท่ายังไม่ถูก</li>
+      </ol>
+      <div class="note">กล้องไม่เปิด? ตรวจว่าเปิดเว็บผ่าน https และอนุญาตกล้องในการตั้งค่าเบราว์เซอร์แล้ว</div>
+    </section>
+
+    <section class="ch" id="game"><h2><span class="n"></span>เกมออกกำลังกาย</h2>
+      <p class="lead">เกมที่ใช้ร่างกายเล่นผ่านกล้อง เช่น สควอทเป่าลูกโป่ง ช่วยให้ออกกำลังกายสนุกขึ้น คะแนนสูงสุดถูกบันทึกในหน้าหลัก</p>
+    </section>
+
+    <section class="ch" id="fitness"><h2><span class="n"></span>ทดสอบสมรรถภาพทางกาย</h2>
+      <p class="lead">ชุดทดสอบสำหรับผู้ใหญ่และผู้สูงอายุ เช่น ลุก-นั่งเก้าอี้ 30 วินาที ย่ำเท้า 2 นาที นั่งงอตัว ลุกเดินไป-กลับ (TUG) ยืนขาเดียว และแรงบีบมือ</p>
+      <ol class="steps"><li>ไปที่เมนู <span class="ui">สมรรถภาพทางกาย</span></li><li>ให้ AI ช่วยวัดผ่านกล้อง หรือกรอกผลเอง</li><li>ระบบแปลผลเทียบเกณฑ์ตามอายุ และแสดงกราฟเปรียบเทียบแต่ละครั้ง</li></ol>
+    </section>
+
+    <section class="ch" id="body"><h2><span class="n"></span>Body Composition และ AI Body Transformation</h2>
+      <h3>Body Composition</h3>
+      <p>บันทึกน้ำหนัก ส่วนสูง รอบเอว เปอร์เซ็นต์ไขมัน กล้ามเนื้อ ไขมันในช่องท้อง (จากเครื่องชั่งวัดองค์ประกอบร่างกาย หรือถ่ายรูปหน้าจอเครื่องให้ AI อ่าน) ระบบแสดงกราฟการเปลี่ยนแปลง</p>
+      <h3>AI Body Transformation</h3>
+      <ol class="steps"><li>อัปโหลดรูปเต็มตัว กรอกน้ำหนัก ส่วนสูง รอบเอว รอบสะโพก และน้ำหนักที่อยากลด</li><li>เลือกให้ AI สร้างภาพ (บัญชีจริงใช้ได้วันละ 5 ภาพ) หรือปรับสัดส่วนในเครื่อง</li><li>ดูภาพก่อน-หลังเพื่อเป็นแรงจูงใจ ดาวน์โหลดเก็บไว้ได้</li></ol>
+      <div class="note">ภาพเป็นการจำลองโดยประมาณเพื่อสร้างแรงจูงใจ ไม่ใช่ผลลัพธ์ที่รับประกัน</div>
+    </section>
+
+    <section class="ch" id="food"><h2><span class="n"></span>บันทึกอาหารอีสาน</h2>
+      <ol class="steps"><li>ไปที่เมนู <span class="ui">บันทึกอาหาร</span></li><li>เลือกเมนูจากฐานข้อมูลอาหารอีสาน (เช่น ส้มตำ ลาบ ข้าวเหนียว) หรือถ่ายรูปให้ AI ช่วยระบุ (บัญชีจริงวันละ 40 รูป)</li><li>ดูพลังงาน คาร์โบไฮเดรต และคำแนะนำ เช่น ข้าวเหนียวมื้อละ 1 ปั้นขนาดกำปั้น</li></ol>
+    </section>
+
+    <section class="ch" id="tree"><h2><span class="n"></span>ต้นไม้สุขภาพ และเกียรติบัตร</h2>
+      <ul class="dots"><li><b>ต้นไม้สุขภาพ</b> โตขึ้นเมื่อออกกำลังกายต่อเนื่อง ถ้าน้ำหนักหรือรอบเอวลดลง จะได้ใส่ปุ๋ยและพรวนดินให้ต้นไม้</li><li><b>เกียรติบัตร 3 เดือน</b> เมื่อฝึกต่อเนื่องและผลลัพธ์ดีขึ้นภายใน 3 เดือน ระบบออกเกียรติบัตรให้ พิมพ์หรือดาวน์โหลดได้</li></ul>
+    </section>
+
+    <section class="ch" id="consult"><h2><span class="n"></span>ปรึกษานักกายภาพบำบัด (วิดีโอคอล)</h2>
+      <ol class="steps"><li>ไปที่เมนู <span class="ui">ปรึกษานักกายภาพ</span> แล้วกดเริ่มห้องปรึกษา</li><li>ส่งลิงก์ห้องให้นักกายภาพ (เช่น ทาง LINE) เมื่อเข้ามาแล้วจะเห็นภาพและเสียงกัน พิมพ์แชทได้</li><li>อนุญาตกล้องและไมโครโฟนเมื่อเบราว์เซอร์ถาม</li></ol>
+    </section>
+
+    <section class="ch" id="chatbot"><h2><span class="n"></span>น้องอ่อนหวาน ผู้ช่วยโค้ชสุขภาพ</h2>
+      <div class="tip"><span class="mini" data-mascot="1"></span><span>กดปุ่มรูปหนูที่มุมขวาล่างได้ทุกหน้าเลยค่ะ ถามเรื่องการออกกำลังกาย อาหาร น้ำหนัก ชีพจร อาการที่ต้องหยุด หรือวิธีใช้แอปได้</span></div>
+      <ul class="dots" style="margin-top:10px"><li><span class="ui">💬 แชท</span> — พิมพ์คำถาม หรือแตะคำถามแนะนำ</li><li><span class="ui">📚 คลังคำถาม</span> — ค้นหาจากคำถามที่พบบ่อยกว่า 100 ข้อ แยกตามหมวด</li><li><span class="ui">📖 วิธีใช้งาน</span> — เปิดคำแนะนำทีละขั้นอีกครั้ง</li><li><span class="ui">ล้างแชท</span> — เริ่มบทสนทนาใหม่</li></ul>
+      <div class="note">คำตอบเป็นคำแนะนำทั่วไปเพื่อส่งเสริมสุขภาพ ไม่ใช่การวินิจฉัยโรค</div>
+    </section>
+
+    <section class="ch" id="profile"><h2><span class="n"></span>โปรไฟล์และบัตรสมาชิก</h2>
+      <ul class="dots"><li>แก้ไขชื่อ อายุ เพศ ส่วนสูง และเปลี่ยนรูปโปรไฟล์ (ระบบครอปเป็นสี่เหลี่ยมให้)</li><li>บัตรสมาชิกแบบห้อยคอ มีเลขประจำตัว ลากให้แกว่ง แตะสองครั้งหรือกด <span class="ui">🔄 พลิกบัตร</span> เพื่อดูด้านหลัง</li><li>สีบัตรเปลี่ยนตามระดับความเสี่ยงล่าสุด (ดูตารางในหัวข้อประเมินความเสี่ยง)</li></ul>
+    </section>
+
+    <section class="ch" id="staff"><h2><span class="n"></span>สำหรับนักกายภาพบำบัดและผู้ดูแลระบบ</h2>
+      <p class="lead">ระบบผู้ดูแลแยกจากแอปผู้ใช้ เข้าได้จากลิงก์ <span class="ui">🔐 สำหรับผู้ดูแลระบบ / นักกายภาพบำบัด</span> ในหน้าเข้าสู่ระบบ</p>
+      <h3>เข้าสู่ระบบอย่างปลอดภัย (2 ขั้น)</h3>
+      <ol class="steps"><li>กรอกอีเมลและรหัสผ่านของบัญชีที่มีบทบาท physio หรือ admin แล้วกด <span class="ui">ถัดไป: ส่งรหัส OTP ทางอีเมล</span></li><li>เปิดอีเมล นำรหัส OTP มากรอก แล้วกด <span class="ui">ยืนยันและเข้าสู่ระบบ</span> (ขอรหัสใหม่ได้หลัง 60 วินาที)</li><li>ระบบให้อยู่ในระบบได้ไม่เกิน 12 ชั่วโมง จากนั้นต้องยืนยัน OTP ใหม่</li></ol>
+      <h3>สิ่งที่ทำได้</h3>
+      <ul class="dots"><li><b>Dashboard</b> — การใช้งานระบบ เวลาออกกำลังกายเฉลี่ย ท่าที่นิยม และการเปลี่ยนแปลงของค่าต่าง ๆ</li><li><b>ผู้ป่วยและโปรแกรม</b> — เลือกปัญหาของผู้ป่วย ระบบแนะนำท่าที่เหมาะและข้อควรระวัง ปรับแล้ว <span class="ui">ส่งโปรแกรม</span> ผู้ป่วยเห็นในแท็บ “🩺 จากนักกายภาพ”</li><li><b>ทีมและบทบาท</b> (เฉพาะ admin) — มอบหมายผู้ป่วยให้นักกายภาพ และกำหนดบทบาท นักกายภาพเห็นเฉพาะผู้ป่วยที่ดูแล</li></ul>
+      <div class="note">บัญชีทดลองในหน้าผู้ดูแล (admin / pt01, PIN 1234) ใช้ข้อมูลตัวอย่างเท่านั้น ไม่เข้าถึงข้อมูลจริง</div>
+    </section>
+
+    <section class="ch" id="faq"><h2><span class="n"></span>คำถามที่พบบ่อยและการแก้ปัญหา</h2>
+      <details><summary>ข้อมูลหายเมื่อเปลี่ยนเครื่อง</summary><p>บัญชีทดลองเก็บข้อมูลในเครื่องเท่านั้น ถ้าต้องการใช้หลายเครื่อง ให้สมัคร “บัญชีจริง” ข้อมูลจะซิงก์อัตโนมัติ</p></details>
+      <details><summary>ซิงก์ไม่สำเร็จ / ออฟไลน์</summary><p>ระบบบันทึกในเครื่องก่อน และซิงก์ขึ้นฐานข้อมูลเองเมื่อกลับมาออนไลน์ ดูสถานะได้ที่มุมล่างของเมนู</p></details>
+      <details><summary>กล้องหรือไมโครโฟนใช้ไม่ได้</summary><p>อนุญาตสิทธิ์ในการตั้งค่าเบราว์เซอร์ ปิดแอปอื่นที่ใช้กล้องอยู่ และเปิดเว็บผ่าน https</p></details>
+      <details><summary>ไม่ได้รับอีเมล OTP (ผู้ดูแล)</summary><p>ดูในโฟลเดอร์จดหมายขยะ รอ 60 วินาทีแล้วกด “ส่งรหัสอีกครั้ง” หากยังไม่ได้ ติดต่อผู้ดูแลระบบให้ตรวจการตั้งค่าอีเมล</p></details>
+      <details><summary>ลืม PIN / รหัสผ่าน</summary><p>บัญชีทดลองใช้ PIN 1234 · บัญชีจริงกด “ลืมรหัสผ่าน?” ใต้ปุ่มเข้าสู่ระบบ แล้วตั้งรหัสใหม่จากลิงก์ในอีเมล</p></details>
+      <details><summary>ไม่ได้รับการแจ้งเตือนนัดฝึก</summary><p>การแจ้งเตือนของแอปทำงานเมื่อเปิดแอปไว้ ถ้าต้องการให้เตือนแม้ปิดแอป ให้ใช้ “เพิ่มลงปฏิทินในโทรศัพท์” และตรวจว่าเปิดเสียงเตือนของปฏิทินไว้</p></details>
+    </section>
+
+    <section class="ch" id="privacy"><h2><span class="n"></span>ความเป็นส่วนตัวและความปลอดภัย</h2>
+      <ul class="dots"><li>ภาพจากกล้องสำหรับ AI นับท่าประมวลผลในเครื่อง ไม่ถูกส่งออก</li><li>ข้อมูลบัญชีจริงเก็บในฐานข้อมูลที่มีการควบคุมสิทธิ์ ผู้ป่วยเห็นเฉพาะข้อมูลตนเอง นักกายภาพเห็นเฉพาะผู้ป่วยที่ได้รับมอบหมาย</li><li>การเก็บข้อมูลสุขภาพทำเมื่อได้รับความยินยอมตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล</li><li>ระบบนี้เป็นเครื่องมือส่งเสริมสุขภาพ ไม่ใช่อุปกรณ์การแพทย์ ไม่ใช้แทนคำแนะนำของแพทย์</li></ul>
+      <div class="warn">ฉุกเฉินทางการแพทย์ โทร <b>1669</b> ได้ตลอด 24 ชั่วโมง</div>
+    </section>
+  </main>
+
+  <footer>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · คู่มือการใช้งาน · <a href="landing.html">หน้าแรก</a> · <a href="index.html">เปิดแอป</a></footer>
+</div>
+
+<script src="mascot.js?v=3"></script>
+<script>
+(function () {
+  try { const t = JSON.parse(localStorage.getItem("predm.v1.theme") || "null"); if (t) document.documentElement.dataset.theme = t; } catch { /* storage blocked */ }
+  document.querySelectorAll("[data-mascot]").forEach((el) => { el.innerHTML = window.PreDMMascot ? PreDMMascot.svg({ wave: el.dataset.mascot === "wave" }) : ""; });
+  // numbered chapters + table of contents
+  const secs = [...document.querySelectorAll("section.ch")];
+  secs.forEach((s, i) => { s.querySelector(".n").textContent = i + 1; });
+  document.getElementById("toc").innerHTML = secs.map((s) => `<li><a href="#${s.id}">${s.querySelector("h2").childNodes[1].textContent.trim()}</a></li>`).join("");
+  const links = [...document.querySelectorAll("#toc a")];
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-30% 0px -60% 0px" });
+    secs.forEach((s) => io.observe(s));
+  }
+  document.getElementById("printBtn").addEventListener("click", () => { document.querySelectorAll("details").forEach((d) => (d.open = true)); window.print(); });
+})();
+</script>
+</body>
+</html>

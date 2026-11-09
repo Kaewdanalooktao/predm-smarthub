@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</title>
+<meta name="description" content="Know Your Risk. Shape Your Future. — Smart Screening · Body Composition · AI Exercise · AI Body Transformation">
+<script id="landing-redirect">/* hosts without rewrites (GitHub Pages): the bare site address shows the public landing page first */
+try { if (/\/$/.test(location.pathname) && !location.hash && !location.search && !localStorage.getItem("predm.v1.session")) location.replace("landing.html"); } catch (e) {}
+</script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f4aa0">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pre-DM">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Anuphan:wght@300;400;500;600;700&family=Pridi:wght@400;500;700&family=Charm:wght@700&display=swap">
+<link rel="stylesheet" href="styles.css?v=99">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="nav" aria-label="เมนูหลัก">
+    <div class="brand">
+      <span class="brand-mark"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><path d="M20 5c6 8 11 13 11 20a11 11 0 0 1-22 0C9 18 14 13 20 5z" fill="currentColor"/><path d="M14.5 26h3.5l2-4.5 2.8 8 1.8-3.5h2.9" fill="none" stroke="var(--card)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div><b>Pre-DM</b><span>Smart Hub</span><small class="brand-pl">(แพลตฟอร์มอ่อนหวานวิทยา)</small></div>
+    </div>
+    <nav>
+      <a href="#home" data-view="home" aria-label="หน้าหลัก"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>หน้าหลัก</span></a>
+      <a href="#profile" data-view="profile" aria-label="โปรไฟล์ของฉัน"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17c.8-2 2.2-3 4-3s3.2 1 4 3M10 3V1.5h4V3"/></svg><span>โปรไฟล์ของฉัน</span></a>
+      <a href="#risk" data-view="risk" aria-label="ประเมินความเสี่ยง"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg><span>ประเมินความเสี่ยง</span></a>
+      <a href="#exercise" data-view="exercise" aria-label="โปรแกรมออกกำลังกาย"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6v12M18 6v12M3 9.5v5M21 9.5v5M6 12h12"/></svg><span>โปรแกรมออกกำลังกาย</span></a>
+      <a href="#tracking" data-view="tracking" aria-label="AI Tracking"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="9.5" r="2.2"/><path d="M8.5 17c.3-2.2 1.6-3.4 3.5-3.4s3.2 1.2 3.5 3.4"/></svg><span>AI Tracking</span></a>
+      <a href="#game" data-view="game" aria-label="เกมส์"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11.5" r=".8"/><circle cx="18" cy="13.8" r=".8"/></svg><span>เกมส์</span></a>
+      <a href="#fitness" data-view="fitness" aria-label="สมรรถภาพกาย"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="7"/><path d="M12 14v-3.5M9.5 2.5h5M12 2.5V7"/></svg><span>สมรรถภาพกาย</span></a>
+      <a href="#body" data-view="body" aria-label="Body Composition"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M7.5 9a6 6 0 0 1 9 0M12 9.5l1.5-2"/></svg><span>Body Composition</span></a>
+      <a href="#transform" data-view="transform" aria-label="AI Body Transformation"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/><path d="M5 4l.8 1.7L7.5 6.5l-1.7.8L5 9l-.8-1.7L2.5 6.5l1.7-.8z"/></svg><span>AI Transformation</span></a>
+      <a href="#chat" data-view="chat" aria-label="คุยกับน้องอ่อนหวาน"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1-4.8A8.5 8.5 0 1 1 21 12z"/></svg><span>น้องอ่อนหวาน</span></a>
+      <a href="#food" data-view="food" aria-label="บันทึกอาหาร"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h18a9 9 0 0 1-18 0z"/><path d="M8 9c0-2 2-2 2-4M12 9c0-2 2-2 2-4M16 9c0-2 2-2 2-4"/></svg><span>บันทึกอาหาร</span></a>
+      <a href="#tree" data-view="tree" aria-label="ต้นไม้สุขภาพ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-4 0-6.5-2.4-6.5-5.4C5.5 5.7 8.4 3 12 3s6.5 2.7 6.5 5.6c0 3-2.5 5.4-6.5 5.4z"/><path d="M8 21h8"/></svg><span>ต้นไม้ของฉัน</span></a>
+      <a href="#consult" data-view="consult" aria-label="ปรึกษานักกายภาพ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3"/><path d="M15.5 10.5l6-3.5v10l-6-3.5"/><path d="M6.5 12h5M9 9.5v5"/></svg><span>ปรึกษานักกายภาพ</span></a>
+    </nav>
+    <div class="nav-foot">
+      <button class="nav-btn theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>โหมดสว่าง/มืด</span></button>
+      <button class="nav-btn" id="logout" type="button" aria-label="ออกจากระบบ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg><span>ออกจากระบบ</span></button>
+      <p class="nav-note">ข้อมูลเก็บในเบราว์เซอร์เครื่องนี้เท่านั้น</p>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- WELCOME -->
+    <section id="view-welcome" class="view welcome" hidden>
+      <div class="w-left">
+        <div class="w-brand">
+          <div>
+            <div class="wordmark" aria-label="Pre-DM">pre<span class="wm-icon" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="5"/><path d="M20 9c4 5.5 7.5 9 7.5 13.5a7.5 7.5 0 0 1-15 0C12.5 18 16 14.5 20 9z" fill="var(--salmon-ink)"/></svg></span>dm</div>
+            <p class="w-sub">SMART HUB · DIABETES PREVENTION PLATFORM</p>
+            <p class="w-pl">(แพลตฟอร์มอ่อนหวานวิทยา)</p>
+            <p class="w-tag">Know Your Risk. <span>Shape Your Future.</span></p>
+          </div>
+          <button class="icon-btn theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+        </div>
+        <figure class="scene-card">
+          <div id="sceneArt"></div>
+          <figcaption><small>ป้องกันเบาหวานที่บ้าน</small><b>เติมความรู้ ลดความหวาน สร้างสุขภาพที่ยั่งยืน</b><span>AI นับท่า · ครอบครัวช่วยเชียร์ · ติดตามผลกับ รพ.สต. ใกล้บ้าน</span></figcaption>
+        </figure>
+        <div id="welcomeGuide"></div>
+        <a class="w-link" href="landing.html" id="tourLink">ดูภาพรวมระบบ Pre-DM (แพลตฟอร์มอ่อนหวานวิทยา) →</a>
+        <a class="w-link" href="manual.html">📘 คู่มือการใช้งานระบบ →</a>
+        <button class="w-link install-link" type="button" data-install hidden>📲 ติดตั้งเป็นแอปบนโทรศัพท์ →</button>
+        <p class="w-desc">ระบบส่งเสริมการออกกำลังกายสำหรับกลุ่มเสี่ยงเบาหวาน ประเมินความเสี่ยงด้วย Thai Diabetes Risk Score ฝึกตามโปรแกรม 4 แบบ มี AI ตรวจท่าและนับครั้ง พร้อมติดตามสมรรถภาพกายและ Body Composition</p>
+        <nav class="w-pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#transform"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
+        <div class="groups" id="tour">
+          <div class="group blue"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.5 4.8 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 11 8.5 7.8 12 3z"/><path d="M9 14.5h2l1-2 1.5 3 1-1.5h1"/></svg><b>ภาวะก่อนเบาหวาน</b><small>FPG 100–125 หรือ HbA1c 5.7–6.4%</small></div>
+          <div class="group lav"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12h8M12 8v8"/></svg><b>น้ำหนักเกิน / อ้วนลงพุง</b><small>BMI ≥ 23 หรือรอบเอวเกินเกณฑ์</small></div>
+          <div class="group green"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg><b>ความดันโลหิตสูง</b><small>กำลังรักษาหรือเคยได้รับการวินิจฉัย</small></div>
+          <div class="group salmon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M11 19c0-3 2.2-5 5-5s5 2 5 5"/></svg><b>ญาติสายตรงเป็นเบาหวาน</b><small>พ่อ แม่ พี่ หรือน้อง</small></div>
+        </div>
+      </div>
+      <aside class="w-right">
+        <form class="card login" id="loginForm">
+          <h2>เข้าสู่ระบบ</h2>
+          <div class="role-switch" id="roleSwitch" role="group" aria-label="ประเภทผู้ใช้">
+            <button type="button" data-role="user" aria-pressed="true">ผู้ใช้ / ญาติ</button>
+            <button type="button" data-role="staff" aria-pressed="false">อสม. / เจ้าหน้าที่</button>
+          </div>
+          <label class="f">เบอร์โทรศัพท์<input id="l-phone" inputmode="tel" placeholder="08xxxxxxxx" autocomplete="off"></label>
+          <label class="f">รหัส PIN<input id="l-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"></label>
+          <button class="btn grad" type="submit">เข้าสู่ระบบ</button>
+          <a class="admin-link" href="admin.html">🔐 สำหรับผู้ดูแลระบบ / นักกายภาพบำบัด → เข้าระบบผู้ดูแล</a>
+          <div><h3>บัญชีทดลอง</h3><p class="hint">กดเพื่อกรอกให้อัตโนมัติ · PIN ทุกบัญชีคือ 1234</p></div>
+          <div class="demo-list" id="demoList"></div>
+          <p class="hint">ต้นแบบนี้ไม่มีการยืนยันตัวตนจริง ระบบจริงควรใช้ OTP หรือ ThaiD และเข้ารหัสข้อมูลสุขภาพ</p>
+        </form>
+      </aside>
+    </section>
+
+    <!-- HOME -->
+    <section id="view-home" class="view">
+      <header class="topbar">
+        <div class="hello"><span class="avatar" id="helloAvatar" aria-hidden="true">ส</span><div><small id="today"></small><b id="helloName">สวัสดีครับ</b></div></div>
+        <span class="top-acts"><button class="btn sm install-btn" type="button" data-install hidden>📲 ติดตั้งแอป</button><button class="icon-btn m-only theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button><button class="icon-btn m-only" type="button" id="logoutM" aria-label="ออกจากระบบ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg></button><a class="icon-btn dot" href="#chat" aria-label="ถามโค้ช"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15.5 6 9zM10 20.5a2 2 0 0 0 4 0"/></svg></a></span>
+      </header>
+      <div id="homeReminder"></div>
+      <div id="homeGuide" hidden></div>
+      <div id="treeMini"></div>
+      <div class="home-grid" id="homeGrid"></div>
+      <div class="card">
+        <div class="card-head"><h2>บันทึกการออกกำลังกายล่าสุด</h2></div>
+        <div class="tbl-wrap"><table class="tbl" id="logTable"></table></div>
+      </div>
+    </section>
+
+    <!-- RISK -->
+    <section id="view-risk" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">แบบประเมินความเสี่ยงเบาหวานชนิดที่ 2</p>
+        <h1>Thai Diabetes Risk Score</h1>
+        <p class="lede">แบบประเมินของกระทรวงสาธารณสุข สำหรับผู้ที่อายุ 35 ปีขึ้นไป คะแนนรวม 0–17</p>
+      </header>
+      <div class="grid2">
+        <form class="card form" id="riskForm" novalidate>
+          <label>อายุ (ปี)<input id="r-age" type="number" inputmode="numeric" min="15" max="100" placeholder="เช่น 45" required></label>
+          <fieldset><legend>เพศ</legend>
+            <label class="chip"><input type="radio" name="r-sex" value="m" required>ชาย</label>
+            <label class="chip"><input type="radio" name="r-sex" value="f">หญิง</label>
+          </fieldset>
+          <div class="row2">
+            <label>น้ำหนัก (กก.)<input id="r-wt" type="number" inputmode="decimal" step="0.1" min="25" max="250" placeholder="เช่น 68.5" required></label>
+            <label>ส่วนสูง (ซม.)<input id="r-ht" type="number" inputmode="decimal" step="0.1" min="100" max="220" placeholder="เช่น 160" required></label>
+          </div>
+          <label>รอบเอว (ซม.)<small class="field-hint">วัดผ่านสะดือ ขณะหายใจออก</small><input id="r-waist" type="number" inputmode="decimal" step="0.1" min="40" max="200" placeholder="เช่น 85" required></label>
+          <fieldset><legend>เป็นความดันโลหิตสูง หรือกำลังรักษาอยู่</legend>
+            <label class="chip"><input type="radio" name="r-ht2" value="1" required>ใช่</label>
+            <label class="chip"><input type="radio" name="r-ht2" value="0">ไม่ใช่</label>
+          </fieldset>
+          <fieldset><legend>พ่อ แม่ พี่ หรือน้อง เป็นเบาหวาน</legend>
+            <label class="chip"><input type="radio" name="r-fh" value="1" required>ใช่</label>
+            <label class="chip"><input type="radio" name="r-fh" value="0">ไม่ใช่</label>
+          </fieldset>
+          <p class="form-error" id="riskError" role="alert" tabindex="-1" hidden></p>
+          <details><summary>ผลเลือด (ถ้ามี)</summary>
+            <div class="row2">
+              <label>FPG (มก./ดล.)<input id="r-fpg" type="number" inputmode="numeric" min="40" max="600" placeholder="เช่น 108"></label>
+              <label>HbA1c (%)<input id="r-a1c" type="number" inputmode="decimal" step="0.1" min="3" max="20" placeholder="เช่น 5.9"></label>
+            </div>
+          </details>
+          <button class="btn primary" type="submit">คำนวณความเสี่ยง</button>
+        </form>
+        <div class="card" id="riskResult"></div>
+      </div>
+    </section>
+
+    <!-- EXERCISE -->
+    <section id="view-exercise" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">โปรแกรมตามแนวทาง ADA / ACSM สำหรับกลุ่มเสี่ยงเบาหวาน</p>
+        <h1>โปรแกรมการออกกำลังกาย</h1>
+      </header>
+      <div id="parqStatus"></div>
+      <div class="tabs" role="tablist" id="exTabs"></div>
+      <div id="exPanel"></div>
+      <div class="card">
+        <h2>ตารางแนะนำ 1 สัปดาห์</h2>
+        <div class="tbl-wrap"><table class="tbl week" id="weekPlan"></table></div>
+      </div>
+    </section>
+
+    <!-- TRACKING -->
+    <section id="view-tracking" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">MediaPipe Pose + Hand · ประมวลผลในเครื่อง ไม่ส่งภาพออกไป</p>
+        <h1>AI Exercise Tracking</h1>
+      </header>
+      <div class="track">
+        <div class="stage">
+          <video id="tVideo" playsinline muted hidden></video>
+          <div class="stage-art" id="tArt"></div>
+          <canvas id="tCanvas" width="640" height="480"></canvas>
+          <div class="stage-msg" id="tMsg">กดเริ่มเพื่อเปิดกล้อง ยืนห่างกล้อง 2–3 เมตรให้เห็นทั้งตัว</div>
+        </div>
+        <div class="card side">
+          <label>เลือกท่า
+            <select id="tExercise">
+              <option value="squat">สควอท (Squat) · เสริมแรง</option>
+              <option value="arm">ยกแขนขึ้นเหนือศีรษะ · เสริมแรง/ยืดเหยียด</option>
+              <option value="march">ย่ำเท้ายกเข่า · แอโรบิก</option>
+              <option value="balance">ยืนขาเดียว · ทรงตัว</option>
+              <option value="fist">กำ-แบมือ (Hand) · บริหารมือและนิ้ว</option>
+            </select>
+          </label>
+          <div class="counter"><span id="tCount">0</span><small id="tUnit">ครั้ง</small></div>
+          <p class="feedback" id="tFeedback">—</p>
+          <div class="btns">
+            <button class="btn primary" id="tStart">เริ่ม</button>
+            <button class="btn" id="tStop" disabled>หยุดและบันทึก</button>
+          </div>
+          <label class="switch"><input type="checkbox" id="tVoice" checked><span></span>เสียงบรรยาย</label>
+          <label class="switch"><input type="checkbox" id="tHands"><span></span>แสดงจุดมือ (MediaPipe Hand · 21 จุด/มือ)</label>
+          <div class="pl-legend inline"><span><i class="dot w"></i>ขาว เริ่มจับ</span><span><i class="dot r"></i>แดง ทำผิด</span><span><i class="dot g"></i>เขียว ทำถูก</span></div>
+          <p class="hint" id="tHint"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section id="view-game" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">เกมส์กระตุ้นการออกกำลังกาย</p>
+        <h1>เลือกเกมส์ ฝึกทั้งแขนและขา</h1>
+        <p class="lede">เล่นด้วยกล้องเว็บแคม AI จับท่าทางของคุณ เกมส์ละ 60 วินาที สะสมคะแนนและเหรียญรางวัล</p>
+      </header>
+      <div class="game-pick" id="gamePick" role="radiogroup" aria-label="เลือกเกมส์"></div>
+      <div class="track">
+        <div class="stage">
+          <video id="gVideo" playsinline muted hidden></video>
+          <div class="stage-art game-art" id="gArt"></div>
+          <canvas id="gCanvas" width="640" height="480"></canvas>
+          <div class="stage-msg" id="gMsg">เลือกเกมส์ แล้วกดเริ่ม ยืนห่างกล้อง 2–3 เมตรให้เห็นทั้งตัว</div>
+        </div>
+        <div class="card side">
+          <div class="g-title"><span class="g-part" id="gPart">แขน</span><h2 id="gName">Bubble Pop</h2><p class="hint" id="gHow"></p></div>
+          <div class="gstats">
+            <div><small>คะแนน</small><b id="gScore">0</b></div>
+            <div><small>เวลา</small><b id="gTime">60</b></div>
+            <div><small>สถิติสูงสุด</small><b id="gBest">0</b></div>
+          </div>
+          <label>ระดับ
+            <select id="gLevel"><option value="1">เริ่มต้น (นั่งเล่นได้)</option><option value="2" selected>ปานกลาง</option><option value="3">ท้าทาย</option></select>
+          </label>
+          <label class="switch"><input type="checkbox" id="gVoice" checked><span></span>เสียงเชียร์</label>
+          <button class="btn primary" id="gStart">เริ่มเกมส์</button>
+          <h3>เหรียญรางวัล</h3>
+          <div id="badges" class="badges"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FITNESS -->
+    <section id="view-fitness" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">ประเมินซ้ำทุก 4–8 สัปดาห์</p>
+        <h1>การประเมินสมรรถภาพกาย</h1>
+      </header>
+      <div class="grid2">
+        <form class="card form" id="fitForm">
+          <div class="row2">
+            <label>วันที่ประเมิน<input id="f-date" type="date" required></label>
+            <label>อายุ (ปี)<input id="f-age" type="number" inputmode="numeric" min="15" max="100" placeholder="เช่น 45"></label>
+          </div>
+          <div id="fitFields"></div>
+          <button class="btn primary" type="submit">บันทึกผลการประเมิน</button>
+        </form>
+        <div class="card">
+          <h2>ผลล่าสุดเทียบครั้งก่อน</h2>
+          <div id="fitResult"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>ประวัติการประเมิน</h2>
+        <div class="tbl-wrap"><table class="tbl" id="fitTable"></table></div>
+      </div>
+    </section>
+
+    <!-- BODY COMP -->
+    <section id="view-body" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">ติดตามองค์ประกอบร่างกายหลายครั้ง</p>
+        <h1>Body Composition</h1>
+      </header>
+      <div class="sample-banner" id="sampleBanner" hidden>กำลังแสดงข้อมูลตัวอย่าง <button class="link" id="clearSample">ล้างตัวอย่างและเริ่มบันทึกของคุณ</button></div>
+      <div class="grid2">
+        <form class="card form" id="bodyForm" novalidate>
+          <div class="seg" role="tablist" aria-label="วิธีบันทึก">
+            <button type="button" role="tab" aria-selected="true" data-mode="photo">อ่านจากรูปผลตรวจ</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="manual">กรอกเอง</button>
+          </div>
+          <div id="ocrBox">
+            <label class="tf-drop" id="ocrDrop" for="b-photo">
+              <input id="b-photo" type="file" accept="image/*">
+              <img id="ocrThumb" alt="รูปผลตรวจที่อัปโหลด" hidden>
+              <span id="ocrText"><b>อัปโหลดรูปใบผลตรวจ หรือภาพหน้าจอแอปเครื่องชั่ง</b><small>รองรับ InBody, Tanita, Omron, Xiaomi และอื่น ๆ · ถ่ายตรง ไม่เอียง แสงพอ</small></span>
+            </label>
+            <div class="ocr-prog" id="ocrProg" hidden><div><span id="ocrBar"></span></div><small id="ocrStatus">กำลังเตรียมตัวอ่าน…</small></div>
+            <p class="ocr-note" id="ocrNote" hidden></p>
+            <details id="ocrRawBox" hidden><summary>ดูข้อความที่อ่านได้จากรูป</summary><pre id="ocrRaw"></pre></details>
+          </div>
+          <div class="row2">
+            <label>วันที่วัด<input id="b-date" type="date" required></label>
+            <label>อายุ (ปี)<input id="b-age" type="number" inputmode="numeric" min="15" max="100" placeholder="เช่น 48"></label>
+          </div>
+          <fieldset><legend>เพศ (ใช้แปลผล)</legend>
+            <label class="chip"><input type="radio" name="b-sex" value="m">ชาย</label><label class="chip"><input type="radio" name="b-sex" value="f">หญิง</label>
+          </fieldset>
+          <div class="row2">
+            <label>น้ำหนัก (กก.)<input id="b-wt" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 72.4"></label>
+            <label>ส่วนสูง (ซม.)<input id="b-ht" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 165"></label>
+          </div>
+          <div class="row2">
+            <label>รอบเอว (ซม.)<input id="b-waist" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 88"></label>
+            <label>ไขมันในร่างกาย (%)<input id="b-fat" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 28.5"></label>
+          </div>
+          <div class="row2">
+            <label>มวลกล้ามเนื้อ (กก.)<input id="b-muscle" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 27.3"></label>
+            <label>ชนิดค่ากล้ามเนื้อ<select id="b-mtype"><option value="smm">กล้ามเนื้อลาย (SMM · InBody/Omron)</option><option value="total">กล้ามเนื้อรวม (Tanita/Xiaomi)</option></select></label>
+          </div>
+          <div class="row2">
+            <label>ไขมันช่องท้อง (ระดับ)<input id="b-visc" type="number" inputmode="numeric" step="1" placeholder="เช่น 9"></label>
+            <label>BMR (kcal)<input id="b-bmr" type="number" inputmode="numeric" placeholder="เช่น 1450"></label>
+          </div>
+          <div class="row2 three">
+            <label>น้ำในร่างกาย (%)<input id="b-water" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 52"></label>
+            <label>มวลกระดูก (กก.)<input id="b-bone" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 2.6"></label>
+            <label>อายุร่างกาย (ปี)<input id="b-mage" type="number" inputmode="numeric" placeholder="เช่น 52"></label>
+          </div>
+          <p class="form-error" id="bodyError" role="alert" tabindex="-1" hidden></p>
+          <button class="btn primary" type="submit">บันทึกผล</button>
+        </form>
+        <div class="card" id="bodyInterpCard">
+          <div class="card-head"><div><h2>แปลผลตามอายุและเพศ</h2><p id="interpFor"></p></div></div>
+          <div id="bodyInterp" class="interp"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>เปลี่ยนแปลงจากครั้งแรก</h2>
+        <div id="bodyDelta" class="deltas"></div>
+      </div>
+      <div class="card">
+        <div class="chart-head">
+          <h2>แนวโน้ม</h2>
+          <select id="bodyMetric">
+            <option value="weight">น้ำหนัก (กก.)</option>
+            <option value="bmi">BMI</option>
+            <option value="fat">ไขมัน (%)</option>
+            <option value="muscle">มวลกล้ามเนื้อ (กก.)</option>
+            <option value="waist">รอบเอว (ซม.)</option>
+            <option value="visc">ไขมันช่องท้อง</option>
+          </select>
+        </div>
+        <div class="chart-box"><canvas id="bodyChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>ตารางเปรียบเทียบทุกครั้ง</h2>
+        <div class="tbl-wrap"><table class="tbl" id="bodyTable"></table></div>
+      </div>
+    </section>
+
+    <!-- AI BODY TRANSFORMATION -->
+    <section id="view-transform" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">AI Body Transformation · Shape Your Future</p>
+        <h1>ดูรูปร่างของคุณเมื่อถึงเป้าหมาย</h1>
+        <p class="lede">อัปโหลดรูปเต็มตัวของคุณ กรอกสัดส่วนปัจจุบันและเป้าหมาย AI จะตรวจจับโครงร่างร่างกายในรูป แล้วปรับรูปให้เห็นรูปร่างโดยประมาณเมื่อทำได้ตามเป้า รูปประมวลผลในเครื่องนี้เท่านั้น ไม่ถูกส่งออกไป</p>
+      </header>
+      <div class="tf2-grid">
+        <form class="card form" id="tfForm" novalidate>
+          <h2><span class="step">1</span> อัปโหลดรูปเต็มตัว</h2>
+          <label class="tf-drop" id="tfDrop" for="tf-photo">
+            <input id="tf-photo" type="file" accept="image/*">
+            <img id="tfThumb" alt="รูปที่อัปโหลด" hidden>
+            <span id="tfDropText"><b>เลือกรูป</b> หรือ ลากไฟล์มาวางที่นี่<small>JPG หรือ PNG · ยืนหันหน้าตรง เห็นตั้งแต่ศีรษะถึงเท้า</small></span>
+          </label>
+          <ul class="tf-tips"><li>ยืนตรง แขนห่างลำตัวเล็กน้อย</li><li>ใส่เสื้อผ้าพอดีตัว</li><li>พื้นหลังเรียบ แสงสว่างพอ</li></ul>
+
+          <h2><span class="step">2</span> สัดส่วนปัจจุบัน <button class="link sm-link" type="button" id="tfFill">ใช้ค่าจาก Body Composition ล่าสุด</button></h2>
+          <div class="row2">
+            <label>น้ำหนัก (กก.)<input id="tf-wt" type="number" inputmode="decimal" step="0.1" min="25" max="250" placeholder="เช่น 72"></label>
+            <label>ส่วนสูง (ซม.)<input id="tf-ht" type="number" inputmode="decimal" step="0.1" min="100" max="220" placeholder="เช่น 160"></label>
+          </div>
+          <div class="row2">
+            <label>รอบเอว (ซม.)<input id="tf-waist" type="number" inputmode="decimal" step="0.1" min="40" max="200" placeholder="เช่น 90"></label>
+            <label>รอบสะโพก (ซม.)<input id="tf-hip" type="number" inputmode="decimal" step="0.1" min="50" max="220" placeholder="เช่น 102"></label>
+          </div>
+
+          <h2><span class="step">3</span> เป้าหมาย</h2>
+          <label>อยากลดน้ำหนัก (กก.)<input id="tf-loss" type="number" inputmode="decimal" step="0.5" min="0.5" max="60" placeholder="เช่น 5"></label>
+          <div class="row2">
+            <label>รอบเอวเป้าหมาย (ซม.)<input id="tf-twaist" type="number" inputmode="decimal" step="0.5" min="40" max="200" placeholder="คำนวณให้ถ้าเว้นว่าง"></label>
+            <label>รอบสะโพกเป้าหมาย (ซม.)<input id="tf-thip" type="number" inputmode="decimal" step="0.5" min="50" max="220" placeholder="คำนวณให้ถ้าเว้นว่าง"></label>
+          </div>
+          <p class="hint" id="tfSuggest"></p>
+          <h2><span class="step">4</span> วิธีสร้างภาพ</h2>
+          <div class="seg tf-engine" id="tfEngine" role="radiogroup" aria-label="วิธีสร้างภาพ">
+            <button type="button" role="radio" aria-checked="true" data-engine="ai">✨ AI สร้างภาพสมจริง</button>
+            <button type="button" role="radio" aria-checked="false" data-engine="local">ปรับสัดส่วนในเครื่อง</button>
+          </div>
+          <div class="tf-ai" id="tfAiBox">
+            <p class="hint">ใช้ Google Gemini สร้างภาพใหม่จากรูปของคุณ โดยคงใบหน้า ทรงผม เสื้อผ้า ท่าทาง และพื้นหลังเดิม ต้องใช้ Gemini API key (สร้างได้ที่ <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>)</p>
+            <label>Gemini API key<input id="tf-key" type="password" autocomplete="off" spellcheck="false" placeholder="วาง API key ที่นี่"></label>
+            <div class="row2">
+              <label>โมเดล<select id="tf-model"><option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image</option><option value="gemini-3.1-flash-image-preview">Gemini 3.1 Flash Image (preview)</option></select></label>
+              <label class="tf-check"><input type="checkbox" id="tf-remember">จำ key ไว้ในเบราว์เซอร์นี้</label>
+            </div>
+            <label class="tf-check tf-consent"><input type="checkbox" id="tf-consent">ยินยอมให้ส่งรูปที่อัปโหลดและสัดส่วนที่กรอกไปยัง Google Gemini เพื่อสร้างภาพครั้งนี้ (แอปนี้ไม่เก็บรูปไว้บนเซิร์ฟเวอร์ใด ๆ)</label>
+          </div>
+          <p class="form-error" id="tfError" role="alert" tabindex="-1" hidden></p>
+          <button class="btn primary" type="submit" id="tfGo">สร้างภาพรูปร่างเป้าหมาย</button>
+        </form>
+
+        <div class="card tf-result">
+          <div class="tf-empty" id="tfEmpty">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="18" y="14" width="84" height="92" rx="14" fill="var(--sub)"/><circle cx="60" cy="44" r="12" fill="var(--blue)"/><path d="M38 96c2-18 10-28 22-28s20 10 22 28z" fill="var(--blue)"/><path d="M88 22l3 6 6 3-6 3-3 6-3-6-6-3 6-3z" fill="var(--yellow-ink)"/></svg>
+            <b>ภาพก่อน-หลังจะแสดงที่นี่</b>
+            <span>อัปโหลดรูป กรอกสัดส่วนและเป้าหมาย แล้วกด “สร้างภาพรูปร่างเป้าหมาย”</span>
+          </div>
+          <div class="tf-busy" id="tfBusy" hidden><span class="spin"></span><b id="tfBusyText">AI กำลังตรวจจับโครงร่างร่างกาย…</b></div>
+          <div id="tfOut" hidden>
+            <div class="ba">
+              <figure class="ba-fig">
+                <div class="ba-img"><canvas id="tfBefore" aria-label="ภาพปัจจุบัน"></canvas><span class="ba-tag">ตอนนี้</span></div>
+                <figcaption id="tfCapBefore"></figcaption>
+              </figure>
+              <div class="ba-arrow" aria-hidden="true">→</div>
+              <figure class="ba-fig goal">
+                <div class="ba-img"><canvas id="tfAfter" aria-label="ภาพเมื่อทำสำเร็จตามเป้าหมาย"></canvas><span class="ba-tag">เมื่อทำสำเร็จ</span></div>
+                <figcaption id="tfCapAfter"></figcaption>
+              </figure>
+            </div>
+            <label class="chip tf-pts"><input type="checkbox" id="tf-showpts">แสดงจุดที่ AI ตรวจจับ</label>
+            <div class="tf-sum" id="tfSum"></div>
+            <div class="tf-time" id="tfTime"></div>
+            <div class="btns"><button class="btn primary" type="button" id="tfSave">บันทึกภาพก่อน-หลัง</button><button class="btn" type="button" id="tfReset">เริ่มใหม่</button></div>
+          </div>
+        </div>
+      </div>
+      <p class="disclaimer">โหมด AI สร้างภาพด้วย Google Gemini ภาพที่ได้อาจคลาดเคลื่อนจากความจริง · ภาพเป็นการจำลองโดยประมาณจากการปรับสัดส่วนรูปตามเป้าหมายที่กรอก ไม่ใช่ผลลัพธ์ที่รับประกัน รูปร่างจริงขึ้นกับพันธุกรรม การกระจายไขมัน และการรักษามวลกล้ามเนื้อ ควรลดน้ำหนักอย่างปลอดภัยสัปดาห์ละ 0.5–1 กก.</p>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="view-profile" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">Member Card · บัตรสมาชิก Pre-DM</p>
+        <h1>โปรไฟล์ของฉัน</h1>
+        <p class="lede">บัตรสมาชิกพร้อมเลขประจำตัว ปรับรูปและข้อมูลส่วนตัวได้ที่นี่</p>
+      </header>
+      <div id="profileRoot"></div>
+      <div id="remindRoot"></div>
+    </section>
+
+    <!-- FOOD -->
+    <section id="view-food" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">Isan Food Log · กินเป็น เห็นเสี่ยง เลี่ยงเบาหวาน</p>
+        <h1>บันทึกอาหารอีสาน</h1>
+        <p class="lede">เลือกเมนูจากฐานข้อมูลอาหารอีสาน หรือถ่ายรูปให้ AI ช่วย ติดตามข้าวเหนียว คาร์บ น้ำตาล และโซเดียมรายวัน พร้อมคำแนะนำปรับเมนูสำหรับกลุ่มเสี่ยงเบาหวาน</p>
+      </header>
+      <div id="foodRoot"></div>
+    </section>
+
+    <!-- TREE -->
+    <section id="view-tree" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">Health Tree · ความต่อเนื่องคือปุ๋ยที่ดีที่สุด</p>
+        <h1>ต้นไม้สุขภาพของฉัน</h1>
+        <p class="lede">ฝึกทุกวันเพื่อรดน้ำ ยิ่งฝึกต่อเนื่องต้นไม้ยิ่งโต และเมื่อน้ำหนักหรือรอบเอวลด จะได้ปุ๋ยและพรวนดินช่วยเร่งการเติบโต</p>
+      </header>
+      <div id="treeRoot"></div>
+      <div id="certRoot"></div>
+    </section>
+
+    <!-- CONSULT -->
+    <section id="view-consult" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">Tele-Physiotherapy · วิดีโอคอลปรึกษาอาการ</p>
+        <h1>ปรึกษานักกายภาพบำบัด</h1>
+        <p class="lede">จองคิว เล่าอาการ แล้ววิดีโอคอลกับนักกายภาพบำบัดได้จากที่บ้าน แนบสรุปข้อมูลสุขภาพจากแอปให้นักกายภาพดูประกอบการให้คำแนะนำได้</p>
+      </header>
+      <div id="csRoot"></div>
+    </section>
+
+    <!-- CHAT -->
+  </main>
+</div>
+<div class="player" id="player" hidden role="dialog" aria-modal="true" aria-labelledby="plName">
+  <div class="pl-top">
+    <div class="pl-title"><small id="plProg">โปรแกรม</small><b id="plStep">ท่า 1/1</b></div>
+    <span class="pill pl-mode" id="plModeBadge">Auto</span>
+    <label class="switch light"><input type="checkbox" id="plVoice"><span></span>เสียงบรรยาย</label>
+    <button class="icon-btn" type="button" id="plClose" aria-label="จบการฝึก">✕</button>
+  </div>
+  <div class="pl-bar"><span id="plBarFill"></span></div>
+  <div class="pl-main" id="plMain">
+    <div class="pl-stage" id="plStage">
+      <div class="pl-cam" id="plCam" hidden>
+        <video id="plVideo" playsinline muted hidden></video><canvas id="plCanvas" width="640" height="480"></canvas>
+        <div class="stage-msg" id="plMsg">กำลังเปิดกล้อง…</div>
+        <span class="pl-state" id="plState" data-state="idle">กำลังจับท่า</span>
+        <div class="pl-legend"><span><i class="dot w"></i>ขาว เริ่มจับ</span><span><i class="dot r"></i>แดง ทำผิด</span><span><i class="dot g"></i>เขียว ทำถูก</span></div>
+      </div>
+      <div class="pl-fig" id="plFig"></div>
+    </div>
+    <div class="pl-side">
+      <span class="pl-phase" id="plPhase" data-phase="ready">เตรียมตัว</span>
+      <h2 id="plName"></h2>
+      <p class="pl-desc" id="plDesc"></p>
+      <div class="pl-count"><b id="plBig">5</b><small id="plUnit">วินาที</small></div>
+      <p class="pl-target" id="plTarget"></p>
+      <p class="pl-fb" id="plFb" data-state="idle"></p>
+      <p class="pl-next" id="plNext"></p>
+      <div class="pl-ctrl"><button class="btn" type="button" id="plPrev">⏮ ก่อนหน้า</button><button class="btn" type="button" id="plPause">⏸ หยุดชั่วคราว</button><button class="btn primary" type="button" id="plDone">เริ่มท่านี้ ▶</button></div>
+    </div>
+  </div>
+  <div class="pl-summary" id="plSummary" hidden></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<button class="chat-fab" id="chatFab" type="button" aria-label="คุยกับน้องอ่อนหวาน ผู้ช่วยโค้ชสุขภาพ" aria-expanded="false" aria-controls="chatDock"><span class="chat-fab-av" data-mascot="wave"></span><span class="chat-fab-tip" id="chatTip" hidden>มีอะไรถามน้องอ่อนหวานได้เลยนะคะ 💗</span></button>
+<section class="chat-dock" id="chatDock" role="dialog" aria-labelledby="chatDockName" hidden>
+  <div class="chat-head"><span class="coach-av" data-mascot="1"></span>
+    <div><b id="chatDockName">น้องอ่อนหวาน</b><small><i class="online"></i>ผู้ช่วยโค้ชสุขภาพ · อ้างอิง ADA, ACSM, สสส.</small></div>
+    <button class="btn sm" type="button" id="chatClear">ล้างแชท</button>
+    <button class="icon-btn sm chat-x" type="button" id="chatClose" aria-label="ปิดหน้าต่างแชท">✕</button></div>
+  <div class="chat-tabs" role="tablist" aria-label="แชทหรือคลังคำถาม"><button type="button" role="tab" aria-selected="true" data-ctab="chat">💬 แชท</button><button type="button" role="tab" aria-selected="false" data-ctab="kb">📚 คลังคำถาม</button><button type="button" class="chat-guide-btn" data-guide="1">📖 วิธีใช้งาน</button><a class="chat-guide-btn" href="manual.html" target="_blank" rel="noopener">📘 คู่มือ</a></div>
+  <div class="chat-pane" data-pane="chat">
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="chips" id="chatChips"></div>
+    <form class="chat-in" id="chatForm"><input id="chatInput" placeholder="พิมพ์คำถาม เช่น กินข้าวเหนียวได้ไหม" autocomplete="off" aria-label="พิมพ์คำถาม"><button class="btn primary" type="submit">ส่ง</button></form>
+  </div>
+  <div class="chat-pane kb-pane" data-pane="kb" hidden>
+    <label class="chat-search" for="kbSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="kbSearch" type="search" placeholder="ค้นหาคำถาม เช่น ข้าวเหนียว เข่า ชีพจร" autocomplete="off"></label>
+    <div class="kb-list" id="kbList"></div>
+  </div>
+  <p class="chat-disc">คำแนะนำทั่วไปเพื่อการส่งเสริมสุขภาพ ไม่ใช่การวินิจฉัย หากมีอาการเจ็บหน้าอก หน้ามืด ใจสั่น ให้หยุดและโทร 1669</p>
+</section>
+<a class="sos" href="tel:1669" aria-label="โทรฉุกเฉิน 1669"><b>1669</b><small>ฉุกเฉิน</small></a>
+<script src="mascot.js?v=3"></script>
+<script src="guide.js?v=3"></script>
+<script src="care.js?v=1"></script>
+<script src="chatkb.js?v=7"></script>
+<script src="app.js?v=100"></script>
+<script src="config.js?v=3"></script>
+<script src="db.js?v=8"></script>
+<script src="hub.js?v=5"></script>
+<script src="tree.js?v=2"></script>
+<script src="food.js?v=3"></script>
+<script src="fitai.js?v=1"></script>
+<script src="cert.js?v=11"></script>
+<script src="profile.js?v=6"></script>
+<script type="module" src="pose.js?v=61"></script>
+</body>
+</html>
