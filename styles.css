@@ -2127,6 +2127,7 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 :root[data-theme="dark"] .ln-badge { color: #6fe89f; }
 .ln-what { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: .9rem; line-height: 1.55; }
 .ln-steps { margin: 0; padding-left: 22px; display: grid; gap: 12px; line-height: 1.7; }
+.ln-qr { display: flex; align-items: center; gap: 12px; margin-top: 10px; } .ln-qr img { width: 150px; height: 150px; border-radius: 12px; border: 1px solid var(--line); background: #fff; padding: 6px; } .ln-qr small { color: var(--muted, #667); max-width: 14em; line-height: 1.5; }
 .ln-code { display: inline-block; font-family: var(--display); font-size: 1.5rem; letter-spacing: .14em; padding: 4px 14px; border-radius: 12px; background: var(--sub); border: 1px dashed var(--line); margin: 0 6px; user-select: all; }
 .btn.ln-btn { background: #06c755; color: #fff; border-color: #06c755; } .btn.ln-btn:disabled { opacity: .5; }
 

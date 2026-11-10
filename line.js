@@ -56,7 +56,8 @@
     if (S.code && Date.now() < S.expires) {
       const oa = encodeURIComponent(OA);
       return wrap(`<ol class="ln-steps">
-        <li>เพิ่มเพื่อนบัญชีทางการของโครงการ <a class="btn sm ln-btn" href="https://line.me/R/ti/p/${oa}" target="_blank" rel="noopener">➕ เพิ่มเพื่อน ${esc(OA)}</a></li>
+        <li>เพิ่มเพื่อนบัญชีทางการของโครงการ <a class="btn sm ln-btn" href="https://line.me/R/ti/p/${oa}" target="_blank" rel="noopener">➕ เพิ่มเพื่อน ${esc(OA)}</a>
+          <span class="ln-qr"><img src="line-qr.png" width="150" height="150" alt="คิวอาร์โค้ดเพิ่มเพื่อน LINE น้องอ่อนหวาน ${esc(OA)}" loading="lazy"><small>หรือสแกนด้วยแอป LINE ในโทรศัพท์</small></span></li>
         <li>ส่งรหัสนี้ในแชต LINE ของบัญชีนั้น <b class="ln-code" aria-label="รหัสเชื่อมต่อ">${esc(S.code)}</b>
           <a class="btn sm ln-btn" href="https://line.me/R/oaMessage/${oa}/?${encodeURIComponent(S.code)}" target="_blank" rel="noopener">💬 เปิด LINE พร้อมรหัส</a></li>
         <li>กลับมาหน้านี้ ระบบจะขึ้นว่า “เชื่อมต่อแล้ว” เอง <button type="button" class="btn sm" data-ln="check">ตรวจสอบอีกครั้ง</button></li></ol>
