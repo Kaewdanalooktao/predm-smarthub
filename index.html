@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=131">
+<link rel="stylesheet" href="styles.css?v=132">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -105,6 +105,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <div class="hello"><span class="avatar" id="helloAvatar" aria-hidden="true">ส</span><div><small id="today"></small><b id="helloName">สวัสดีครับ</b></div></div>
         <span class="top-acts"><button class="btn sm install-btn" type="button" data-install hidden>📲 ติดตั้งแอป</button><button class="icon-btn m-only theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button><button class="icon-btn m-only" type="button" id="logoutM" aria-label="ออกจากระบบ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg></button><a class="icon-btn dot" href="#chat" aria-label="ถามโค้ช"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15.5 6 9zM10 20.5a2 2 0 0 0 4 0"/></svg></a></span>
       </header>
+      <button type="button" class="ar-cta ai-cta home-ai" data-aiplan><span class="ar-cta-ic" aria-hidden="true">🤖</span><span><b>AI จัดตารางฝึกให้ (ตามความชอบของคุณ)</b><small>ตอบ 5 ข้อ AI ดูประวัติการฝึก เกมที่ชอบ และเป้าหมาย แล้วจัดตาราง 7 วันพร้อมเหตุผล ประมวลผลในเครื่อง</small></span><span class="fq-card-go">จัดเลย →</span></button>
       <div id="homeReminder"></div>
       <div id="homeGuide" hidden></div>
       <div id="treeMini"></div>
@@ -161,6 +162,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <p class="eyebrow">โปรแกรมตามแนวทาง ADA / ACSM สำหรับกลุ่มเสี่ยงเบาหวาน</p>
         <h1>โปรแกรมการออกกำลังกาย</h1>
       </header>
+      <button type="button" class="ar-cta ai-cta" data-aiplan><span class="ar-cta-ic" aria-hidden="true">🤖</span><span><b>AI จัดตารางฝึกให้ (ตามความชอบของคุณ)</b><small>ตอบ 5 ข้อ AI ดูประวัติการฝึก เกมที่ชอบ และเป้าหมาย แล้วจัดตาราง 7 วันพร้อมเหตุผล ประมวลผลในเครื่อง</small></span><span class="fq-card-go">จัดเลย →</span></button>
       <button type="button" class="ar-cta" data-arfit><span class="ar-cta-ic" aria-hidden="true"><img src="vendor/fit3d/person_running.webp" alt=""></span><span><b>🕶️ โหมด AR · เลือกท่าฝึกเอง</b><small>เปิดกล้อง ชี้นิ้วแตะการ์ดเลือกโหมด เสริมแรง แอโรบิก ทรงตัว ยืดเหยียด หรือเกม AR แล้ว AI นับท่าให้</small></span><span class="fq-card-go">เปิด →</span></button>
       <div id="parqStatus"></div>
       <div class="tabs" role="tablist" id="exTabs"></div>
@@ -628,7 +630,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="guide.js?v=3"></script>
 <script src="care.js?v=1"></script>
 <script src="chatkb.js?v=7"></script>
-<script src="app.js?v=103"></script>
+<script src="app.js?v=104"></script>
 <script src="config.js?v=5"></script>
 <script src="db.js?v=9"></script>
 <script src="hub.js?v=8"></script>
@@ -645,5 +647,6 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script type="module" src="pose.js?v=72"></script>
 <script type="module" src="handkitchen.js?v=24"></script>
 <script src="arfit.js?v=12"></script>
+<script src="aiplan.js?v=2"></script>
 </body>
 </html>

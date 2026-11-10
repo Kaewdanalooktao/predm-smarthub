@@ -1932,5 +1932,5 @@ Return only the edited image.`;
   $("#tArt").innerHTML = skeletonArt(P.squat); $("#gArt").innerHTML = fig(P.reach, `<circle cx="18" cy="14" r="9" fill="#5aaae6" opacity=".7"/><circle cx="86" cy="10" r="7" fill="#f0b440" opacity=".85"/><circle cx="84" cy="40" r="8" fill="#e05246" opacity=".7"/><circle cx="12" cy="44" r="6" fill="#5aaae6" opacity=".6"/>`, 1, { noBlob: true });
   initZoom(); initBanners(); initWelcome(); initRisk(); initExercise(); initFitness(); initBody(); initTransform(); initChat(); initChatDock(); renderBadges();
   window.addEventListener("hashchange", route); route();
-  window.PreDM = { store, addLog, toast, profile, renderBadges, renderHome, speak, speakTrack, calcRisk, PROGRAMS, TYPE_TH };
+  window.PreDM = { store, addLog, toast, profile, renderBadges, renderHome, speak, speakTrack, calcRisk, PROGRAMS, TYPE_TH, openPlayer, normItem, estSecs, targetText }; // the last four are used by the AI plan (aiplan.js)
 })();
