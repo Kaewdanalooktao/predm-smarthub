@@ -42,7 +42,8 @@ const ST_ITEMS = [
   ["cabbage", "🥬", "กะหล่ำปลีซอย", 0, 5, 1, 8, 2, "เพิ่มปริมาณผัก อิ่มนาน"], ["cucumber", "🥒", "แตงกวา", 0, 1, 1, 5, 2, "ฉ่ำน้ำ แคลอรีต่ำ"],
   ["garlic", "🧄", "กระเทียม", 0, 1, 0, 5, 1, "หอม ช่วยลดการใช้ผงปรุง"], ["chili", "🌶️", "พริกสด 3 เม็ด", 0, 1, 0, 2, 1, "เผ็ดพอดี เพิ่มรสโดยไม่เพิ่มเกลือ"],
   ["chili10", "🌶️", "พริกสด 10 เม็ด", 0, 2, 0, 4, 0, "เผ็ดจัด อาจระคายกระเพาะ"], ["lime", "🍋", "มะนาว", 0, 1, 1, 4, 1, "เปรี้ยวแทนการเติมน้ำปลา"],
-  ["tamarind", "🫘", "มะขามเปียก", 0, 10, 3, 15, 0, "เปรี้ยวอมหวาน มีน้ำตาลธรรมชาติ"],
+  ["tamarind", "🫘", "มะขามเปียก", 0, 10, 3, 15, 0, "เปรี้ยวอมหวาน มีน้ำตาลธรรมชาติ"], ["krathin", "🫛", "เม็ดกระถิน", 0, 2, 0, 10, 1, "ผักพื้นบ้าน ใยอาหารดี"],
+  ["sprout", "🌱", "ถั่วงอก", 0, 3, 1, 8, 2, "กรอบ แคลอรีต่ำ"], ["culantro", "🌿", "ผักชีฝรั่ง", 0, 1, 0, 2, 1, "หอม เพิ่มรสโดยไม่เพิ่มเกลือ"], ["pakdong", "🥬", "ผักกาดดอง", 0, 300, 2, 10, -1, "ผักดองเค็ม ใส่น้อย ๆ"],
   ["fs1", "🫙", "น้ำปลา 1 ช้อน", 1, 450, 0, 3, 0, "พอดี (1 ช้อนชา ≈ 450 มก. โซเดียม)"], ["fs3", "🫙", "น้ำปลา 3 ช้อน", 1, 1350, 0, 9, -3, "เค็มมาก เกินครึ่งของโซเดียมทั้งวัน"],
   ["fslow", "🫙", "น้ำปลาสูตรลดโซเดียม", 1, 250, 0, 3, 1, "โซเดียมน้อยกว่าน้ำปลาปกติราว 40%"], ["pr1", "🫙", "ปลาร้าต้มสุก 1 ช้อน", 1, 450, 0, 10, 0, "ต้มสุกแล้วปลอดภัย ใช้น้อย ๆ"],
   ["pr3", "🫙", "ปลาร้าต้มสุก 3 ช้อน", 1, 1350, 0, 30, -3, "โซเดียมสูงมาก"], ["prraw", "🫙", "ปลาร้าดิบ ไม่ต้ม", 1, 500, 0, 10, -3, "ดิบ เสี่ยงพยาธิใบไม้ตับ ควรต้มสุกก่อนใช้", 1],
@@ -53,7 +54,7 @@ const ST_ITEMS = [
   ["shrimpd", "🦐", "กุ้งแห้ง", 2, 250, 0, 30, 1, "โปรตีน แต่เค็มนิด ใส่พอประมาณ"], ["peanut", "🥜", "ถั่วลิสงคั่ว", 2, 5, 1, 90, 1, "ไขมันดีและโปรตีน"],
   ["crabraw", "🦀", "ปูนาดอง ดิบ", 2, 700, 0, 30, -3, "ดิบ เสี่ยงพยาธิ และเค็มมาก", 1], ["crabck", "🦀", "ปูนาต้มสุก", 2, 200, 0, 35, 1, "สุกแล้วปลอดภัยกว่าปูดอง"],
   ["bluecrab", "🦀", "ปูม้าต้มสุก", 2, 250, 0, 60, 1, "โปรตีนดี"], ["saltegg", "🥚", "ไข่เค็ม", 2, 700, 0, 90, -1, "โซเดียมสูง"],
-  ["mooyor", "🌭", "หมูยอ", 2, 450, 2, 80, -1, "อาหารแปรรูป เค็ม"], ["shrimpck", "🦐", "กุ้งลวกสุก", 2, 150, 0, 45, 2, "โปรตีนดี ไขมันต่ำ"],
+  ["mooyor", "🌭", "หมูยอ", 2, 450, 2, 80, -1, "อาหารแปรรูป เค็ม"], ["kakmoo", "🥓", "กากหมู", 2, 150, 0, 150, -2, "ไขมันสูงมาก"], ["crabsalt", "🦀", "ปูดองเค็ม 2 ตัว", 2, 600, 0, 40, -3, "ปูดองไม่ผ่านความร้อน เสี่ยงพยาธิ และเค็ม", 1], ["shrimpck", "🦐", "กุ้งลวกสุก", 2, 150, 0, 45, 2, "โปรตีนดี ไขมันต่ำ"],
   ["squidck", "🦑", "ปลาหมึกลวก", 2, 200, 0, 45, 1, "ไขมันต่ำ"], ["cockle", "🦪", "หอยแครงลวกสุก", 2, 200, 0, 40, 0, "ลวกให้สุกทั่วถึง"],
   ["clamraw", "🦪", "หอยดอง ดิบ", 2, 600, 0, 30, -3, "ดิบ เสี่ยงเชื้อโรค", 1], ["kjeen", "🍜", "ขนมจีน 1 จับ", 2, 20, 0, 120, 0, "เป็นแป้ง นับแทนข้าว"],
   ["sticky1", "🍙", "ข้าวเหนียว 1 ปั้น", 3, 2, 0, 160, 0, "พอดีสำหรับ 1 มื้อ"], ["sticky2", "🍙", "ข้าวเหนียว 2 ปั้น", 3, 4, 0, 320, -2, "แป้งมากเกินไป"],
@@ -64,21 +65,51 @@ const ST_ITEMS = [
 const STI = Object.fromEntries(ST_ITEMS.map((x) => [x.id, x]));
 // kind: [id, name, base, sauce, cupboard key, base nutrition {na, sug, kcal}, classic recipe, description]
 const ST_TYPES = [
-  ["thai", "ส้มตำไทย", "papaya", "thai", "somtam-thai", [60, 3, 50], ["tomato", "longbean", "garlic", "chili", "lime", "fs1", "sug1", "shrimpd", "peanut"], "รสหวานเปรี้ยว ใส่ถั่ว กุ้งแห้ง"],
-  ["lao", "ตำลาว ปลาร้า", "papaya", "lao", "somtam-pla", [60, 2, 45], ["tomato", "longbean", "eggplant", "garlic", "chili", "lime", "pr1"], "รสนัวแซ่บ ใส่ปลาร้าต้มสุก"],
-  ["sua", "ตำซั่ว", "papaya", "lao", "tam-sua", [60, 2, 45], ["kjeen", "tomato", "longbean", "garlic", "chili", "lime", "pr1"], "ใส่ขนมจีนคลุกในจาน"],
+  ["thai", "ส้มตำไทย", "papaya", "thai", "somtam-thai", [60, 3, 50], ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fs1", "sug1", "shrimpd", "peanut"], "รสหวานเปรี้ยว ใส่ถั่ว กุ้งแห้ง"],
+  ["lao", "ตำลาว ปลาร้า", "papaya", "lao", "somtam-pla", [60, 2, 45], ["tomato", "carrot", "garlic", "chili", "lime", "pr1", "krathin"], "รสนัวแซ่บ ใส่ปลาร้าต้มสุก"],
+  ["sua", "ตำซั่ว", "papaya", "lao", "tam-sua", [60, 2, 45], ["kjeen", "tomato", "sprout", "garlic", "chili", "tamarind", "pr1", "culantro"], "ใส่ขนมจีนคลุกในจาน"],
+  ["poopla", "ตำปูปลาร้า", "papaya", "lao", "somtam-pla", [60, 2, 45], ["tomato", "garlic", "chili", "lime", "pr1", "crabck", "krathin"], "ปูกับปลาร้า แซ่บนัว (ใช้ปูต้มสุก)"],
   ["poo", "ตำปูนา", "papaya", "lao", "tam-poo", [60, 2, 45], ["crabck", "tomato", "longbean", "garlic", "chili", "lime", "pr1"], "ใส่ปูนา ต้องต้มสุก"],
   ["pa", "ตำป่า", "papaya", "lao", "tam-pon", [60, 2, 45], ["kjeen", "cabbage", "longbean", "cockle", "chili", "lime", "pr1"], "รวมมิตรผักและหอย"],
   ["tang", "ตำแตง", "cucumber", "thai", "tam-tang", [40, 2, 30], ["tomato", "longbean", "garlic", "chili", "lime", "fs1", "peanut"], "แตงกวากรอบ ฉ่ำน้ำ"],
   ["tua", "ตำถั่ว", "longbean", "thai", "tam-tang", [40, 2, 40], ["tomato", "garlic", "chili", "lime", "fs1", "shrimpd"], "ถั่วฝักยาวล้วน ใยอาหารสูง"],
-  ["corn", "ตำข้าวโพด", "corn", "thai", "somtam-thai", [40, 6, 130], ["tomato", "longbean", "garlic", "chili", "lime", "fs1", "saltegg"], "ข้าวโพดหวานกรอบ (นับเป็นแป้ง)"],
+  ["corn", "ตำข้าวโพด", "corn", "thai", "somtam-thai", [40, 6, 130], ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fs1", "sug1", "shrimpd", "saltegg"], "ข้าวโพดหวานกรอบ (นับเป็นแป้ง)"],
   ["fruit", "ตำผลไม้", "fruit", "thai", "tam-ponlamai", [40, 18, 120], ["tomato", "garlic", "chili", "lime", "fs1", "peanut"], "ผลไม้รวม หวานธรรมชาติ"],
   ["kaikem", "ตำไข่เค็ม", "papaya", "thai", "somtam-thai", [60, 3, 50], ["saltegg", "tomato", "longbean", "garlic", "chili", "lime"], "ไข่เค็มมัน ๆ (เค็มนะ)"],
   ["talay", "ตำทะเลสุก", "papaya", "thai", "somtam-thai", [60, 3, 50], ["shrimpck", "squidck", "tomato", "longbean", "chili", "lime", "fs1"], "กุ้ง ปลาหมึก ลวกสุก"],
   ["mango", "ตำมะม่วง", "mango", "thai", "somtam-thai", [30, 8, 60], ["tomato", "garlic", "chili", "lime", "fs1", "shrimpd", "peanut"], "มะม่วงดิบเปรี้ยว (มีน้ำตาลนิดหน่อย)"],
 ].map(([id, n, base, sauce, key, nut, classic, desc]) => ({ id, n, base, sauce, key, nut: { na: nut[0], sug: nut[1], kcal: nut[2] }, classic, desc }));
 const STT = Object.fromEntries(ST_TYPES.map((t) => [t.id, t]));
-const ST_MAX = 10, ST_PER = 6, POUNDS = 10;
+const ST_MAX = 12, ST_PER = 6, POUNDS = 10;
+/* 5 classic recipes (from the recipe sheet the team supplied). Each line: [ingredient, amount, sodium mg, sugar g].
+   Sodium / sugar are rough estimates for the whole recipe (1–2 servings), to show why the healthy version matters. */
+const ST_RECIPES = {
+  thai: { lines: [["น้ำปลา", "2 ช้อนโต๊ะ", 2700, 0], ["มะละกอดิบ", "½ ลูก", 20, 6], ["พริกขี้หนู", "5 เม็ด", 0, 0], ["แครอท", "½ ถ้วยตวง", 40, 3], ["กระเทียม", "5 กลีบ", 0, 0], ["น้ำตาลปี๊บ", "1½ ช้อนโต๊ะ", 0, 18], ["ถั่วฝักยาว", "½ ถ้วยตวง", 0, 1], ["มะนาว", "3 ช้อนโต๊ะ", 0, 1], ["มะเขือเทศ", "½ ถ้วยตวง", 5, 2], ["กุ้งแห้ง", "⅓ ถ้วยตวง", 800, 0], ["ถั่วลิสง", "¼ ถ้วยตวง", 5, 1]],
+    original: ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fs3", "sug3", "shrimpd", "peanut"], healthy: ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fslow", "stevia", "peanut", "sideveg"],
+    tips: ["ลดน้ำปลาจาก 2 ช้อนโต๊ะ เหลือ 1 ช้อนชา หรือใช้น้ำปลาลดโซเดียม", "ลดน้ำตาลปี๊บ หรือใช้หญ้าหวาน ให้รสหวานจากมะเขือเทศแทน", "ลดกุ้งแห้งลงครึ่งหนึ่ง (เค็ม) เพิ่มผักแนม"] },
+  poopla: { lines: [["น้ำปลา", "1 ช้อนโต๊ะ", 1350, 0], ["มะละกอดิบ", "½ ลูก", 20, 6], ["พริกขี้หนู", "4 เม็ด", 0, 0], ["ปูดองเค็ม", "2 ตัว", 600, 0], ["กระเทียม", "5 กลีบ", 0, 0], ["น้ำตาลปี๊บ", "½ ช้อนโต๊ะ", 0, 6], ["เม็ดกระถิน", "ตามชอบ", 0, 0], ["มะนาว", "½ ลูก", 0, 1], ["มะเขือเทศ", "½ ถ้วยตวง", 5, 2], ["น้ำปลาร้านัว", "3 ช้อนโต๊ะ", 3000, 2]],
+    original: ["tomato", "garlic", "chili", "lime", "fs3", "sug1", "crabsalt", "pr3", "krathin"], healthy: ["tomato", "garlic", "chili", "lime", "pr1", "crabck", "krathin", "longbean", "sideveg"],
+    tips: ["ปูดองไม่ผ่านความร้อน เสี่ยงพยาธิใบไม้ตับ ใช้ปูต้มสุกแทน", "น้ำปลาร้านัว 3 ช้อนโต๊ะ โซเดียมสูงมาก ใช้ปลาร้าต้มสุก 1 ช้อนชาก็พอได้รส", "ไม่ต้องเติมน้ำปลาซ้ำเมื่อใส่ปลาร้าแล้ว"] },
+  sua: { lines: [["น้ำปลา", "1 ช้อนโต๊ะ", 1350, 0], ["เส้นขนมจีน", "1 จับ", 20, 0], ["พริกขี้หนู", "5 เม็ด", 0, 0], ["ถั่วงอก", "1 กำมือ", 5, 1], ["กระเทียม", "5 กลีบ", 0, 0], ["น้ำตาลปี๊บ", "1½ ช้อนโต๊ะ", 0, 18], ["ผักกาดดอง", "ตามชอบ", 300, 2], ["น้ำมะขามเปียก", "2 ช้อนโต๊ะ", 10, 4], ["มะเขือเทศ", "1 ลูก", 5, 3], ["กากหมู", "ตามชอบ", 150, 0], ["น้ำปลาร้าต้มสุก", "½ ช้อนโต๊ะ", 550, 0], ["ผักชีฝรั่ง", "½ ช้อนโต๊ะ", 0, 0]],
+    original: ["kjeen", "sprout", "garlic", "chili", "tamarind", "tomato", "fs3", "sug3", "pakdong", "kakmoo", "pr1", "culantro"], healthy: ["kjeen", "sprout", "garlic", "chili", "tamarind", "tomato", "pr1", "culantro", "cabbage", "stevia"],
+    tips: ["ไม่ใส่กากหมู (ไขมันสูงมาก)", "ลดน้ำตาลปี๊บ เพราะน้ำมะขามเปียกให้รสหวานอยู่แล้ว", "ผักกาดดองเค็ม ใส่น้อย ๆ หรือไม่ใส่", "ขนมจีนเป็นแป้งแล้ว ไม่ต้องกินข้าวเหนียวเพิ่ม"] },
+  lao: { lines: [["น้ำปลา", "1 ช้อนโต๊ะ", 1350, 0], ["มะละกอดิบ", "½ ลูก", 20, 6], ["พริกขี้หนู", "8 เม็ด", 0, 0], ["แครอท", "½ ถ้วยตวง", 40, 3], ["กระเทียม", "3 กลีบ", 0, 0], ["น้ำตาลปี๊บ", "½ ช้อนชา", 0, 2], ["เม็ดกระถิน", "ตามชอบ", 0, 0], ["มะนาว", "½ ลูก", 0, 1], ["มะเขือเทศ", "2 ลูก", 10, 6], ["น้ำปลาร้านัว", "1 ทัพพี", 3000, 2]],
+    original: ["carrot", "garlic", "chili10", "lime", "tomato", "fs3", "pr3", "krathin"], healthy: ["carrot", "garlic", "chili", "lime", "tomato", "pr1", "krathin", "longbean", "sideveg"],
+    tips: ["น้ำปลาร้า 1 ทัพพี โซเดียมเกินทั้งวันแล้ว ลดเหลือ 1 ช้อนชา และต้องต้มสุก", "ไม่ต้องเติมน้ำปลาซ้ำ", "พริก 8 เม็ด เผ็ดจัด ลดเหลือ 3 เม็ดถ้าระคายท้อง"] },
+  corn: { lines: [["น้ำปลา", "1 ช้อนโต๊ะ", 1350, 0], ["ข้าวโพดต้ม", "1 ฝัก", 15, 6], ["พริกขี้หนู", "4 เม็ด", 0, 0], ["แครอท", "½ ถ้วยตวง", 40, 3], ["กระเทียม", "4 กลีบ", 0, 0], ["น้ำตาลปี๊บ", "1 ช้อนโต๊ะ", 0, 12], ["ถั่วฝักยาว", "2 ฝัก", 0, 1], ["มะนาว", "1 ช้อนโต๊ะ", 0, 0], ["กุ้งแห้ง", "⅓ ถ้วยตวง", 800, 0], ["ไข่เค็ม", "1 ฟอง", 900, 0], ["มะเขือเทศ", "1 ผล", 5, 3]],
+    original: ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fs3", "sug3", "shrimpd", "saltegg"], healthy: ["tomato", "longbean", "carrot", "garlic", "chili", "lime", "fs1", "stevia", "shrimpck", "sideveg"],
+    tips: ["ข้าวโพดหวานเป็นแป้ง ไม่ต้องกินข้าวเพิ่ม", "ไข่เค็ม 1 ฟองโซเดียมสูง ใช้ไข่ต้มหรือกุ้งลวกแทน", "ลดน้ำตาลปี๊บ ข้าวโพดหวานอยู่แล้ว"] },
+};
+function recipeCard(typeId) { // the recipe sheet with quantities + a health check of the original
+  const R = ST_RECIPES[typeId], T = STT[typeId]; if (!R) return "";
+  const na = R.lines.reduce((t, l) => t + l[2], 0), sug = R.lines.reduce((t, l) => t + l[3], 0);
+  return `<div class="st-rcp" role="dialog" aria-label="สูตร${esc(T.n)}"><div class="st-rcp-h"><b>📖 สูตร${esc(T.n)}</b><button type="button" class="hk-x" data-hk="rcpclose" aria-label="ปิดสูตร">✕</button></div>
+    <ul>${R.lines.map(([n, q]) => `<li><span>${esc(n)}</span><b>${esc(q)}</b></li>`).join("")}</ul>
+    <div class="st-rcp-check"><span class="${na > 2000 ? "bad" : na > 1000 ? "warn" : ""}">🧂 โซเดียมทั้งสูตร ~${na.toLocaleString()} มก.${na > 2000 ? " (เกินที่ควรได้ทั้งวัน 2,000 มก.)" : ""}</span><span class="${sug > 12 ? "bad" : sug > 6 ? "warn" : ""}">🍬 น้ำตาล ~${sug} ก. (${Math.round(sug / 4)} ช้อนชา)</span></div>
+    <p class="st-rcp-tip">💡 สูตรสุขภาพ: ${R.tips.map(esc).join(" · ")}</p>
+    <div class="hk-start-btns"><button type="button" class="btn" data-hk="rcporig">ใส่ตามสูตรต้นฉบับ</button><button type="button" class="btn primary" data-hk="rcphealthy">ใส่แบบสูตรสุขภาพ ✨</button></div>
+    <small class="st-rcp-src">สูตรจากแผ่นสูตรที่ทีมให้มา · ค่าโซเดียม/น้ำตาลเป็นค่าประมาณทั้งสูตร (1–2 ที่)</small></div>`;
+}
 const ST_LOG = { sticky1: ["sticky", 1], sticky2: ["sticky", 2], gaiyang: ["gai-yang", 1], kormoo: ["kor-moo", 1], sideveg: ["pak", 1], boilegg: ["kai-tom", 1], kabmoo: ["kab-moo", 1] };
 const PLATE_STEPS = [
   { kind: "rice", n: 1, t: "เลือกข้าว/แป้ง 1 อย่าง" }, { kind: "pro", n: 1, t: "เลือกโปรตีน 1 อย่าง" },
@@ -143,6 +174,7 @@ function shell() {
         <svg class="hk-m-front" viewBox="0 0 240 150"><defs><linearGradient id="hkClay" x1="0" x2="1"><stop offset="0" stop-color="#7a3f1d"/><stop offset=".5" stop-color="#c46e37"/><stop offset="1" stop-color="#6e3818"/></linearGradient></defs><path d="M16 34a104 26 0 0 0 208 0c0 50-36 84-70 92v14H86v-14C52 118 16 84 16 34z" fill="url(#hkClay)"/><path d="M40 60c18 30 44 46 80 48" stroke="#e8a06a" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/><rect x="72" y="134" width="96" height="12" rx="6" fill="#5a2c12"/></svg>
       </div>
       <div class="hk-serve" id="hkServe" hidden aria-hidden="true"></div>
+      <div class="hk-recipe" id="hkRecipe" hidden></div>
       <div class="hk-bowl" id="hkBowl" hidden aria-hidden="true"></div>
       <div class="nd-shop" id="hkShop" hidden aria-hidden="true"><div class="nd-sign">🍜 ก๋วยเตี๋ยวอ่อนหวาน <small>ปรุงพอดี ใส่ใจสุขภาพ</small></div><div class="nd-counter"></div><img class="nd-cook" src="vendor/people/man_cook.webp" alt=""></div>
       <div class="nd-cust" id="hkCust" hidden></div>
@@ -213,7 +245,7 @@ function newRound() {
   $("#hkMortar").hidden = G.mode !== "somtam"; $("#hkPestle").hidden = true; $("#hkServe").hidden = true; $("#hkMix").innerHTML = ""; $("#hkMortar").classList.remove("gone");
   G.mk = { phase: "menu", recipe: null, stall: 0, page: 0, menuPage: 0, cart: [], combo: 0, t0: 0 };
   G.score = 0; $("#hkList").hidden = true; if (G.mode === "noodle") ndNew(); ndBowl();
-  $("#hkShop").hidden = G.mode !== "noodle"; $("#hkCust").hidden = true;
+  $("#hkShop").hidden = G.mode !== "noodle"; $("#hkCust").hidden = true; $("#hkRecipe").hidden = true;
   if (G.mode !== "noodle" && window.PreDMMascot) $("#hkMasc").innerHTML = PreDMMascot.svg(); // mascot back in the other modes
   if (G.mode === "plate") { const kg = window.PreDMKitchenGames; G.sc = kg?.scenes ? kg.scenes[Math.floor(Math.random() * kg.scenes.length)] : { t: "มื้อกลางวัน", meal: "l", cap: 650, ic: "☀️" }; }
   layout();
@@ -305,6 +337,7 @@ function somtamItems() {
   const items = view.map((x) => { const inn = G.picks.some((p) => p.id === x.id), cl = T.classic.includes(x.id); return { id: x.id, e: x.e, n: x.n, sub: inn ? "✓ ในครก" : x.tip.length > 26 ? x.tip.slice(0, 25) + "…" : x.tip, cls: inn ? "in" : cl ? "need" : "", badge: inn ? "✓" : cl ? "📋" : "" }; });
   const last = S2.group === ST_GROUPS.length - 1 && S2.page === pages - 1;
   items.unshift({ id: "sprev", e: "⬅️", n: S2.group === 0 && S2.page === 0 ? "เปลี่ยนชนิด" : "ย้อนกลับ" });
+  if (ST_RECIPES[S2.type]) items.splice(1, 0, { id: "recipe", e: "📖", n: "ดูสูตร", sub: "ปริมาณ + สูตรสุขภาพ", cls: "need" });
   if (!last) items.push({ id: "snext", e: "➡️", n: S2.page < pages - 1 ? "หน้าถัดไป" : ST_GROUPS[S2.group + 1], sub: "หมวดถัดไป" });
   if (G.picks.length) items.push({ id: "pound", e: "🪵", n: "เริ่มตำ!", big: true, sub: `${POUNDS} ครั้ง` });
   return items;
@@ -312,12 +345,21 @@ function somtamItems() {
 function somtamNav(id) {
   const S2 = G.st;
   if (id === "tmore") { S2.tpage = (S2.tpage + 1) % Math.ceil(ST_TYPES.length / ST_PER); layout(); return true; }
-  if (id.startsWith("t:")) { S2.type = id.slice(2); S2.group = 0; S2.page = 0; renderMix(); window.PreDMMusic?.sfx("ok"); layout(); return true; }
+  if (id.startsWith("t:")) { S2.type = id.slice(2); S2.group = 0; S2.page = 0; renderMix(); window.PreDMMusic?.sfx("ok"); layout(); if (ST_RECIPES[S2.type]) showRecipe(); return true; }
+  if (id === "recipe") { showRecipe(); return true; }
   const pagesOf = (g) => Math.ceil(ST_ITEMS.filter((x) => x.g === g).length / ST_PER);
   if (id === "snext") { if (S2.page < pagesOf(S2.group) - 1) S2.page++; else { S2.group++; S2.page = 0; } layout(); return true; }
   if (id === "sprev") { if (S2.page > 0) S2.page--; else if (S2.group > 0) { S2.group--; S2.page = pagesOf(S2.group) - 1; } else { S2.type = null; G.picks = []; renderMix(); } layout(); return true; }
   return false;
 }
+function showRecipe() { const el = $("#hkRecipe"); if (!el) return; el.innerHTML = recipeCard(G.st.type); el.hidden = false; }
+function fillRecipe(which) { // put the whole recipe into the mortar at once
+  const R = ST_RECIPES[G.st.type]; if (!R) return;
+  G.picks = R[which].filter((id) => STI[id]).slice(0, ST_MAX).map((id) => ({ id })); renderMix(true); $("#hkRecipe").hidden = true;
+  say(which === "original" ? "ใส่ตามสูตรต้นฉบับแล้ว ลองตำแล้วดูค่าความเค็ม/หวาน" : "ใส่แบบสูตรสุขภาพแล้ว แตะ “เริ่มตำ!” ได้เลย");
+  S2group(ST_GROUPS.length - 1); layout();
+}
+function S2group(g) { G.st.group = g; G.st.page = 0; }
 function stTotals() {
   const T = STT[G.st.type], t = { na: T.nut.na, sug: T.nut.sug, add: 0, kcal: T.nut.kcal, raw: false };
   G.picks.forEach((p) => { const x = STI[p.id]; if (!x) return; t.na += x.na; t.sug += x.sug; t.kcal += x.kcal; if (x.g === 1 || x.id === "tamarind") t.add += x.sug; if (x.raw) t.raw = true; });
@@ -769,6 +811,9 @@ function onClick(e) {
     if (a === "cam") return startCam();
     if (a === "nocam") return startNoCam();
     if (a === "again") return newRound();
+    if (a === "rcpclose") { $("#hkRecipe").hidden = true; return; }
+    if (a === "rcporig") return fillRecipe("original");
+    if (a === "rcphealthy") return fillRecipe("healthy");
     if (a === "ndnextc") { G.nd.ci++; G.nd.step = 0; G.nd.page = 0; G.nd.picks = {}; ndBowl(); return layout(); }
     if (a === "ndsum") return ndSummary();
     if (a === "ndagain") { ndNew(); ndBowl(); return layout(); }

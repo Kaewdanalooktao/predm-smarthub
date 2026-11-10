@@ -1065,7 +1065,7 @@
         <div class="hz-main"><div class="hz-head"><b>${z.name}</b><small>${z.lo}–${z.hi}% HRmax</small>${z.rec ? `<em>แนะนำ</em>` : ""}</div><p>${z.use} · <i>${z.feel}</i></p>
         <div class="hz-bar" aria-hidden="true"><span style="width:${z.hi}%"></span></div></div>
         <span class="hz-bpm"><b>${r.at(z.lo)}–${z.z === 5 ? r.max : r.at(z.hi)}</b><small>ครั้ง/นาที</small></span></li>`).join("")}</ol>
-      <p class="hint">${inp.formula === "tanaka" ? "สูตร Tanaka (208 − 0.7 × อายุ) เหมาะกับผู้ใหญ่และผู้สูงอายุ" : "สูตรดั้งเดิม 220 − อายุ"} · เป้าหมาย 64–76% ของ HRmax = ความหนักปานกลางตามแนวทาง ACSM (อยู่ใน Zone 2–3) · วิธีจับชีพจร: วางนิ้วชี้และนิ้วกลางที่ข้อมือด้านนิ้วโป้ง นับ 15 วินาทีแล้วคูณ 4 หรือดูจากนาฬิกาวัดชีพจร</p>`;
+      <p class="hint">${inp.formula === "tanaka" ? "สูตร Tanaka (208 − 0.7 × อายุ) เหมาะกับผู้ใหญ่และผู้สูงอายุ" : "สูตรดั้งเดิม 220 − อายุ"} · เป้าหมาย 64–76% ของ HRmax = ความหนักปานกลางตามแนวทาง ACSM (อยู่ใน Zone 2–3) · วิธีจับชีพจร: วางนิ้วชี้และนิ้วกลางที่ข้อมือด้านนิ้วโป้ง นับ 15 วินาทีแล้วคูณ 4 หรือดูจากนาฬิกาวัดชีพจร</p><button type="button" class="btn sm pz-open" data-pulse>💓 สอนวิธีวัดชีพจร + จับเวลาให้</button>`;
   }
   function hrCard() {
     const inp = hrInputs();
