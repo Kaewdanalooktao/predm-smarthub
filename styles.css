@@ -2058,3 +2058,9 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 .sg-f small { color: var(--muted); font-size: .74rem; } .sg-row2 { display: flex; flex-wrap: wrap; gap: 10px; } .sg-row2 label { display: flex; gap: 6px; align-items: center; }
 @media (max-width: 560px) { .sg-explain { grid-template-columns: repeat(2, 1fr); } .sg-row { grid-template-columns: 1fr; gap: 2px; } }
 @media print { .sg-card { break-inside: avoid; } }
+/* AONWANWITTHAYA on the sign-in page: bigger, bold, high contrast */
+.w-en { margin: 6px 0 4px; font: 800 1.35rem/1.2 var(--display, sans-serif); letter-spacing: .14em; color: #22388f; background: linear-gradient(90deg, #1d2f86, #4b33c9 60%, #7b3fd6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+:root[data-theme="dark"] .w-en { color: #b9ccff; background: linear-gradient(90deg, #b9ccff, #d6c4ff); -webkit-background-clip: text; background-clip: text; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .w-en { color: #b9ccff; background: linear-gradient(90deg, #b9ccff, #d6c4ff); -webkit-background-clip: text; background-clip: text; } }
+@media (forced-colors: active) { .w-en { -webkit-text-fill-color: CanvasText; background: none; } }
+@media (max-width: 420px) { .w-en { font-size: 1.12rem; letter-spacing: .1em; } }
