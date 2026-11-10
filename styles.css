@@ -2065,6 +2065,3 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 @media (forced-colors: active) { .w-en { -webkit-text-fill-color: CanvasText; background: none; } }
 @media (max-width: 420px) { .w-en { font-size: 1.12rem; letter-spacing: .1em; } }
 
-/* sign-in page photo */
-.scene-photo { position: relative; } .scene-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 30%; }
-.scene-photo::after { content: ""; position: absolute; inset: auto 0 0 0; height: 28%; background: linear-gradient(180deg, transparent, rgba(31, 37, 80, .55)); pointer-events: none; }

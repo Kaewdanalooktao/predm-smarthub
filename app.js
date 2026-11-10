@@ -1820,61 +1820,128 @@ Return only the edited image.`;
 
   /* ---------- welcome / login ---------- */
   // Home scene: family member cheering while the user does chair squats in front of a phone that counts reps.
+  // sign-in illustration: a realistic-style cartoon (window light, soft shadows, shaded skin and clothes)
+  // daughter cheering while dad does a chair squat; the AI skeleton and the phone count his reps
   function sceneArt() {
-    const place = (x, y, s) => (p) => [x + ((p[0] + 4) / 108) * s, y + ((p[1] + 4) / 108) * s];
-    const nest = (svg, x, y, s) => svg.replace("<svg ", `<svg x="${x}" y="${y}" width="${s}" height="${s}" `);
-    const cheer = [[54, 14], [51, 24], [50, 54], [62, 15], [66, 3], [40, 40], [45, 51], [53, 74], [56, 94], [45, 74], [42, 94]];
-    const man = P.squat, mp = place(140, 58, 160);
-    const bones = [[1, 2], [1, 3], [3, 4], [1, 5], [5, 6], [2, 7], [7, 8], [2, 9], [9, 10]];
-    const skel = bones.map(([a, b]) => { const A = mp(man[a]), B = mp(man[b]); return `<line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}"/>`; }).join("");
-    const dots = [1, 2, 3, 4, 7, 8].map((i) => { const A = mp(man[i]); return `<circle cx="${A[0].toFixed(1)}" cy="${A[1].toFixed(1)}" r="3.6"/>`; }).join("");
-    const knee = mp(man[7]);
-    const bubble = (x, y, w, txt, tail) => `<g class="float"><rect x="${x}" y="${y}" width="${w}" height="24" rx="12" fill="#fff" stroke="#1f2550" stroke-width="1.6"/>
-      <path d="M${tail} ${y + 23.2}l5 8 4-8" fill="#fff" stroke="#1f2550" stroke-width="1.6" stroke-linejoin="round"/><rect x="${tail - 1}" y="${y + 20}" width="12" height="4" fill="#fff"/>
-      <text x="${x + w / 2}" y="${y + 16.5}" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2550" font-family="Anuphan, sans-serif">${txt}</text></g>`;
-    return `<svg class="scene" viewBox="0 0 400 250" role="img" aria-label="ภาพผู้ใช้ทำท่าสควอทกับเก้าอี้ที่บ้าน โดยมีลูกสาวเชียร์และโทรศัพท์นับจำนวนครั้ง">
-      <defs><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe3c8"/><stop offset="1" stop-color="#f6cfa6"/></linearGradient>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9dcef"/><stop offset="1" stop-color="#e3f4f9"/></linearGradient></defs>
+    const f = (n) => n.toFixed(1);
+    // a limb drawn as a rounded tube with a soft outline, base colour and a light-side highlight
+    const limb = (pts, w, base, shade, hi) => { const d = "M" + pts.map((p) => `${f(p[0])} ${f(p[1])}`).join(" L"); return `<path d="${d}" stroke="${shade}" stroke-width="${w + 2.2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${base}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${hi ? `<path d="${d}" stroke="${hi}" stroke-width="${(w * 0.32).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".55" transform="translate(-1.2 -1)"/>` : ""}`; };
+    const SK = ["#eab28a", "#c98a62", "#f7cfaa"]; // skin: base, shade, highlight
+    // ---- dad (chair squat, facing right) ----
+    const D = { sh: [232, 104], hip: [216, 150], kn: [258, 150], an: [255, 195], el: [258, 110], wr: [284, 112], head: [241, 84] };
+    const shadowE = (cx, cy, rx, ry, o) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#5a3418" opacity="${o}" filter="url(#sBlur)"/>`;
+    const skel = [[D.sh, D.hip], [D.hip, D.kn], [D.kn, D.an], [D.sh, D.el], [D.el, D.wr]].map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`).join("");
+    const dots = [D.sh, D.hip, D.kn, D.an, D.el, D.wr].map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.4"/>`).join("");
+    const bubble = (x, y, w, txt, tail) => `<g class="float" filter="url(#soft)"><rect x="${x}" y="${y}" width="${w}" height="24" rx="12" fill="#fff"/>
+      <path d="M${tail} ${y + 22}l5 9 5-9z" fill="#fff"/><text x="${x + w / 2}" y="${y + 16.5}" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2550" font-family="Anuphan, sans-serif">${txt}</text></g>`;
+    return `<svg class="scene" viewBox="0 0 400 250" role="img" aria-label="ภาพลูกสาวเชียร์พ่อที่กำลังทำท่าสควอทกับเก้าอี้ที่บ้าน โดยมีโทรศัพท์และ AI นับจำนวนครั้ง">
+      <defs>
+        <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbeedd"/><stop offset=".6" stop-color="#f3dcc0"/><stop offset="1" stop-color="#e8c9a6"/></linearGradient>
+        <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8905c"/><stop offset="1" stop-color="#9c6536"/></linearGradient>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0ec"/><stop offset="1" stop-color="#e6f6fb"/></linearGradient>
+        <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff8e6" stop-opacity=".75"/><stop offset="1" stop-color="#fff8e6" stop-opacity="0"/></linearGradient>
+        <linearGradient id="curt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9674a"/><stop offset=".35" stop-color="#ef8a6a"/><stop offset=".7" stop-color="#d9674a"/><stop offset="1" stop-color="#c4553a"/></linearGradient>
+        <linearGradient id="polo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f9bc0"/><stop offset="1" stop-color="#2f6f92"/></linearGradient>
+        <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a78"/><stop offset="1" stop-color="#e2694b"/></linearGradient>
+        <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a86b3a"/><stop offset=".5" stop-color="#c9894f"/><stop offset="1" stop-color="#9a5f30"/></linearGradient>
+        <radialGradient id="faceL" cx=".38" cy=".35" r=".75"><stop offset="0" stop-color="#f8d3b0"/><stop offset=".7" stop-color="#eab28a"/><stop offset="1" stop-color="#d49770"/></radialGradient>
+        <radialGradient id="vig" cx=".35" cy=".35" r=".9"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#3a2210" stop-opacity=".18"/></radialGradient>
+        <filter id="sBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#1f2550" flood-opacity=".25"/></filter>
+      </defs>
+      <!-- room -->
       <rect width="400" height="250" fill="url(#wall)"/>
-      <rect y="196" width="400" height="54" fill="#d9a066"/>
-      ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<path d="M${i * 50 - 20} 250l${30} -54" stroke="#c48a52" stroke-width="1.4"/>`).join("")}
-      <rect y="192" width="400" height="6" fill="#b97d47"/>
-      <!-- window -->
-      <rect x="22" y="26" width="96" height="86" rx="4" fill="url(#sky)" stroke="#fff" stroke-width="5"/>
-      <path d="M70 26v86M22 69h96" stroke="#fff" stroke-width="4"/>
-      <path d="M26 112c10-14 22-18 34-12 8-10 22-12 30-2 10-6 20-2 24 14z" fill="#8fc77a"/>
-      <circle cx="98" cy="44" r="8" fill="#ffe08a"/>
-      <path d="M14 20h112" stroke="#b97d47" stroke-width="4" stroke-linecap="round"/>
-      <path d="M16 22c0 30 4 60 10 96h10c-6-34-8-64-8-96z" fill="#e9785a"/><path d="M124 22c0 30-4 60-10 96h-10c6-34 8-64 8-96z" fill="#e9785a"/>
-      <!-- frame + shelf -->
-      <rect x="196" y="36" width="40" height="32" rx="3" fill="#fff" stroke="#b97d47" stroke-width="3"/><path d="M200 62l10-12 8 8 6-6 8 10z" fill="#8fc77a"/><circle cx="226" cy="45" r="3.5" fill="#ffd166"/>
-      <rect x="318" y="92" width="70" height="5" rx="2" fill="#b97d47"/>
-      <path d="M330 92l-4-14h16l-4 14z" fill="#e9785a"/><path d="M334 78c-8-8-10-16-4-20 2 6 4 8 4 12 0-8 4-14 10-14-2 8-4 14-10 22z" fill="#5fa86b"/>
-      <rect x="356" y="70" width="7" height="22" rx="1.5" fill="#3d84a8"/><rect x="364" y="74" width="7" height="18" rx="1.5" fill="#f2c94c"/><rect x="372" y="66" width="7" height="26" rx="1.5" fill="#9b87d8"/>
-      <!-- mat -->
-      <ellipse cx="230" cy="212" rx="78" ry="11" fill="none" stroke="#e9785a" stroke-width="2" stroke-dasharray="6 5" opacity=".8"/>
-      <!-- people -->
-      ${nest(fig(cheer, `<circle cx="47" cy="12" r="5" fill="#2a1f1b"/>`, 0, { noBlob: true }), 26, 62, 152)}
-      ${nest(fig(man, chair, 1, { noBlob: true }), 140, 58, 160)}
-      <g stroke="#7ef0b8" stroke-width="2.6" stroke-linecap="round" opacity=".95">${skel}</g>
-      <g fill="#ffffff" stroke="#3d84a8" stroke-width="1.6">${dots}</g>
-      <g class="float"><rect x="${knee[0] + 8}" y="${knee[1] - 32}" width="34" height="18" rx="9" fill="#1f2550"/><text x="${knee[0] + 25}" y="${knee[1] - 19.5}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" font-family="Outfit, sans-serif">92°</text></g>
-      <path d="M${knee[0] + 50} ${knee[1] - 44}l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#f2c94c"/>
-      <!-- side table + glucose meter + water -->
-      <rect x="300" y="160" width="76" height="6" rx="2" fill="#b97d47"/><path d="M306 166v30M370 166v30" stroke="#a06a3b" stroke-width="4" stroke-linecap="round"/>
-      <rect x="348" y="146" width="16" height="14" rx="3" fill="#fff" stroke="#1f2550" stroke-width="1.4"/><rect x="351" y="149" width="10" height="5" rx="1" fill="#c3e4ef"/><text x="356" y="153.4" text-anchor="middle" font-size="4.5" font-weight="700" fill="#1f2550" font-family="Outfit">98</text>
-      <rect x="368" y="138" width="7" height="22" rx="3" fill="#bfe3ef" stroke="#3d84a8" stroke-width="1.2"/>
-      <!-- phone on stand -->
-      <path d="M326 160l8-10 8 10" fill="none" stroke="#1f2550" stroke-width="3" stroke-linejoin="round"/>
-      <rect x="318" y="86" width="34" height="62" rx="6" fill="#1f2550"/><rect x="321" y="91" width="28" height="52" rx="3" fill="#24304f"/>
-      <text x="335" y="102" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" font-family="Outfit">12/15</text>
-      <g stroke="#7ef0b8" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="335" cy="110" r="3"/><path d="M335 113v12l-5 4v8M335 125l6 2v10M335 116l-6 4M335 116l7 1"/></g>
-      ${bubble(70, 34, 76, "เก่งมาก พ่อ!", 104)}
-      ${bubble(276, 52, 94, "ย่อได้ลึกขึ้นแล้ว", 322)}
-      <!-- cat -->
-      <g transform="translate(250 214)"><ellipse cx="24" cy="10" rx="20" ry="8" fill="#9aa3ad"/><circle cx="44" cy="6" r="7" fill="#9aa3ad"/><path d="M39 1l2-6 4 4zM46 0l4-5 1 6z" fill="#9aa3ad"/>
-        <path d="M5 10c-8 2-10-6-4-8" fill="none" stroke="#9aa3ad" stroke-width="4" stroke-linecap="round"/><path d="M42 6h3M47 6h3" stroke="#3a3f45" stroke-width="1.3" stroke-linecap="round"/></g>
-      <text class="zz" x="300" y="206" font-size="10" fill="#7a6a5a" font-family="Outfit" font-style="italic">z z</text>
+      <rect y="194" width="400" height="56" fill="url(#floor)"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => `<path d="M${i * 46 - 30} 250L${i * 40 - 4} 194" stroke="#8a5629" stroke-width="1" opacity=".5"/>`).join("")}
+      <path d="M0 214h400M0 234h400" stroke="#8a5629" stroke-width=".8" opacity=".35"/>
+      <rect y="188" width="400" height="7" fill="#f4e6d4"/><rect y="194" width="400" height="2" fill="#c9a77f"/>
+      <!-- window with daylight -->
+      <rect x="24" y="26" width="94" height="86" rx="3" fill="url(#sky)"/>
+      <path d="M24 92c12-10 24-12 36-6 10-12 26-12 34-2 10-6 20-4 24 6v22H24z" fill="#7fbf6e"/><path d="M24 100c16-6 30-4 44 2 14-6 34-6 50 0v12H24z" fill="#5fa65a"/>
+      <circle cx="100" cy="44" r="9" fill="#fff1b8"/><circle cx="100" cy="44" r="14" fill="#fff1b8" opacity=".35"/>
+      <rect x="24" y="26" width="94" height="86" rx="3" fill="none" stroke="#fffaf2" stroke-width="5"/><path d="M71 26v86M24 69h94" stroke="#fffaf2" stroke-width="3.5"/>
+      <rect x="20" y="112" width="102" height="6" rx="2" fill="#efe1cf"/>
+      <path d="M24 118L150 250H60L-10 250Z" fill="url(#beam)" opacity=".7"/>
+      <path d="M12 20h118" stroke="#8a5629" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M14 22c0 32 3 62 8 98h14c-6-34-8-66-8-98z" fill="url(#curt)"/><path d="M18 30c2 28 4 56 8 84M24 30c1 28 3 56 6 86" stroke="#b9472e" stroke-width="1" opacity=".5" fill="none"/>
+      <path d="M128 22c0 32-3 62-8 98h-14c6-34 8-66 8-98z" fill="url(#curt)"/><path d="M124 30c-2 28-4 56-8 84M118 30c-1 28-3 56-6 86" stroke="#b9472e" stroke-width="1" opacity=".5" fill="none"/>
+      <!-- wall art + shelf with plant and books -->
+      <g filter="url(#soft)"><rect x="190" y="30" width="44" height="34" rx="2" fill="#fffaf3"/><rect x="194" y="34" width="36" height="26" fill="#cfe6d8"/><path d="M194 60l11-13 8 8 6-6 11 11z" fill="#6fae73"/><circle cx="222" cy="41" r="3.5" fill="#ffd166"/></g>
+      <rect x="314" y="92" width="76" height="5" rx="2" fill="url(#wood)"/>
+      <path d="M326 92l-4-15h18l-4 15z" fill="#d9674a"/><path d="M322 77h18" stroke="#b9472e" stroke-width="2"/>
+      <path d="M331 77c-9-9-11-18-4-22 2 7 4 9 4 13 0-9 5-16 12-16-2 9-5 16-12 25z" fill="#4f9a55"/><path d="M331 77c4-8 9-12 14-12" stroke="#3d7f44" stroke-width="1.2" fill="none"/>
+      <rect x="354" y="70" width="7" height="22" rx="1.5" fill="#3d84a8"/><rect x="362" y="74" width="7" height="18" rx="1.5" fill="#f2c94c"/><rect x="370" y="66" width="7" height="26" rx="1.5" fill="#9b87d8"/><rect x="378" y="78" width="7" height="14" rx="1.5" fill="#e9785a" transform="rotate(12 381 85)"/>
+      <!-- side table, glucose meter, water -->
+      ${shadowE(338, 197, 40, 4, 0.35)}
+      <rect x="300" y="158" width="78" height="7" rx="2" fill="url(#wood)"/><path d="M307 165l-3 31M371 165l3 31" stroke="#8a5629" stroke-width="4" stroke-linecap="round"/>
+      <rect x="348" y="144" width="17" height="14" rx="3" fill="#fff" stroke="#9aa6b8" stroke-width="1"/><rect x="351" y="147" width="11" height="5" rx="1" fill="#bfe3ef"/><text x="356.5" y="151.4" text-anchor="middle" font-size="4.4" font-weight="700" fill="#1f2550" font-family="Outfit">98</text>
+      <path d="M368 136h9l-1.5 22h-6z" fill="#d7eef6" stroke="#8fc3d6" stroke-width="1"/><path d="M369 144h7l-1 14h-5z" fill="#9fd3e6" opacity=".8"/><path d="M370 138v18" stroke="#fff" stroke-width="1" opacity=".8"/>
+      <!-- phone on a stand: AI counting -->
+      <path d="M327 158l8-10 8 10" fill="none" stroke="#2b3354" stroke-width="3" stroke-linejoin="round"/>
+      <g filter="url(#soft)"><rect x="318" y="84" width="34" height="64" rx="6" fill="#20263f"/><rect x="321" y="89" width="28" height="54" rx="3" fill="#2a3456"/></g>
+      <text x="335" y="100" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" font-family="Outfit">12/15</text>
+      <g stroke="#7ef0b8" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="335" cy="108" r="3"/><path d="M335 111v10l6 2v9M335 121l-5 4v8M335 114l-6 4M335 114l7 1"/></g>
+      <rect x="324" y="136" width="22" height="3" rx="1.5" fill="#3c4a78"/><rect x="324" y="136" width="18" height="3" rx="1.5" fill="#7ef0b8"/>
+      <!-- rug -->
+      <ellipse cx="232" cy="206" rx="86" ry="12" fill="#e9d6bd"/><ellipse cx="232" cy="206" rx="78" ry="9" fill="none" stroke="#d98f6c" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <!-- chair (behind dad) -->
+      ${shadowE(200, 200, 30, 4, 0.35)}
+      <path d="M186 98c-3 20-3 40-1 62" stroke="#8a5629" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M186 104h10M186 120h8" stroke="#8a5629" stroke-width="3" stroke-linecap="round"/>
+      <rect x="182" y="156" width="44" height="7" rx="2.5" fill="url(#wood)"/><path d="M188 163v34M220 163v34" stroke="#8a5629" stroke-width="4" stroke-linecap="round"/>
+      <!-- daughter (cheering) -->
+      ${shadowE(90, 206, 26, 4, 0.4)}
+      ${limb([[82, 150], [80, 177], [78, 201]], 9, "#2f3b6b", "#1f2850", "#4a5a94")}
+      ${limb([[92, 150], [95, 177], [97, 201]], 9, "#34417a", "#1f2850", "#4a5a94")}
+      <path d="M70 200c0-4 4-6 9-6s7 2 7 6v3H70z" fill="#fff" stroke="#c9ced8" stroke-width="1"/><path d="M90 200c0-4 4-6 9-6s7 2 7 6v3H90z" fill="#fff" stroke="#c9ced8" stroke-width="1"/><path d="M71 202h15M91 202h15" stroke="#ef8a9a" stroke-width="2"/>
+      ${limb([[79, 114], [68, 130], [74, 118]], 6.5, SK[0], SK[1], SK[2])}<circle cx="75" cy="117" r="4.6" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
+      <path d="M74 112c4-4 22-4 26 0l3 40H71z" fill="url(#top)"/><path d="M82 110c2 4 8 4 10 0" stroke="#c9553a" stroke-width="1.4" fill="${SK[0]}"/>
+      <path d="M72 113c-4 2-6 7-5 12l8 1 2-12z" fill="url(#top)"/><path d="M101 113c4 1 7 6 7 10l-7 3-2-12z" fill="url(#top)"/><path d="M86 112v40" stroke="#c9553a" stroke-width="1" opacity=".35"/><path d="M75 140c8 3 18 3 26 0" stroke="#c9553a" stroke-width="1" opacity=".4" fill="none"/>
+      ${limb([[97, 114], [110, 96], [114, 76]], 6.5, SK[0], SK[1], SK[2])}
+      <g transform="translate(114 70) rotate(-10)"><ellipse cx="0" cy="0" rx="5.4" ry="6.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/><path d="M-4-5v-5M-1.4-6v-6M1.4-6v-6M4-5v-4" stroke="${SK[0]}" stroke-width="2.6" stroke-linecap="round"/></g>
+      <rect x="84" y="102" width="8" height="10" rx="3" fill="${SK[1]}"/>
+      <ellipse cx="88" cy="91" rx="11.5" ry="12.5" fill="url(#faceL)"/>
+      <path d="M76 90c-1-10 6-17 13-17 8 0 14 6 13 15-4-6-9-8-14-8-5 0-9 3-12 10z" fill="#2a1f1b"/><path d="M98 80c8 2 12 10 10 22-3-4-5-10-6-16z" fill="#2a1f1b"/><path d="M82 77c4-2 9-2 13 0" stroke="#5a463c" stroke-width="1.4" opacity=".6" fill="none"/>
+      <circle cx="104" cy="82" r="3.2" fill="#ef7d5e"/>
+      <ellipse cx="84.5" cy="91" rx="1.5" ry="2" fill="#2a1f1b"/><ellipse cx="92.5" cy="91" rx="1.5" ry="2" fill="#2a1f1b"/><circle cx="85" cy="90.3" r=".5" fill="#fff"/><circle cx="93" cy="90.3" r=".5" fill="#fff"/>
+      <path d="M82.5 87c1.5-1 3.5-1 4.5 0M90.5 87c1.5-1 3.5-1 4.5 0" stroke="#2a1f1b" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M84 96.5c2.5 3 7 3 9.5 0" stroke="#9c3b2e" stroke-width="1.3" fill="#fff" stroke-linecap="round"/>
+      <circle cx="81.5" cy="95" r="2.2" fill="#f28c8c" opacity=".45"/><circle cx="95.5" cy="95" r="2.2" fill="#f28c8c" opacity=".45"/>
+      <!-- dad (chair squat) -->
+      ${shadowE(250, 202, 30, 4.5, 0.4)}
+      ${limb([[212, 152], [250, 154], [246, 194]], 13, "#9c8664", "#7a6646", null)}
+      <path d="M239 191h11l1 4c4 0 8 1 8 5H238z" fill="#5a3d29" stroke="#3d2819" stroke-width="1"/>
+      ${limb([[226, 108], [252, 116], [277, 118]], 8, "#2f6f92", "#1f5373", null)}<ellipse cx="280" cy="118" rx="4.5" ry="3.6" fill="${SK[1]}"/>
+      ${limb([D.hip, D.kn], 15, "#b9a27e", "#8e7a58", "#d6c39f")}
+      ${limb([D.kn, D.an], 12, "#b39a74", "#8e7a58", "#d6c39f")}
+      <path d="M248 192h12l1 4c4 0 9 1 9 5H247z" fill="#6b4a33" stroke="#4a3122" stroke-width="1"/><rect x="249" y="187" width="11" height="6" rx="2" fill="#f3f3f3"/>
+      <path d="M212 102c10-6 26-4 32 4l-6 46-26 2c-6-14-6-34 0-52z" fill="url(#polo)"/><path d="M224 104l6 10 6-8" fill="#2f6f92" stroke="#25587a" stroke-width="1"/><path d="M228 114v14" stroke="#25587a" stroke-width="1"/><circle cx="228" cy="119" r="1" fill="#e6f1f7"/><circle cx="228" cy="124" r="1" fill="#e6f1f7"/>
+      <path d="M216 120c-2 10-2 20 0 30" stroke="#25587a" stroke-width="1.2" opacity=".5" fill="none"/><path d="M212 150h28" stroke="#25587a" stroke-width="3" opacity=".5"/>
+      ${limb([D.sh, D.el], 9, "#3d84a8", "#25587a", "#6fb4d6")}
+      ${limb([D.el, D.wr], 7, SK[0], SK[1], SK[2])}<ellipse cx="288" cy="112" rx="5" ry="4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
+      <rect x="236" y="92" width="9" height="11" rx="3" fill="${SK[1]}"/>
+      <ellipse cx="241" cy="83" rx="12" ry="13" fill="url(#faceL)"/><ellipse cx="229.6" cy="84" rx="2.4" ry="3.4" fill="${SK[1]}"/>
+      <path d="M229 82c-1-11 6-17 14-17 7 0 12 5 12 11-3-3-6-4-10-4-6 0-10 2-14 6z" fill="#5f5a57"/><path d="M233 70c4-3 12-3 16 1" stroke="#9a9590" stroke-width="1.6" fill="none"/>
+      <path d="M238 77.5c1.5-.8 3-.8 4.5 0M246 77.5c1.5-.8 3-.8 4.5 0" stroke="#4a4442" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <rect x="236.6" y="79.5" width="7" height="5" rx="2" fill="none" stroke="#3a3f45" stroke-width="1"/><rect x="245.6" y="79.5" width="7" height="5" rx="2" fill="none" stroke="#3a3f45" stroke-width="1"/><path d="M243.6 82h2" stroke="#3a3f45" stroke-width="1"/>
+      <circle cx="240" cy="82.2" r="1.1" fill="#2a1f1b"/><circle cx="249" cy="82.2" r="1.1" fill="#2a1f1b"/>
+      <path d="M247 86.5c1 1.6 1 3-1 3.6" stroke="${SK[1]}" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <path d="M242 91c2.4 2 6 2 8.4-.4" stroke="#8a3b2e" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M244 94c2 .8 4 .6 5.6-.2" stroke="${SK[1]}" stroke-width=".8" fill="none" opacity=".6"/>
+      <path d="M254 74c3 2 4 5 4 8" stroke="#f4a261" stroke-width="1.4" fill="none" opacity=".0"/>
+      <path d="M256 78l3-2M257 83l3 0" stroke="#7ec8ff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>
+      <!-- AI pose overlay -->
+      <g stroke="#7ef0b8" stroke-width="2.4" stroke-linecap="round" opacity=".9">${skel}</g>
+      <g fill="#fff" stroke="#3d84a8" stroke-width="1.5">${dots}</g>
+      <path d="M${D.kn[0] - 12} ${D.kn[1]} A12 12 0 0 1 ${D.kn[0]} ${D.kn[1] + 12}" stroke="#ffd166" stroke-width="2" fill="none"/>
+      <g class="float" filter="url(#soft)"><rect x="${D.kn[0] + 8}" y="${D.kn[1] - 34}" width="34" height="18" rx="9" fill="#1f2550"/><text x="${D.kn[0] + 25}" y="${D.kn[1] - 21.5}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" font-family="Outfit, sans-serif">92°</text></g>
+      <path d="M${D.kn[0] + 50} ${D.kn[1] - 46}l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#f2c94c"/>
+      ${bubble(56, 30, 80, "เก่งมาก พ่อ!", 100)}
+      ${bubble(270, 50, 96, "ย่อได้ลึกขึ้นแล้ว", 318)}
+      <!-- cat napping on the rug -->
+      ${shadowE(282, 220, 22, 3, 0.3)}
+      <g transform="translate(258 206)"><ellipse cx="24" cy="10" rx="20" ry="8" fill="#a3acb6"/><ellipse cx="22" cy="8" rx="14" ry="4" fill="#bcc4cc" opacity=".8"/><circle cx="44" cy="6" r="7" fill="#a3acb6"/><path d="M39 1l2-6 4 4zM46 0l4-5 1 6z" fill="#a3acb6"/><path d="M40.5 0l1.4-3.4 2 2zM47 -0.5l2.4-3 .6 3.4z" fill="#f3b6c0"/>
+        <path d="M5 10c-8 2-10-6-4-8" fill="none" stroke="#a3acb6" stroke-width="4" stroke-linecap="round"/><path d="M41.5 6h3M47 6h3" stroke="#3a3f45" stroke-width="1.2" stroke-linecap="round"/><path d="M46 8.4l.6.8.6-.8" stroke="#c98a94" stroke-width=".8" fill="none"/></g>
+      <text class="zz" x="318" y="212" font-size="10" fill="#7a6a5a" font-family="Outfit" font-style="italic">z z</text>
+      <rect width="400" height="250" fill="url(#vig)" pointer-events="none"/>
     </svg>`;
   }
   const DEMO = [
@@ -1898,7 +1965,7 @@ Return only the edited image.`;
     toast("ยินดีต้อนรับ " + d.name); location.hash = "home";
   }
   function initWelcome() {
-    if (!$("#sceneArt").classList.contains("scene-photo")) $("#sceneArt").innerHTML = sceneArt(); // the sign-in page now uses a real photo
+    $("#sceneArt").innerHTML = sceneArt();
     renderDemo();
     $("#roleSwitch").addEventListener("click", (e) => {
       const b = e.target.closest("[data-role]"); if (!b) return;
