@@ -1933,3 +1933,36 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 .nd-res-top { display: flex; align-items: center; justify-content: center; gap: 10px; } .nd-res-top .nd-bowl { width: 190px; } .nd-av { font-size: 3.4rem; }
 .hand-on { margin: 8px 0; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, #5b8cff 12%, transparent); font-size: .84rem; font-weight: 600; }
 @media (max-width: 760px) { .hk-bowl { width: 62vw; bottom: 100px; } .hk-plate2.small { width: 140px; } }
+
+/* ---------- noodle shop pictures ---------- */
+.hk-bg.noodle { background: linear-gradient(180deg, #3a1d10 0, #5a2e16 55%, #7a4220 100%); }
+.hk-bg.noodle::before { content: ""; position: absolute; left: 0; right: 0; top: 64px; height: 46px; background: repeating-linear-gradient(90deg, #d9302a 0 56px, #ffd23f 56px 112px); clip-path: polygon(0 0, 100% 0, 100% 70%, 96% 100%, 92% 70%, 88% 100%, 84% 70%, 80% 100%, 76% 70%, 72% 100%, 68% 70%, 64% 100%, 60% 70%, 56% 100%, 52% 70%, 48% 100%, 44% 70%, 40% 100%, 36% 70%, 32% 100%, 28% 70%, 24% 100%, 20% 70%, 16% 100%, 12% 70%, 8% 100%, 4% 70%, 0 100%); }
+.hk-stage.cam .hk-bg.noodle::before { opacity: .8; }
+.nd-shop { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.nd-sign { position: absolute; left: 50%; top: 112px; transform: translateX(-50%); padding: 6px 18px; border-radius: 12px; background: #b31f1b; color: #ffe9a8; font-weight: 800; font-size: 1.05rem; box-shadow: 0 6px 14px rgba(0, 0, 0, .35); border: 3px solid #ffd23f; white-space: nowrap; text-align: center; }
+.nd-sign small { display: block; font-size: .7rem; font-weight: 600; color: #fff; opacity: .9; }
+.nd-counter { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(180deg, #a86a35, #7a4520); box-shadow: 0 -6px 14px rgba(0, 0, 0, .35); }
+.nd-counter::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; background: #c98a4f; }
+.hk-stage.cam .nd-counter { opacity: .75; }
+.nd-cook { position: absolute; left: max(8px, calc(50% - min(40vw, 300px) / 2 - 150px)); bottom: 96px; width: 120px; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .4)); }
+.nd-cust { position: absolute; left: 12px; top: 120px; z-index: 5; display: flex; gap: 10px; align-items: center; max-width: min(320px, 46vw); padding: 10px 14px 10px 10px; border-radius: 20px; background: rgba(255, 250, 240, .96); color: #3a2414; box-shadow: 0 8px 22px rgba(0, 0, 0, .35); }
+.nd-cust .nd-face { width: 72px; height: 72px; flex: none; }
+.nd-cust b { display: block; font-size: 1rem; } .nd-cust small { display: block; color: #b2402a; font-weight: 700; font-size: .78rem; } .nd-cust p { margin: 4px 0 0; font-size: .86rem; line-height: 1.35; }
+.nd-jar { width: clamp(70px, 8vw, 96px); height: auto; display: block; }
+.hk-card .hk-pic .nd-bowl.card { width: clamp(90px, 11vw, 132px); }
+.nd-res-top .nd-av { width: 96px; height: 96px; } .nd-sum { list-style: none; padding: 0; } .nd-sum li { display: flex; align-items: center; gap: 8px; margin: 4px 0; } .nd-mini { width: 36px; height: 36px; }
+@media (max-width: 760px) { .nd-cust { top: auto; bottom: 200px; left: 8px; right: 8px; max-width: none; padding: 6px 10px; } .nd-cust .nd-face { width: 48px; height: 48px; } .nd-cook { display: none; } .nd-sign { top: 108px; font-size: .9rem; } .nd-counter { height: 96px; } }
+
+/* customer greeting (centre, ~2 s) + face in the top bar */
+.nd-cust { left: 50%; top: 42%; transform: translate(-50%, -50%); max-width: min(440px, calc(100% - 32px)); padding: 16px 22px 16px 16px; border-radius: 26px; z-index: 7; gap: 14px; }
+.nd-cust.in { animation: ndIn .45s cubic-bezier(.2, 1.4, .5, 1); } @keyframes ndIn { 0% { transform: translate(-50%, -50%) scale(.5); opacity: 0; } 100% { transform: translate(-50%, -50%); opacity: 1; } }
+.nd-cust .nd-face { width: 110px; height: 110px; }
+.nd-cust b { font-size: 1.3rem; } .nd-cust em { display: block; font-style: normal; color: #b2402a; font-weight: 700; } .nd-cust small { color: #7a6a5a; font-weight: 600; } .nd-cust p { font-size: 1rem; }
+.hk-masc .nd-hud { width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 760px) { .nd-cust { top: 40%; bottom: auto; left: 50%; right: auto; } .nd-cust .nd-face { width: 76px; height: 76px; } }
+
+/* shop sign sits on the counter, clear of the cards */
+.nd-sign { top: auto; left: auto; right: 16px; bottom: 24px; transform: none; font-size: .95rem; }
+@media (max-width: 760px) { .nd-sign { display: none; } }
+.nd-sign { z-index: 2; }
+.hk-card .hk-pic .nd-top { width: clamp(78px, 9.5vw, 116px); height: auto; filter: drop-shadow(0 3px 4px rgba(0,0,0,.25)); }

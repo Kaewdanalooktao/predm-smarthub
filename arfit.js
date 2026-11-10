@@ -91,7 +91,7 @@
       say("แตะการ์ดเพื่อเลือกโหมด"); idleLoop();
     }
   }
-  function stopCam() { try { S.runner?.stop(); } catch { /* ignore */ } S.cam = false; cancelAnimationFrame(S.idle); }
+  function stopCam() { try { S.runner?.stop(); } catch { /* ignore */ } S.cam = false; cancelAnimationFrame(S.idle); $("#arStage")?.classList.remove("cam"); }
   function idleLoop() { cancelAnimationFrame(S.idle); const f = () => { S.idle = requestAnimationFrame(f); if (!S.cam) pointerStep([]); }; f(); }
 
   /* ------------------------------------------------------------ cards */

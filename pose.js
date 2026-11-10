@@ -11,12 +11,11 @@ const MODEL_FULL = new URL("vendor/models/pose_landmarker_full.task", location.h
 let landmarker = null;
 async function getLandmarker(msgEl) {
   if (landmarker) return landmarker;
-  msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Pose…";
+  if (msgEl) msgEl.textContent = "กำลังโหลดโมเดล MediaPipe Pose…";
   const fs = await FilesetResolver.forVisionTasks(WASM);
-  // GPU: the more accurate "full" model; CPU-only devices: the faster "lite" model. Lower thresholds keep tracking through awkward poses.
-  const opts = (delegate, model) => ({ baseOptions: { modelAssetPath: model, delegate }, runningMode: "VIDEO", numPoses: 1, minPoseDetectionConfidence: 0.4, minPosePresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
-  try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU", MODEL_FULL)); }
-  catch { try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU", MODEL)); } catch { landmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU", MODEL)); } }
+  // the "lite" model starts and runs fast on phones; smoothing + lower thresholds keep tracking steady
+  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numPoses: 1, minPoseDetectionConfidence: 0.4, minPosePresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
+  try { landmarker = await PoseLandmarker.createFromOptions(fs, opts("GPU")); } catch { landmarker = await PoseLandmarker.createFromOptions(fs, opts("CPU")); }
   return landmarker;
 }
 // MediaPipe Hand Landmarker (21 points per hand, up to 2 hands) — loaded only when a hand mode / overlay is used
@@ -41,10 +40,11 @@ class Runner {
   async setHands(on) { this.hands = !!on; if (on && this.on) { try { await getHandLandmarker(null); } catch { this.hands = false; } } }
   async start(onFrame) {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error("เบราว์เซอร์นี้ไม่รองรับกล้อง ต้องเปิดผ่าน https หรือ localhost");
-    const lm = await getLandmarker(this.msg);
-    if (this.hands) { try { await getHandLandmarker(this.msg); } catch { this.hands = false; } }
-    this.msg.textContent = "กำลังเปิดกล้อง…";
-    this.stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: "user" }, audio: false });
+    this.msg.textContent = "กำลังเปิดกล้องและโหลด AI…";
+    // camera, pose model and hand model all start at the same time (not one after another)
+    const [lm, stream] = await Promise.all([getLandmarker(null), navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: "user" }, audio: false }),
+      this.hands ? getHandLandmarker(null).catch(() => { this.hands = false; }) : null]);
+    this.stream = stream;
     this.v.srcObject = this.stream; await this.v.play();
     this.c.width = this.v.videoWidth || 640; this.c.height = this.v.videoHeight || 480;
     this.msg.hidden = true; this.on = true; let lastT = -1;
@@ -642,7 +642,15 @@ const arGame = {
     return { score, best: Math.max(prev, score), record: score > prev && prev > 0 };
   },
 };
-Object.assign(window.PreDMTrack, { Runner, makeEval, drawSkeleton, drawHands, COLORS, modes: MODES, games: GAMES, arGame,
+// warm-up: download + prepare the AI models in the background so the camera opens fast (models stay cached by the service worker)
+let warming = null;
+function warm() { if (!warming) warming = Promise.all([getLandmarker(null), getHandLandmarker(null)]).catch(() => { warming = null; }); return warming; }
+const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 4000 }) : setTimeout(f, 1500));
+window.addEventListener("predm:view", (e) => { if (["game", "tracking", "exercise"].includes(e.detail)) idle(warm); });
+if (["#game", "#tracking", "#exercise"].includes(location.hash)) idle(warm);
+document.addEventListener("pointerover", (e) => { if (e.target.closest?.("[data-arfit],[data-handgame],#gStart,#tStart,#plStart,.gcard")) warm(); }, { passive: true });
+document.addEventListener("pointerdown", (e) => { if (e.target.closest?.("[data-arfit],[data-handgame],#gStart,#tStart,.gcard")) warm(); }, { passive: true });
+Object.assign(window.PreDMTrack, { Runner, makeEval, drawSkeleton, drawHands, COLORS, modes: MODES, games: GAMES, arGame, warm, getHand: () => getHandLandmarker(null),
   startGame(id) { location.hash = "game"; setTimeout(() => { selectGame(id); $("#gStart").click(); }, 350); } });
 window.dispatchEvent(new Event("predm:track-ready"));
 

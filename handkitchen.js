@@ -25,6 +25,7 @@ function drawHand(ctx, P) {
 }
 async function getLandmarker() {
   if (landmarker) return landmarker;
+  if (window.PreDMTrack?.getHand) { landmarker = await window.PreDMTrack.getHand(); return landmarker; } // one shared hand model (already warmed up)
   const fs = await FilesetResolver.forVisionTasks(WASM);
   const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4, minTrackingConfidence: 0.4 });
   try { landmarker = await HandLandmarker.createFromOptions(fs, opts("GPU")); } catch { landmarker = await HandLandmarker.createFromOptions(fs, opts("CPU")); }
@@ -143,6 +144,8 @@ function shell() {
       </div>
       <div class="hk-serve" id="hkServe" hidden aria-hidden="true"></div>
       <div class="hk-bowl" id="hkBowl" hidden aria-hidden="true"></div>
+      <div class="nd-shop" id="hkShop" hidden aria-hidden="true"><div class="nd-sign">🍜 ก๋วยเตี๋ยวอ่อนหวาน <small>ปรุงพอดี ใส่ใจสุขภาพ</small></div><div class="nd-counter"></div><img class="nd-cook" src="vendor/people/man_cook.webp" alt=""></div>
+      <div class="nd-cust" id="hkCust" hidden></div>
       <div class="hk-list" id="hkList" hidden></div>
       <div class="hk-fxl" id="hkFx" aria-hidden="true"></div>
       <div class="hk-tray" id="hkTray"></div>
@@ -172,11 +175,12 @@ function open(mode) {
   $("#hkStartT").textContent = { market: "🧺 ตลาดแตะมือ", noodle: "🍜 ร้านก๋วยเตี๋ยวแตะมือ", somtam: "🥗 ร้านส้มตำแตะมือ" }[G.mode] || "ครัวแตะมือ";
   $("#hkModal").hidden = false; document.body.classList.add("care-open"); window.PreDMMusic?.start();
   $("#hkStart").hidden = false; $("#hkMsg").textContent = "";
+  getLandmarker().catch(() => {}); // start getting the hand model ready while the player reads the start screen
   newRound();
 }
 function close() {
   cancelAnimationFrame(G.raf); G.raf = 0;
-  G.stream?.getTracks().forEach((t) => t.stop()); G.stream = null; G.cam = false;
+  G.stream?.getTracks().forEach((t) => t.stop()); G.stream = null; G.cam = false; $("#hkStage")?.classList.remove("cam");
   const v = $("#hkVideo"); if (v) v.srcObject = null;
   $("#hkModal").hidden = true; document.body.classList.remove("care-open"); window.PreDMMusic?.stop();
 }
@@ -185,15 +189,19 @@ async function startCam() {
   const msg = $("#hkMsg");
   try {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error("เบราว์เซอร์นี้ไม่รองรับกล้อง (ต้องเปิดผ่าน https)");
-    msg.textContent = "กำลังเปิดกล้องและโหลดระบบจับมือ…";
-    const [stream] = await Promise.all([navigator.mediaDevices.getUserMedia({ video: { width: 960, height: 540, facingMode: "user" }, audio: false }), getLandmarker()]);
+    msg.textContent = "กำลังเปิดกล้อง…";
+    const ready = getLandmarker(); // keeps loading while the camera picture is already showing
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 960, height: 540, facingMode: "user" }, audio: false });
     G.stream = stream; const v = $("#hkVideo"); v.srcObject = stream; await v.play();
     G.cam = true; $("#hkStage").classList.add("cam");
     $("#hkStart").hidden = true; loop();
+    if (!landmarkerReady()) { const keep = $("#hkSay").textContent; say("⏳ กำลังเตรียม AI จับมือ… ใช้เมาส์/นิ้วแตะจอไปก่อนได้"); await ready; say(keep); }
+    landmarker = await ready;
   } catch (err) {
     msg.textContent = `เปิดกล้องไม่ได้ (${err.name === "NotAllowedError" ? "ไม่ได้อนุญาตกล้อง" : err.message || err}) ลองเล่นด้วยเมาส์/นิ้วแตะจอแทนได้ค่ะ`;
   }
 }
+function landmarkerReady() { return !!landmarker; }
 function startNoCam() { G.cam = false; $("#hkStage").classList.remove("cam"); $("#hkStart").hidden = true; loop(); }
 
 /* ------------------------------------------------------------------ rounds */
@@ -205,6 +213,8 @@ function newRound() {
   $("#hkMortar").hidden = G.mode !== "somtam"; $("#hkPestle").hidden = true; $("#hkServe").hidden = true; $("#hkMix").innerHTML = ""; $("#hkMortar").classList.remove("gone");
   G.mk = { phase: "menu", recipe: null, stall: 0, page: 0, menuPage: 0, cart: [], combo: 0, t0: 0 };
   G.score = 0; $("#hkList").hidden = true; if (G.mode === "noodle") ndNew(); ndBowl();
+  $("#hkShop").hidden = G.mode !== "noodle"; $("#hkCust").hidden = true;
+  if (G.mode !== "noodle" && window.PreDMMascot) $("#hkMasc").innerHTML = PreDMMascot.svg(); // mascot back in the other modes
   if (G.mode === "plate") { const kg = window.PreDMKitchenGames; G.sc = kg?.scenes ? kg.scenes[Math.floor(Math.random() * kg.scenes.length)] : { t: "มื้อกลางวัน", meal: "l", cap: 650, ic: "☀️" }; }
   layout();
 }
@@ -539,8 +549,21 @@ const ND_CUST = [ // [name, avatar, condition, what they ask, limits]
   ["น้องเมย์", "👧", "กำลังลดน้ำหนัก", "ขออิ่มแต่ไม่อ้วนนะคะ", { kcal: 380 }], ["พี่ต้น", "🧑", "กลุ่มเสี่ยงเบาหวาน ชอบต้มยำ", "อยากกินต้มยำแต่ไม่อยากหวาน", { sug: 3, carb: 45 }],
   ["ยายบุญ", "👵", "ไตเสื่อม ต้องจำกัดเค็ม", "เค็มน้อย ๆ นะหลาน", { na: 900 }], ["ครูนิด", "👩", "ไขมันในเลือดสูง", "ไม่เอามัน ๆ นะคะ", { fat: 10 }],
   ["ตาเพิ่ม", "👴", "เบาหวาน + ความดัน", "ไม่หวาน ไม่เค็ม แต่อร่อยนะ", { sug: 2, na: 1100, carb: 35 }], ["พี่แบงค์", "🧔", "สุขภาพดี ออกกำลังกาย", "ขอโปรตีนเยอะ ๆ", { pro: 2 }],
-].map(([n, av, cond, ask, lim]) => ({ n, av, cond, ask, lim }));
+].map(([n, av, cond, ask, lim]) => ({ n, av, cond, ask, lim, face: { "ป้าแดง": "old_woman", "ลุงสม": "old_man", "น้องเมย์": "girl", "พี่ต้น": "person", "ยายบุญ": "old_woman", "ครูนิด": "woman_teacher", "ตาเพิ่ม": "old_man", "พี่แบงค์": "man_beard" }[n] }));
 const ND_ROUND = 3;
+const face = (c, cls) => `<img class="${cls || "nd-face"}" src="vendor/people/${c.face}.webp" alt="${esc(c.n)}">`;
+// condiment jars drawn as SVG (the classic 4-jar noodle-shop set + MSG)
+function jarSVG(kind) {
+  const J = { sug: ["#ffffff", "#f3efe6", "sugar"], fs: ["#c9822e", "#b06a1d", "fish"], chili: ["#d63a22", "#b02a16", "chili"], vin: ["#eef6e8", "#d9ead0", "vin"], msg: ["#ffffff", "#eceff3", "msg"] }[kind];
+  let dots = "";
+  if (kind === "fs" || kind === "vin") for (let i = 0; i < 7; i++) dots += `<circle cx="${30 + (i * 13) % 40}" cy="${62 + (i * 17) % 26}" r="5" fill="none" stroke="${i % 2 ? "#e0402a" : "#5aa83c"}" stroke-width="2.6"/>`;
+  if (kind === "sug" || kind === "msg") for (let i = 0; i < 18; i++) dots += `<rect x="${26 + (i * 11) % 48}" y="${58 + (i * 7) % 30}" width="3" height="3" fill="#d8d2c4" transform="rotate(${i * 20} ${27 + (i * 11) % 48} ${59 + (i * 7) % 30})"/>`;
+  if (kind === "chili") for (let i = 0; i < 14; i++) dots += `<circle cx="${28 + (i * 9) % 44}" cy="${60 + (i * 13) % 28}" r="1.8" fill="#ffd27a"/>`;
+  return `<svg class="nd-jar" viewBox="0 0 100 110" aria-hidden="true"><ellipse cx="50" cy="104" rx="34" ry="5" fill="rgba(0,0,0,.2)"/><rect x="18" y="30" width="64" height="72" rx="14" fill="rgba(255,255,255,.55)" stroke="#c8d0da" stroke-width="2.5"/>
+    <rect x="22" y="${kind === "fs" || kind === "vin" ? 52 : 46}" width="56" height="${kind === "fs" || kind === "vin" ? 46 : 52}" rx="10" fill="${J[0]}"/>${dots}<rect x="26" y="34" width="10" height="58" rx="5" fill="#fff" opacity=".55"/>
+    <rect x="24" y="16" width="52" height="16" rx="6" fill="#e05a4a"/><rect x="44" y="4" width="12" height="16" rx="4" fill="#c9a26b"/></svg>`;
+}
+const ND_JAR = { sug1: "sug", sug2: "sug", sug3: "sug", fs1: "fs", fs2: "fs", chilip: "chili", vinegar: "vin", msg: "msg" };
 function ndNew() { const order = shuffle(ND_CUST).slice(0, ND_ROUND); G.nd = { order, ci: 0, step: 0, picks: {}, coins: 0, results: [] }; }
 const ndCur = () => G.nd.order[G.nd.ci];
 function ndPicked(k) { return G.nd.picks[k] || []; }
@@ -554,9 +577,18 @@ function noodleItems() {
   if (N.done) return [];
   const st = ND_STEPS[N.step], have = ndPicked(st.k);
   $("#hkTitle").textContent = `🍜 ร้านก๋วยเตี๋ยว · ลูกค้า ${N.ci + 1}/${ND_ROUND} · ${st.t}`;
+  $("#hkMasc").innerHTML = face(c, "nd-hud"); // the customer's face sits in the top bar next to the request
+  if (N.introFor !== N.ci) { // a new customer walks in: big greeting for a moment
+    N.introFor = N.ci; const cp = $("#hkCust"); cp.hidden = false; cp.classList.remove("in"); void cp.offsetWidth; cp.classList.add("in");
+    cp.innerHTML = `${face(c)}<div><small>ลูกค้าคนที่ ${N.ci + 1}/${ND_ROUND}</small><b>${esc(c.n)}</b><em>${esc(c.cond)}</em><p>“${esc(c.ask)}”</p></div>`;
+    clearTimeout(N.introT); N.introT = setTimeout(() => (cp.hidden = true), 2200);
+  }
   say(`${c.av} ${c.n} (${c.cond}): “${c.ask}”`);
   if (G.spoke !== "nd" + N.ci + N.step) { G.spoke = "nd" + N.ci + N.step; if (N.step === 0) window.PreDMVoice?.say(N.ci === 0 ? "nd_open" : "nd_next"); }
-  const items = st.items.map((x) => { const inn = have.includes(x.id); return { id: "n:" + x.id, e: x.e, n: x.n, sub: inn ? "✓ ใส่แล้ว (แตะเพื่อเอาออก)" : x.tip.length > 24 ? x.tip.slice(0, 23) + "…" : x.tip, cls: inn ? "in" : "", badge: inn ? "✓" : "" }; });
+  const pic = (x) => st.k === "noodle" ? topBowlSVG(x.id, "clear") : st.k === "broth" ? topBowlSVG("small", x.id) : ND_JAR[x.id] ? jarSVG(ND_JAR[x.id]) : null;
+  const ND_PER = 6, pages = Math.ceil(st.items.length / ND_PER); N.page = Math.min(N.page || 0, pages - 1);
+  const items = st.items.slice(N.page * ND_PER, N.page * ND_PER + ND_PER).map((x) => { const inn = have.includes(x.id); return { id: "n:" + x.id, e: x.e, html: pic(x), n: x.n, sub: inn ? "✓ ใส่แล้ว (แตะเพื่อเอาออก)" : x.tip.length > 24 ? x.tip.slice(0, 23) + "…" : x.tip, cls: inn ? "in" : "", badge: inn ? "✓" : "" }; });
+  if (pages > 1) items.push({ id: "ndpage", e: "🔄", n: "ดูอย่างอื่น", sub: `หน้า ${N.page + 1}/${pages}` });
   if (st.n > 1 && N.step < ND_STEPS.length - 1) items.push({ id: "ndnext", e: "➡️", n: "ขั้นต่อไป", sub: have.length ? `เลือกแล้ว ${have.length}` : "ข้ามได้" });
   if (N.step === ND_STEPS.length - 1) items.push({ id: "ndserve", e: "🛎️", n: "เสิร์ฟ!", big: true });
   if (N.step > 0) items.unshift({ id: "ndback", e: "⬅️", n: "ย้อนกลับ" });
@@ -564,8 +596,9 @@ function noodleItems() {
 }
 function noodleChoose(id, el) {
   const N = G.nd;
-  if (id === "ndback") { N.step--; ndBowl(); return layout(); }
-  if (id === "ndnext") { N.step++; return layout(); }
+  if (id === "ndback") { N.step--; N.page = 0; ndBowl(); return layout(); }
+  if (id === "ndnext") { N.step++; N.page = 0; return layout(); }
+  if (id === "ndpage") { N.page = ((N.page || 0) + 1) % Math.ceil(ND_STEPS[N.step].items.length / 6); return layout(); }
   if (id === "ndserve") return ndServe();
   if (id === "ndagain") { ndNew(); ndBowl(); return layout(); }
   if (!id.startsWith("n:")) return;
@@ -576,7 +609,7 @@ function noodleChoose(id, el) {
   const item = st.items.find((i) => i.id === x);
   if (k < 0 && el) fx(el, item.hp < 0 ? "ระวัง!" : item.hp > 0 ? "ดีต่อสุขภาพ" : "✓", item.hp < 0 ? "bad" : "good");
   ndBowl(st.k === "season" && k < 0 ? item : null);
-  if (st.n === 1 && k < 0) { N.step++; } // single-choice steps move on by themselves
+  if (st.n === 1 && k < 0) { N.step++; N.page = 0; } // single-choice steps move on by themselves
   layout();
 }
 // the bowl at the bottom of the screen updates as the order is built
@@ -591,7 +624,7 @@ function bowlSVG(noodle, broth, meats, vegs, cls) {
   const soup = { clear: ["#f3e2b0", .85], tomyum: ["#e9883f", .9], tomyumclear: ["#f2b25c", .8], namtok: ["#6e3b22", .92], yentafo: ["#e86a8a", .9], dry: ["#00000000", 0] }[broth] || ["#f6efe0", .5];
   const nd = { small: ["#fbf6e8", 2.4], big: ["#fffaf0", 7], mee: ["#ffffff", 1.4], egg: ["#f6d36b", 3], glass: ["#e9f3f6", 1.8], half: ["#fbf6e8", 2.4] }[noodle];
   let strands = "";
-  if (nd) { const n = noodle === "half" ? 18 : 34; for (let i = 0; i < n; i++) { const x = 70 + r() * 160, y = 112 + r() * 44, w = 40 + r() * 50; strands += `<path d="M${x.toFixed(0)} ${y.toFixed(0)} q${(w / 2).toFixed(0)} ${(-14 + r() * 28).toFixed(0)} ${w.toFixed(0)} ${(-6 + r() * 12).toFixed(0)}" stroke="${nd[0]}" stroke-width="${nd[1]}" fill="none" stroke-linecap="round" opacity=".95"/>`; } }
+  if (nd) { const n = noodle === "half" ? 18 : 34, k = cls === "card" ? 1.7 : 1; for (let i = 0; i < n; i++) { const x = 70 + r() * 160, y = 108 + r() * 34, w = 40 + r() * 50, d = `M${x.toFixed(0)} ${y.toFixed(0)} q${(w / 2).toFixed(0)} ${(-14 + r() * 28).toFixed(0)} ${w.toFixed(0)} ${(-6 + r() * 12).toFixed(0)}`; strands += `<path d="${d}" stroke="#b89a62" stroke-width="${(nd[1] * k + 1.6).toFixed(1)}" fill="none" stroke-linecap="round" opacity=".55"/><path d="${d}" stroke="${nd[0]}" stroke-width="${(nd[1] * k).toFixed(1)}" fill="none" stroke-linecap="round"/>`; } }
   const PIC = (step, id) => picSrc(ND_STEPS.find((s) => s.k === step).items.find((i) => i.id === id)?.e);
   const tops = [...meats.map((m) => PIC("meat", m)), ...vegs.map((v) => PIC("veg", v))].filter(Boolean).slice(0, 8).map((src, i, a) => { const ang = (i / a.length) * Math.PI * 2 + r(), d = 0.3 + r() * 0.55, sz = 52 + r() * 12; return `<image href="${src}" x="${(150 + Math.cos(ang) * d * 88 - sz / 2).toFixed(0)}" y="${(124 + Math.sin(ang) * d * 26 - sz / 2).toFixed(0)}" width="${sz.toFixed(0)}" height="${sz.toFixed(0)}"/>`; }).join("");
   return `<svg class="nd-bowl ${cls || ""}" viewBox="0 0 300 230" role="img" aria-label="ชามก๋วยเตี๋ยว"><defs><linearGradient id="ndb${cls}" x1="0" x2="1"><stop offset="0" stop-color="#d7dde6"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#c8cfda"/></linearGradient></defs>
@@ -599,6 +632,18 @@ function bowlSVG(noodle, broth, meats, vegs, cls) {
     <path d="M40 150c30 34 70 46 110 46s80-12 110-46" stroke="#e05a4a" stroke-width="6" fill="none" opacity=".75"/><path d="M60 170h180" stroke="#e05a4a" stroke-width="3" stroke-dasharray="10 8" opacity=".6"/>
     <ellipse cx="150" cy="120" rx="130" ry="36" fill="#f7f9fc" stroke="#c9d0dc" stroke-width="3"/><ellipse cx="150" cy="122" rx="116" ry="29" fill="${soup[0]}" opacity="${soup[1]}"/>
     ${strands}${tops}<path d="M236 60l40-52" stroke="#c48a4a" stroke-width="7" stroke-linecap="round"/><path d="M226 56l36-50" stroke="#d9a066" stroke-width="7" stroke-linecap="round"/></svg>`;
+}
+// card picture: the bowl seen from above, so the noodle type and broth colour are obvious at a small size
+function topBowlSVG(noodle, broth) {
+  const r = rng("top" + noodle + broth);
+  const soup = { clear: "#f1dfa6", tomyum: "#e9883f", tomyumclear: "#f2b25c", namtok: "#6e3b22", yentafo: "#e86a8a", dry: "#f7f1e3" }[broth] || "#f1dfa6";
+  const nd = { small: ["#fffaf0", 3.2, 30], big: ["#ffffff", 9, 12], mee: ["#ffffff", 1.8, 46], egg: ["#f4cf55", 4, 26], glass: ["#e3f1f5", 2.4, 34], half: ["#fffaf0", 3.2, 14], none: null }[noodle];
+  let st = "";
+  if (nd) for (let i = 0; i < nd[2]; i++) { const a = r() * Math.PI * 2, d = r() * 26, x = 60 + Math.cos(a) * d, y = 60 + Math.sin(a) * d, ang = r() * Math.PI * 2, l = 14 + r() * 16; const path = `M${(x - Math.cos(ang) * l).toFixed(1)} ${(y - Math.sin(ang) * l).toFixed(1)} q${((r() - .5) * 20).toFixed(1)} ${((r() - .5) * 20).toFixed(1)} ${(Math.cos(ang) * l * 2).toFixed(1)} ${(Math.sin(ang) * l * 2).toFixed(1)}`; st += `<path d="${path}" stroke="#a8875a" stroke-width="${(nd[1] + 1.4).toFixed(1)}" fill="none" stroke-linecap="round" opacity=".45"/><path d="${path}" stroke="${nd[0]}" stroke-width="${nd[1]}" fill="none" stroke-linecap="round"/>`; }
+  else for (let i = 0; i < 7; i++) { const a = (i / 7) * Math.PI * 2; st += `<ellipse cx="${(60 + Math.cos(a) * 18).toFixed(1)}" cy="${(60 + Math.sin(a) * 18).toFixed(1)}" rx="9" ry="5" fill="${i % 2 ? "#4f9a30" : "#76c043"}" transform="rotate(${Math.round(a * 57)} ${(60 + Math.cos(a) * 18).toFixed(1)} ${(60 + Math.sin(a) * 18).toFixed(1)})"/>`; }
+  const greens = `<circle cx="44" cy="46" r="2.6" fill="#5aa83c"/><circle cx="76" cy="52" r="2.4" fill="#5aa83c"/><circle cx="64" cy="78" r="2.6" fill="#5aa83c"/>`;
+  return `<svg class="nd-top" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="64" r="54" fill="rgba(0,0,0,.18)"/><circle cx="60" cy="60" r="54" fill="#fff" stroke="#c8cfda" stroke-width="2"/><circle cx="60" cy="60" r="48" fill="none" stroke="#e05a4a" stroke-width="3" stroke-dasharray="7 5"/>
+    <circle cx="60" cy="60" r="42" fill="${soup}"/>${broth === "tomyum" ? `<circle cx="60" cy="60" r="42" fill="#fff" opacity=".18"/>` : ""}${st}${greens}${broth === "tomyum" || broth === "tomyumclear" ? `<circle cx="48" cy="70" r="3" fill="#d22f22"/><circle cx="72" cy="44" r="3" fill="#d22f22"/>` : ""}</svg>`;
 }
 function ndServe() { // judge the bowl against this customer's needs
   const N = G.nd, c = ndCur(), t = ndTotals(), good = [], tips = [];
@@ -616,9 +661,9 @@ function ndServe() { // judge the bowl against this customer's needs
   N.coins += coins; N.results.push({ c, pts, happy });
   window.PreDMMusic?.sfx(happy ? "win" : "bad"); window.PreDMVoice?.say(happy ? "nd_happy" : "nd_sad"); if (happy) confetti();
   const bowl = bowlSVG(ndPicked("noodle")[0], ndPicked("broth")[0], ndPicked("meat"), ndPicked("veg"), "res");
-  $("#hkBowl").hidden = true; G.cards = [];
+  $("#hkBowl").hidden = true; $("#hkCust").hidden = true; G.cards = [];
   const last = N.ci >= ND_ROUND - 1;
-  $("#hkCards").innerHTML = `<div class="hk-result nd-res"><div class="nd-res-top"><span class="nd-av">${c.av}</span>${bowl}</div>
+  $("#hkCards").innerHTML = `<div class="hk-result nd-res"><div class="nd-res-top">${face(c, "nd-av")}${bowl}</div>
     <h2>${happy ? `${c.n} ชอบมาก! 😋` : pts >= 5 ? `${c.n} พอใจนิดหน่อย 🙂` : `${c.n} ไม่ค่อยพอใจ 😕`}</h2>
     <p>${pts}/10 คะแนน · ได้ทิป 💰 ${coins} บาท · รวม ${N.coins} บาท</p>
     <div class="st-bars"><div class="pl-m"><span>น้ำตาล</span><b>${t.sug}<small> ก.</small></b></div><div class="pl-m"><span>โซเดียม</span><b>${t.na}<small> มก.</small></b></div><div class="pl-m"><span>พลังงาน</span><b>${t.kcal}<small> kcal</small></b></div><div class="pl-m"><span>ไขมัน</span><b>${t.fat}<small> ก.</small></b></div></div>
@@ -632,7 +677,7 @@ function ndSummary() {
   $("#hkCards").innerHTML = `<div class="hk-result"><span class="hk-rmasc">${window.PreDMMascot ? PreDMMascot.svg() : "💗"}</span><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div>
     <h2>${["ลองเปิดร้านใหม่นะคะ", "พอไปได้ค่ะ", "ร้านดีมาก ลูกค้าชอบ!", "เจ้าของร้านก๋วยเตี๋ยวสุขภาพ! 🍜"][st]}</h2>
     <p>ลูกค้าพอใจ ${happy}/${ND_ROUND} คน · คะแนนเฉลี่ย ${avg}/10 · ทิปรวม 💰 ${N.coins} บาท · สถิติ ${best} บาท</p>
-    <ul>${N.results.map((x) => `<li>${x.c.av} ${esc(x.c.n)} (${esc(x.c.cond)}) · ${x.pts}/10 ${x.happy ? "😋" : "😕"}</li>`).join("")}</ul>
+    <ul class="nd-sum">${N.results.map((x) => `<li>${face(x.c, "nd-mini")} ${esc(x.c.n)} (${esc(x.c.cond)}) · ${x.pts}/10 ${x.happy ? "😋" : "😕"}</li>`).join("")}</ul>
     <p class="ok">💡 จำไว้: น้ำตาล 1 ช้อนชา = 4 กรัม · น้ำปลา 1 ช้อนชา ≈ 450 มก. โซเดียม · ทั้งวันไม่ควรเกิน 2,000 มก. · ไม่ซดน้ำซุปจนหมด</p>
     <div class="hk-start-btns"><button type="button" class="btn primary" data-hk="ndagain">เปิดร้านอีกรอบ ↺</button><button type="button" class="btn" data-hkmode="market">ไปจ่ายตลาด</button></div></div>`;
 }
@@ -724,7 +769,7 @@ function onClick(e) {
     if (a === "cam") return startCam();
     if (a === "nocam") return startNoCam();
     if (a === "again") return newRound();
-    if (a === "ndnextc") { G.nd.ci++; G.nd.step = 0; G.nd.picks = {}; ndBowl(); return layout(); }
+    if (a === "ndnextc") { G.nd.ci++; G.nd.step = 0; G.nd.page = 0; G.nd.picks = {}; ndBowl(); return layout(); }
     if (a === "ndsum") return ndSummary();
     if (a === "ndagain") { ndNew(); ndBowl(); return layout(); }
     if (a === "eat") { // log the som tam on today's tray, in the meal that fits the time of day
@@ -738,7 +783,7 @@ function onClick(e) {
     }
     if (a === "cook") { const r = G.mk.recipe; if (r && window.PreDMFood?.add && window.PreDMFood.DB.some((d) => d.key === r.key)) { window.PreDMFood.add(r.key, 1, "d"); window.PreDM?.toast(`วาง “${r.n}” ลงพาข้าวมื้อเย็นวันนี้แล้ว`); } close(); if (location.hash !== "#food") location.hash = "food"; return; }
   }
-  const c = t(".hk-card"); if (c && !G.cam) { window.PreDMMusic?.sfx("pick"); lockAll(); choose(c.dataset.id, c); } // tap also works without camera
+  const c = t(".hk-card"); if (c) { window.PreDMMusic?.sfx("pick"); lockAll(); choose(c.dataset.id, c); } // tapping a card works with or without the camera // tap also works without camera
 }
 
 document.addEventListener("click", (e) => { const g = e.target.closest("[data-handgame]"); if (!g) return; e.preventDefault(); open(["somtam", "market", "noodle"].includes(g.dataset.handgame) ? g.dataset.handgame : "plate"); });
