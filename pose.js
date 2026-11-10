@@ -470,6 +470,7 @@ const GAME_FRAME = {
     const ext = [0, 115, 135, 150][lv], fists = [];
     if (seen(lms, [11, 13, 15])) fists.push({ p: lms[15], ok: angle(lms[11], lms[13], lms[15]) > ext });
     if (seen(lms, [12, 14, 16])) fists.push({ p: lms[16], ok: angle(lms[12], lms[14], lms[16]) > ext });
+    (G.hands || []).forEach((hd) => fists.push({ p: hd.pts[9], ok: handOpen(hd) < 1.45 })); // MediaPipe Hand: a clenched fist punches
     G.objs = G.objs.filter((o) => { if (o.hit) return now - o.hit < 400; if (now - o.born > o.life) return false;
       if (G.running && fists.some((f) => f.ok && Math.hypot((f.p.x - o.x) * w, (f.p.y - o.y) * h) < 0.07 * w)) { o.hit = now; addScore(o.veg ? -2 : 1, o.x, o.y, now); if (o.veg) say("อย่าชกผักนะ", true); } return true; });
     G.objs.forEach((o) => { if (o.hit) { const t = (now - o.hit) / 400; ctx.globalAlpha = 1 - t; emo(ctx, o.e, o.x * w + t * 120, o.y * h - t * 80, 54 + t * 20); emo(ctx, "💥", o.x * w, o.y * h, 60); ctx.globalAlpha = 1; } else emo(ctx, o.e, o.x * w, o.y * h + Math.sin((now - o.born) / 160) * 6, 56); });
@@ -599,7 +600,7 @@ function initGame() {
   });
   $("#gStart").addEventListener("click", async () => {
     $("#gStart").disabled = true;
-    G.runner.hands = !!$("#gHands")?.checked; // MediaPipe Hand: draw the fingers and let fingertips touch targets
+    G.runner.hands = true; // MediaPipe Hand is always on in every camera game: fingers are drawn and fingertips / fists count
     resetGame(); G.dur = 60;
     $("#gScore").textContent = 0;
     try {
@@ -619,7 +620,7 @@ window.addEventListener("predm:view", (e) => {
 
 initTracking(); initGame();
 // shared with the AR exercise picker (arfit.js)
-const HAND_GAMES = new Set(["bubble", "reach"]); // games where fingertips can touch targets
+const HAND_GAMES = new Set(Object.keys(GAMES)); // MediaPipe Hand runs in every AR game
 const arGame = {
   handy: (id) => HAND_GAMES.has(id),
   start(id, lv, secs) { G.id = id; resetGame(); G.arLv = lv; G.dur = secs; G.end = performance.now() + secs * 1000; G.last = 0; G.running = true; G.ar = true; },

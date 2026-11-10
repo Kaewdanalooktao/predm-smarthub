@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
-<title>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · Know Your Risk. Shape Your Future.</title>
+<title>Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา · AONWANWITTHAYA) · Know Your Risk. Shape Your Future.</title>
 <meta name="description" content="Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · Know Your Risk. Shape Your Future. Smart Screening, Body Composition, AI Exercise และ AI Body Transformation สำหรับกลุ่มเสี่ยงเบาหวาน">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
 <style>
@@ -244,6 +244,12 @@ footer { padding-block: 100px 40px; border-top: 1px solid var(--line); backgroun
 html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
 .fs-float { position: fixed; left: 14px; bottom: 14px; z-index: 50; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; color: #2a2e8a; box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: pointer; font: 700 1.3rem/1 var(--body); }
 .fs-float .fs-ic small { font-size: .62em; } .fs-float[data-lv="1"], .fs-float[data-lv="2"] { background: #2a2e8a; color: #fff; }
+.aon-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+.aon-card { position: relative; padding: 22px 16px 18px; border-radius: 22px; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, var(--bg2)), var(--bg2)); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); display: grid; gap: 6px; align-content: start; }
+.aon-card b { font: 800 3rem/1 var(--display); color: var(--c); text-shadow: 0 0 22px color-mix(in srgb, var(--c) 60%, transparent); }
+.aon-card span { font: 700 1rem var(--display); color: #fff; } .aon-card small { color: #c9cee9; font-size: .86rem; line-height: 1.5; }
+@media (max-width: 1000px) { .aon-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .aon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .aon-card b { font-size: 2.4rem; } }
 </style>
 </head>
 <body>
@@ -270,7 +276,7 @@ html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
       <div class="layer" id="night">
         <div id="nightArt"></div>
         <div class="hero-copy">
-          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span>
+          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา · AONWANWITTHAYA)</span>
           <h1 class="tag">Know Your <span class="g">Risk.</span></h1>
           <p>รู้ความเสี่ยงเบาหวานของคุณก่อน แล้วขยับร่างกาย<b>วันละ 30 นาที</b> ลดความเสี่ยงได้ถึง<b>ครึ่งหนึ่ง</b></p>
           <nav class="pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#transform"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
@@ -279,7 +285,7 @@ html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
       <div class="layer" id="day" aria-hidden="true">
         <div id="dayArt"></div>
         <div class="hero-copy">
-          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</span>
+          <span class="eyebrow">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา · AONWANWITTHAYA)</span>
           <p class="h1 tag" style="background:none;padding:0;max-width:none;font-family:var(--display);font-weight:900">Shape Your <span class="y">Future.</span></p>
           <p>ออกแบบอนาคตสุขภาพของคุณ ด้วย AI ช่วยฝึก ติดตาม Body Composition และเห็นการเปลี่ยนแปลงของร่างกาย</p>
           <nav class="pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#body" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
@@ -287,6 +293,16 @@ html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
       </div>
       <canvas id="crowd" aria-hidden="true"></canvas>
       <div class="scroll-hint" aria-hidden="true">เลื่อนลง<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+  </section>
+
+  <section class="s" id="aonwan" aria-label="AONWAN Brand Concept">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">Brand Concept</span><h2 class="big" style="margin-top:16px">AONWAN<span class="g">WITTHAYA</span><br><span style="font-size:.55em">อ่อนหวานวิทยา</span></h2>
+        <p>ตัวอักษรแต่ละตัวในชื่อ AONWAN แทนแนวทางการส่งเสริมสุขภาพและการป้องกันโรคเบาหวาน ที่ทุกฟีเจอร์ในแพลตฟอร์มยึดถือ</p></div>
+      </div>
+      <div class="aon-grid reveal"><div class="aon-card" style="--c:#5b8cff"><b>A</b><span>Awareness</span><small>การตระหนักรู้และเข้าใจความเสี่ยงสุขภาพ</small></div><div class="aon-card" style="--c:#9d6bff"><b>O</b><span>Optimization</span><small>การปรับให้เหมาะสมกับสุขภาพของแต่ละบุคคล</small></div><div class="aon-card" style="--c:#3fbf6a"><b>N</b><span>Nutrition</span><small>โภชนาการและการเลือกรับประทานอาหาร</small></div><div class="aon-card" style="--c:#f07ab8"><b>W</b><span>Wellness</span><small>การสร้างเสริมสุขภาวะที่ดี</small></div><div class="aon-card" style="--c:#f6a23a"><b>A</b><span>Activity</span><small>การเคลื่อนไหวร่างกายและการออกกำลังกาย</small></div><div class="aon-card" style="--c:#4fd8f0"><b>N</b><span>Navigation</span><small>การนำทางและสนับสนุนการปรับเปลี่ยนพฤติกรรมสุขภาพ</small></div></div>
     </div>
   </section>
 
@@ -388,7 +404,7 @@ html.fs-1 { font-size: 115%; } html.fs-2 { font-size: 130%; }
       <div><h4>บริการ</h4><ul><li><a href="index.html#risk">ประเมินความเสี่ยง</a></li><li><a href="index.html#tracking">AI นับท่า</a></li><li><a href="index.html#game">เกมส์กระตุ้นการออกกำลังกาย</a></li><li><a href="index.html#body">Body Composition</a></li><li><a href="index.html#ex-isan">ออกกำลังกายสไตล์อีสาน</a></li><li><a href="index.html#ex-pakhaoma">ผ้าขาวม้าพาฟิต</a></li><li><a href="index.html#ex-thai">สไตล์ไทย</a></li></ul></div>
       <div><h4>ฉุกเฉิน</h4><ul><li><a class="hot" href="tel:1669">โทร 1669</a></li><li><a href="tel:1330">สปสช. 1330</a></li><li><a href="tel:1422">กรมควบคุมโรค 1422</a></li></ul></div>
     </div>
-    <div class="bottom"><span>© 2569 Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา) · ต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์</span><span><a href="#contact">นโยบายความเป็นส่วนตัว</a><a href="#contact">ข้อกำหนดการใช้งาน</a></span></div>
+    <div class="bottom"><span>© 2569 Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา · AONWANWITTHAYA) · ต้นแบบเพื่อการศึกษา ไม่ใช่อุปกรณ์การแพทย์</span><span><a href="#contact">นโยบายความเป็นส่วนตัว</a><a href="#contact">ข้อกำหนดการใช้งาน</a></span></div>
   </div>
 </footer>
 <aside class="own" id="own" aria-label="น้องอ่อนหวานทักทาย">

@@ -1912,3 +1912,24 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
   .hk-tray-l { white-space: nowrap; font-size: .78rem; }
   .hk-pound { min-width: 96px; flex: none; } .hk-pound b { font-size: 1.05rem; }
 }
+
+/* AONWANWITTHAYA brand */
+.brand-en { display: block; margin-top: 2px; font: 800 .6rem/1.2 var(--display, sans-serif); letter-spacing: .12em; color: rgba(255, 255, 255, .92); }
+.w-en { margin: 2px 0 0; font: 800 1rem var(--display, sans-serif); letter-spacing: .2em; color: var(--blue, #2f4aa0); }
+.aon-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.aon-chips span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 99px; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); font-size: .74rem; font-weight: 600; }
+.aon-chips b { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-size: .78rem; }
+
+/* ---------- som tam plates (SVG), noodle bowl, results ---------- */
+.st-plate { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .25)); }
+.hk-card .hk-pic .st-plate.card { width: clamp(84px, 10vw, 124px); }
+.hk-plate2 { animation: hkServeIn .7s cubic-bezier(.2, 1.3, .5, 1) both; } .hk-plate2.big { width: min(64vw, 380px); } .hk-plate2.small { width: 170px; margin: -6px auto 0; animation: none; }
+.st-bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 6px 0 10px; }
+.st-bars .pl-m { background: rgba(0, 0, 0, .04); border-radius: 12px; padding: 6px 10px; }
+.hk-bowl { position: absolute; left: 50%; bottom: 92px; width: min(40vw, 300px); transform: translateX(-50%); z-index: 3; pointer-events: none; }
+.nd-bowl { width: 100%; height: auto; display: block; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .35)); }
+.hk-sprinkle img { position: absolute; left: 50%; top: -40px; width: 34px; transform: translateX(calc(-50% + var(--dx))); animation: hkSprinkle .8s var(--d) ease-in both; }
+@keyframes hkSprinkle { 0% { opacity: 0; transform: translate(calc(-50% + var(--dx)), -30px) scale(.8); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), 70px) scale(.5); } }
+.nd-res-top { display: flex; align-items: center; justify-content: center; gap: 10px; } .nd-res-top .nd-bowl { width: 190px; } .nd-av { font-size: 3.4rem; }
+.hand-on { margin: 8px 0; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, #5b8cff 12%, transparent); font-size: .84rem; font-weight: 600; }
+@media (max-width: 760px) { .hk-bowl { width: 62vw; bottom: 100px; } .hk-plate2.small { width: 140px; } }

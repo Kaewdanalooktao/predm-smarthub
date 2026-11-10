@@ -183,7 +183,7 @@
     if (needCam()) return;
     const e = EX[S.ex], T = window.PreDMTrack;
     S.kind = "ex"; S.phase = "count"; layout(); S.last = null; S.reps = 0;
-    S.runner.setHands(S.ex === "fist"); // hands only when the exercise needs them (faster)
+    S.runner.setHands(true); // MediaPipe Hand is always on (fingers drawn, either hand can press "หยุด")
     $("#arTitle").textContent = `${e[0]} · เป้าหมาย ${S.target} ${e[2]}`; say(e[5]);
     $("#arUnit").textContent = e[2]; $("#arGoal").textContent = `เป้าหมาย ${S.target}`; $("#arN").textContent = 0; $("#arBar").style.width = "0%"; $("#arFb").textContent = "เตรียมตัว";
     countdown(() => { S.evalFn = T.makeEval(S.ex); S.phase = "train"; S.t0 = performance.now(); $("#arLive").hidden = false; M()?.start(); stopCard(); });
@@ -207,7 +207,7 @@
     if (S.phase === "train" && S.evalFn) {
       const T = window.PreDMTrack, r = S.evalFn(lms, now, hands), col = T.COLORS[r.state];
       if (lms) T.drawSkeleton(ctx, lms, w, h, col);
-      if (hands && S.ex === "fist") T.drawHands(ctx, hands, w, h, col);
+      if (hands) T.drawHands(ctx, hands, w, h, S.ex === "fist" ? col : null);
       if (r.count !== S.reps) { S.reps = r.count; M()?.sfx("pok"); bump(); if (S.reps % 5 === 0 && S.reps < S.target) speak(String(S.reps)); else if (S.reps === S.target - 2) speak("cheer4"); }
       if (!lms && now - (S.bodyTalk || 0) > 12000 && now - S.t0 > 4000) { S.bodyTalk = now; speak("ar_body"); }
       S.last = r; $("#arN").textContent = r.count; $("#arBar").style.width = `${Math.min(100, (r.count / S.target) * 100)}%`;
