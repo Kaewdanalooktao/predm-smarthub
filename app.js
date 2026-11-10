@@ -1828,12 +1828,79 @@ Return only the edited image.`;
     const limb = (pts, w, base, shade, hi) => { const d = "M" + pts.map((p) => `${f(p[0])} ${f(p[1])}`).join(" L"); return `<path d="${d}" stroke="${shade}" stroke-width="${w + 2.2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${base}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${hi ? `<path d="${d}" stroke="${hi}" stroke-width="${(w * 0.32).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".55" transform="translate(-1.2 -1)"/>` : ""}`; };
     const SK = ["#eab28a", "#c98a62", "#f7cfaa"]; // skin: base, shade, highlight
     // ---- dad (chair squat, facing right) ----
-    const D = { sh: [232, 104], hip: [216, 150], kn: [258, 150], an: [255, 195], el: [258, 110], wr: [284, 112], head: [241, 84] };
+    const D = { sh: [239, 123], hip: [224, 163], kn: [259, 161], an: [256, 196], el: [266, 127], wr: [288, 128], head: [244, 106] };
     const shadowE = (cx, cy, rx, ry, o) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#5a3418" opacity="${o}" filter="url(#sBlur)"/>`;
     const skel = [[D.sh, D.hip], [D.hip, D.kn], [D.kn, D.an], [D.sh, D.el], [D.el, D.wr]].map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`).join("");
     const dots = [D.sh, D.hip, D.kn, D.an, D.el, D.wr].map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.4"/>`).join("");
     const bubble = (x, y, w, txt, tail) => `<g class="float" filter="url(#soft)"><rect x="${x}" y="${y}" width="${w}" height="24" rx="12" fill="#fff"/>
       <path d="M${tail} ${y + 22}l5 9 5-9z" fill="#fff"/><text x="${x + w / 2}" y="${y + 16.5}" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2550" font-family="Anuphan, sans-serif">${txt}</text></g>`;
+    // ---- realistic proportions: adults ~7–7.5 heads tall, hip at mid-height, elbow at waist, knee at a quarter height ----
+    const torso = (sh, hip, wS, wH, fill, line) => { // tapered body between the shoulder centre and the hip centre
+      const dx = sh[0] - hip[0], dy = sh[1] - hip[1], L = Math.hypot(dx, dy), nx = -dy / L, ny = dx / L, ux = dx / L, uy = dy / L;
+      const a = [sh[0] + nx * wS / 2, sh[1] + ny * wS / 2], b = [sh[0] - nx * wS / 2, sh[1] - ny * wS / 2], c = [hip[0] - nx * wH / 2, hip[1] - ny * wH / 2], d = [hip[0] + nx * wH / 2, hip[1] + ny * wH / 2];
+      return `<path d="M${f(d[0])} ${f(d[1])} L${f(a[0])} ${f(a[1])} Q${f(sh[0] + ux * 5)} ${f(sh[1] + uy * 5)} ${f(b[0])} ${f(b[1])} L${f(c[0])} ${f(c[1])} Q${f(hip[0] - ux * 3)} ${f(hip[1] - uy * 3)} ${f(d[0])} ${f(d[1])}Z" fill="${fill}" stroke="${line}" stroke-width="1"/>`;
+    };
+    const head = (cx, cy, rx, ry, o) => { // face turned slightly to the right (towards the phone)
+      const fx = cx + rx * 0.14, ey = cy - ry * 0.04, ex = rx * 0.34;
+      let s = `<path d="M${f(cx - rx * 0.4)} ${f(cy + ry * 0.55)}h${f(rx * 0.8)}l${f(rx * 0.06)} ${f(ry * 0.75)}h${f(-rx * 0.92)}z" fill="${SK[1]}"/>`;
+      s += `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#faceL)"/>`;
+      s += `<ellipse cx="${f(cx - rx * 0.88)}" cy="${f(cy + ry * 0.06)}" rx="${f(rx * 0.18)}" ry="${f(ry * 0.24)}" fill="${SK[1]}"/>`;
+      if (o.hair === "pony") {
+        s += `<path d="M${f(cx - rx * 0.7)} ${f(cy - ry * 0.55)}C${f(cx - rx * 1.9)} ${f(cy - ry * 0.4)} ${f(cx - rx * 2)} ${f(cy + ry * 1)} ${f(cx - rx * 1.5)} ${f(cy + ry * 1.5)}C${f(cx - rx * 1.25)} ${f(cy + ry * 0.7)} ${f(cx - rx * 1.2)} ${f(cy + ry * 0.1)} ${f(cx - rx * 0.6)} ${f(cy - ry * 0.2)}z" fill="${o.hc}"/>`;
+        s += `<circle cx="${f(cx - rx * 0.86)}" cy="${f(cy - ry * 0.48)}" r="${f(rx * 0.2)}" fill="#ef7d5e"/>`;
+      }
+      s += `<path d="M${f(cx - rx * 1.04)} ${f(cy + ry * 0.12)}C${f(cx - rx * 1.12)} ${f(cy - ry * 1.28)} ${f(cx + rx * 1.12)} ${f(cy - ry * 1.32)} ${f(cx + rx * 1.03)} ${f(cy - ry * 0.12)}C${f(cx + rx * 0.55)} ${f(cy - ry * (o.hair === "short" ? 0.62 : 0.5))} ${f(cx - rx * 0.35)} ${f(cy - ry * 0.72)} ${f(cx - rx * 0.78)} ${f(cy - ry * 0.18)}L${f(cx - rx * 0.8)} ${f(cy + ry * 0.3)}z" fill="${o.hc}"/>`;
+      s += `<path d="M${f(cx - rx * 0.5)} ${f(cy - ry * 0.95)}c${f(rx * 0.5)} ${f(-ry * 0.2)} ${f(rx * 1)} ${f(-ry * 0.15)} ${f(rx * 1.2)} ${f(ry * 0.15)}" stroke="${o.hl}" stroke-width="${f(rx * 0.16)}" fill="none" opacity=".7" stroke-linecap="round"/>`;
+      s += `<path d="M${f(fx - ex - rx * 0.16)} ${f(ey - ry * 0.2)}q${f(rx * 0.16)} ${f(-ry * 0.08)} ${f(rx * 0.32)} 0M${f(fx + ex - rx * 0.16)} ${f(ey - ry * 0.2)}q${f(rx * 0.16)} ${f(-ry * 0.08)} ${f(rx * 0.32)} 0" stroke="${o.brow}" stroke-width="${f(rx * 0.1)}" stroke-linecap="round" fill="none"/>`;
+      s += `<ellipse cx="${f(fx - ex)}" cy="${f(ey)}" rx="${f(rx * 0.1)}" ry="${f(ry * 0.1)}" fill="#2a1f1b"/><ellipse cx="${f(fx + ex)}" cy="${f(ey)}" rx="${f(rx * 0.1)}" ry="${f(ry * 0.1)}" fill="#2a1f1b"/>`;
+      s += `<circle cx="${f(fx - ex + rx * 0.03)}" cy="${f(ey - ry * 0.03)}" r="${f(rx * 0.035)}" fill="#fff"/><circle cx="${f(fx + ex + rx * 0.03)}" cy="${f(ey - ry * 0.03)}" r="${f(rx * 0.035)}" fill="#fff"/>`;
+      s += `<path d="M${f(fx + rx * 0.06)} ${f(cy + ry * 0.05)}q${f(rx * 0.12)} ${f(ry * 0.2)} ${f(-rx * 0.04)} ${f(ry * 0.27)}" stroke="${SK[1]}" stroke-width="${f(rx * 0.08)}" fill="none" stroke-linecap="round"/>`;
+      s += `<path d="M${f(fx - rx * 0.28)} ${f(cy + ry * 0.47)}q${f(rx * 0.32)} ${f(ry * 0.22)} ${f(rx * 0.62)} 0" stroke="#8a3b2e" stroke-width="${f(rx * 0.1)}" fill="${o.teeth ? "#fff" : "none"}" stroke-linecap="round"/>`;
+      if (o.blush) s += `<circle cx="${f(fx - ex - rx * 0.12)}" cy="${f(cy + ry * 0.28)}" r="${f(rx * 0.17)}" fill="#f28c8c" opacity=".4"/><circle cx="${f(fx + ex + rx * 0.12)}" cy="${f(cy + ry * 0.28)}" r="${f(rx * 0.17)}" fill="#f28c8c" opacity=".4"/>`;
+      if (o.glasses) s += `<rect x="${f(fx - ex - rx * 0.27)}" y="${f(ey - ry * 0.16)}" width="${f(rx * 0.54)}" height="${f(ry * 0.34)}" rx="${f(rx * 0.14)}" fill="none" stroke="#3a3f45" stroke-width="${f(rx * 0.08)}"/><rect x="${f(fx + ex - rx * 0.27)}" y="${f(ey - ry * 0.16)}" width="${f(rx * 0.54)}" height="${f(ry * 0.34)}" rx="${f(rx * 0.14)}" fill="none" stroke="#3a3f45" stroke-width="${f(rx * 0.08)}"/><path d="M${f(fx - ex + rx * 0.27)} ${f(ey)}h${f(2 * ex - rx * 0.54)}M${f(fx - ex - rx * 0.27)} ${f(ey)}l${f(-rx * 0.5)} ${f(-ry * 0.04)}" stroke="#3a3f45" stroke-width="${f(rx * 0.08)}"/>`;
+      return s;
+    };
+    const shoe = (x, y, k, col, sole) => `<path d="M${f(x - 5 * k)} ${f(y - 4 * k)}h${f(9 * k)}l${f(1 * k)} ${f(3 * k)}c${f(4 * k)} 0 ${f(7 * k)} ${f(1 * k)} ${f(7 * k)} ${f(4.5 * k)}H${f(x - 5.5 * k)}z" fill="${col}" stroke="${sole}" stroke-width="1"/><path d="M${f(x - 5.5 * k)} ${f(y + 3 * k)}h${f(17.5 * k)}" stroke="${sole}" stroke-width="${f(1.6 * k)}"/>`;
+    // daughter: ~7 heads tall (top of head y 74 → soles y 205); dad: chair squat, torso leaning forward ~20°
+    const G = { head: [89, 83], sh: [89, 100], waist: [89, 128], hip: [89, 138], kL: [83, 171], kR: [96, 171], aL: [81, 201], aR: [99, 201] };
+    const people = `
+      <!-- chair: dad's hips hover just above the seat -->
+      ${shadowE(214, 199, 30, 4, 0.35)}
+      <path d="M197 112c-2 20-2 40 0 60" stroke="#8a5629" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M197 122h9M197 138h8M197 154h7" stroke="#8a5629" stroke-width="3" stroke-linecap="round"/>
+      <rect x="194" y="170" width="42" height="6" rx="2.5" fill="url(#wood)"/><path d="M199 176v22M231 176v22" stroke="#8a5629" stroke-width="4" stroke-linecap="round"/>
+      <!-- daughter -->
+      ${shadowE(91, 207, 24, 3.6, 0.4)}
+      ${limb([[84, 136], G.kL], 9.5, "#2f3b6b", "#1f2850", "#4a5a94")}${limb([G.kL, G.aL], 7.5, "#2f3b6b", "#1f2850", "#4a5a94")}
+      ${limb([[94, 136], G.kR], 9.5, "#34417a", "#1f2850", "#4a5a94")}${limb([G.kR, G.aR], 7.5, "#34417a", "#1f2850", "#4a5a94")}
+      ${shoe(G.aL[0], G.aL[1] + 2, 0.82, "#fff", "#c9ced8")}${shoe(G.aR[0], G.aR[1] + 2, 0.82, "#fff", "#c9ced8")}
+      ${torso([89, 128], G.hip, 22, 22, "#2f3b6b", "#1f2850")}
+      ${limb([[78, 102], [72, 123], [79, 106]], 5.2, SK[0], SK[1], SK[2])}<circle cx="79.5" cy="105" r="3.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
+      ${torso(G.sh, G.waist, 25, 21, "url(#top)", "#c9553a")}
+      <circle cx="77.5" cy="103" r="4.6" fill="url(#top)" stroke="#c9553a" stroke-width=".8"/><circle cx="100.5" cy="103" r="4.6" fill="url(#top)" stroke="#c9553a" stroke-width=".8"/>
+      <path d="M78 126h22" stroke="#c9553a" stroke-width="1" opacity=".45"/>
+      ${limb([[101, 102], [108, 83], [112, 64]], 5.2, SK[0], SK[1], SK[2])}
+      <g transform="translate(113 59) rotate(-8)"><ellipse cx="0" cy="0" rx="3.6" ry="4.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width=".9"/><path d="M-2.6-3.4v-3.6M-.9-4.2v-4.2M.9-4.2v-4.2M2.6-3.4v-3M3.6 0l2.6-2" stroke="${SK[0]}" stroke-width="1.8" stroke-linecap="round"/></g>
+      ${head(G.head[0], G.head[1], 7.2, 8.8, { hair: "pony", hc: "#2a1f1b", hl: "#5a463c", brow: "#2a1f1b", blush: true, teeth: true })}
+      <!-- dad: far limbs first (in shadow) -->
+      ${shadowE(256, 201, 28, 4.2, 0.4)}
+      ${limb([[221, 165], [250, 163]], 11.5, "#9c8664", "#7a6646", null)}${limb([[250, 163], [247, 194]], 9.5, "#9c8664", "#7a6646", null)}
+      ${shoe(247, 196, 1, "#5a3d29", "#3d2819")}
+      ${limb([[234, 125], [259, 130], [281, 131]], 6.5, "#c98a62", "#a8714c", null)}<ellipse cx="284" cy="131" rx="3.6" ry="3" fill="#c98a62"/>
+      <!-- near leg -->
+      <circle cx="225" cy="163" r="8" fill="#b9a27e"/>
+      ${limb([[225, 163], D.kn], 12.5, "#b9a27e", "#8e7a58", "#d6c39f")}${limb([D.kn, D.an], 10, "#b39a74", "#8e7a58", "#d6c39f")}
+      <rect x="251" y="188" width="10" height="5" rx="2" fill="#f3f3f3"/>${shoe(D.an[0], D.an[1] + 1, 1, "#6b4a33", "#4a3122")}
+      <!-- torso (polo) -->
+      <path d="M216 165C214 150 219 131 230 119Q238 113 246 118C250 123 249 135 245 147C243 154 241 161 240 166Z" fill="url(#polo)" stroke="#25587a" stroke-width="1"/>
+      <path d="M221 150C220 141 222 132 227 125" stroke="#25587a" stroke-width="1.2" fill="none" opacity=".45"/><path d="M245 125C247 131 246 138 243 145" stroke="#9fd0ea" stroke-width="1.4" fill="none" opacity=".5"/>
+      <path d="M${D.sh[0] - 4} ${D.sh[1] - 2}l4 7 5-6" fill="#2f6f92" stroke="#25587a" stroke-width="1"/><path d="M${D.sh[0]} ${D.sh[1] + 5}l-1.4 9" stroke="#25587a" stroke-width="1"/>
+      <path d="M217 162l23 3" stroke="#25587a" stroke-width="2.2" opacity=".55"/>
+      <!-- near arm: short sleeve then forearm -->
+      ${limb([[242, 121], [253, 125]], 9, "#3d84a8", "#25587a", "#6fb4d6")}
+      ${limb([[252, 125], D.el, D.wr], 6.6, SK[0], SK[1], SK[2])}<ellipse cx="${D.wr[0] + 4}" cy="${D.wr[1]}" rx="4.2" ry="3.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
+      ${head(D.head[0], D.head[1], 8.2, 10, { hair: "short", hc: "#6d6865", hl: "#b5b0aa", brow: "#4a4442", glasses: true })}
+      <path d="M${D.head[0] + 10} ${D.head[1] - 6}l3-2M${D.head[0] + 11} ${D.head[1] - 1}h3" stroke="#7ec8ff" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+`;
     return `<svg class="scene" viewBox="0 0 400 250" role="img" aria-label="ภาพลูกสาวเชียร์พ่อที่กำลังทำท่าสควอทกับเก้าอี้ที่บ้าน โดยมีโทรศัพท์และ AI นับจำนวนครั้ง">
       <defs>
         <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbeedd"/><stop offset=".6" stop-color="#f3dcc0"/><stop offset="1" stop-color="#e8c9a6"/></linearGradient>
@@ -1884,57 +1951,14 @@ Return only the edited image.`;
       <rect x="324" y="136" width="22" height="3" rx="1.5" fill="#3c4a78"/><rect x="324" y="136" width="18" height="3" rx="1.5" fill="#7ef0b8"/>
       <!-- rug -->
       <ellipse cx="232" cy="206" rx="86" ry="12" fill="#e9d6bd"/><ellipse cx="232" cy="206" rx="78" ry="9" fill="none" stroke="#d98f6c" stroke-width="1.6" stroke-dasharray="5 4"/>
-      <!-- chair (behind dad) -->
-      ${shadowE(200, 200, 30, 4, 0.35)}
-      <path d="M186 98c-3 20-3 40-1 62" stroke="#8a5629" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M186 104h10M186 120h8" stroke="#8a5629" stroke-width="3" stroke-linecap="round"/>
-      <rect x="182" y="156" width="44" height="7" rx="2.5" fill="url(#wood)"/><path d="M188 163v34M220 163v34" stroke="#8a5629" stroke-width="4" stroke-linecap="round"/>
-      <!-- daughter (cheering) -->
-      ${shadowE(90, 206, 26, 4, 0.4)}
-      ${limb([[82, 150], [80, 177], [78, 201]], 9, "#2f3b6b", "#1f2850", "#4a5a94")}
-      ${limb([[92, 150], [95, 177], [97, 201]], 9, "#34417a", "#1f2850", "#4a5a94")}
-      <path d="M70 200c0-4 4-6 9-6s7 2 7 6v3H70z" fill="#fff" stroke="#c9ced8" stroke-width="1"/><path d="M90 200c0-4 4-6 9-6s7 2 7 6v3H90z" fill="#fff" stroke="#c9ced8" stroke-width="1"/><path d="M71 202h15M91 202h15" stroke="#ef8a9a" stroke-width="2"/>
-      ${limb([[79, 114], [68, 130], [74, 118]], 6.5, SK[0], SK[1], SK[2])}<circle cx="75" cy="117" r="4.6" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
-      <path d="M74 112c4-4 22-4 26 0l3 40H71z" fill="url(#top)"/><path d="M82 110c2 4 8 4 10 0" stroke="#c9553a" stroke-width="1.4" fill="${SK[0]}"/>
-      <path d="M72 113c-4 2-6 7-5 12l8 1 2-12z" fill="url(#top)"/><path d="M101 113c4 1 7 6 7 10l-7 3-2-12z" fill="url(#top)"/><path d="M86 112v40" stroke="#c9553a" stroke-width="1" opacity=".35"/><path d="M75 140c8 3 18 3 26 0" stroke="#c9553a" stroke-width="1" opacity=".4" fill="none"/>
-      ${limb([[97, 114], [110, 96], [114, 76]], 6.5, SK[0], SK[1], SK[2])}
-      <g transform="translate(114 70) rotate(-10)"><ellipse cx="0" cy="0" rx="5.4" ry="6.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/><path d="M-4-5v-5M-1.4-6v-6M1.4-6v-6M4-5v-4" stroke="${SK[0]}" stroke-width="2.6" stroke-linecap="round"/></g>
-      <rect x="84" y="102" width="8" height="10" rx="3" fill="${SK[1]}"/>
-      <ellipse cx="88" cy="91" rx="11.5" ry="12.5" fill="url(#faceL)"/>
-      <path d="M76 90c-1-10 6-17 13-17 8 0 14 6 13 15-4-6-9-8-14-8-5 0-9 3-12 10z" fill="#2a1f1b"/><path d="M98 80c8 2 12 10 10 22-3-4-5-10-6-16z" fill="#2a1f1b"/><path d="M82 77c4-2 9-2 13 0" stroke="#5a463c" stroke-width="1.4" opacity=".6" fill="none"/>
-      <circle cx="104" cy="82" r="3.2" fill="#ef7d5e"/>
-      <ellipse cx="84.5" cy="91" rx="1.5" ry="2" fill="#2a1f1b"/><ellipse cx="92.5" cy="91" rx="1.5" ry="2" fill="#2a1f1b"/><circle cx="85" cy="90.3" r=".5" fill="#fff"/><circle cx="93" cy="90.3" r=".5" fill="#fff"/>
-      <path d="M82.5 87c1.5-1 3.5-1 4.5 0M90.5 87c1.5-1 3.5-1 4.5 0" stroke="#2a1f1b" stroke-width="1" stroke-linecap="round" fill="none"/>
-      <path d="M84 96.5c2.5 3 7 3 9.5 0" stroke="#9c3b2e" stroke-width="1.3" fill="#fff" stroke-linecap="round"/>
-      <circle cx="81.5" cy="95" r="2.2" fill="#f28c8c" opacity=".45"/><circle cx="95.5" cy="95" r="2.2" fill="#f28c8c" opacity=".45"/>
-      <!-- dad (chair squat) -->
-      ${shadowE(250, 202, 30, 4.5, 0.4)}
-      ${limb([[212, 152], [250, 154], [246, 194]], 13, "#9c8664", "#7a6646", null)}
-      <path d="M239 191h11l1 4c4 0 8 1 8 5H238z" fill="#5a3d29" stroke="#3d2819" stroke-width="1"/>
-      ${limb([[226, 108], [252, 116], [277, 118]], 8, "#2f6f92", "#1f5373", null)}<ellipse cx="280" cy="118" rx="4.5" ry="3.6" fill="${SK[1]}"/>
-      ${limb([D.hip, D.kn], 15, "#b9a27e", "#8e7a58", "#d6c39f")}
-      ${limb([D.kn, D.an], 12, "#b39a74", "#8e7a58", "#d6c39f")}
-      <path d="M248 192h12l1 4c4 0 9 1 9 5H247z" fill="#6b4a33" stroke="#4a3122" stroke-width="1"/><rect x="249" y="187" width="11" height="6" rx="2" fill="#f3f3f3"/>
-      <path d="M212 102c10-6 26-4 32 4l-6 46-26 2c-6-14-6-34 0-52z" fill="url(#polo)"/><path d="M224 104l6 10 6-8" fill="#2f6f92" stroke="#25587a" stroke-width="1"/><path d="M228 114v14" stroke="#25587a" stroke-width="1"/><circle cx="228" cy="119" r="1" fill="#e6f1f7"/><circle cx="228" cy="124" r="1" fill="#e6f1f7"/>
-      <path d="M216 120c-2 10-2 20 0 30" stroke="#25587a" stroke-width="1.2" opacity=".5" fill="none"/><path d="M212 150h28" stroke="#25587a" stroke-width="3" opacity=".5"/>
-      ${limb([D.sh, D.el], 9, "#3d84a8", "#25587a", "#6fb4d6")}
-      ${limb([D.el, D.wr], 7, SK[0], SK[1], SK[2])}<ellipse cx="288" cy="112" rx="5" ry="4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
-      <rect x="236" y="92" width="9" height="11" rx="3" fill="${SK[1]}"/>
-      <ellipse cx="241" cy="83" rx="12" ry="13" fill="url(#faceL)"/><ellipse cx="229.6" cy="84" rx="2.4" ry="3.4" fill="${SK[1]}"/>
-      <path d="M229 82c-1-11 6-17 14-17 7 0 12 5 12 11-3-3-6-4-10-4-6 0-10 2-14 6z" fill="#5f5a57"/><path d="M233 70c4-3 12-3 16 1" stroke="#9a9590" stroke-width="1.6" fill="none"/>
-      <path d="M238 77.5c1.5-.8 3-.8 4.5 0M246 77.5c1.5-.8 3-.8 4.5 0" stroke="#4a4442" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-      <rect x="236.6" y="79.5" width="7" height="5" rx="2" fill="none" stroke="#3a3f45" stroke-width="1"/><rect x="245.6" y="79.5" width="7" height="5" rx="2" fill="none" stroke="#3a3f45" stroke-width="1"/><path d="M243.6 82h2" stroke="#3a3f45" stroke-width="1"/>
-      <circle cx="240" cy="82.2" r="1.1" fill="#2a1f1b"/><circle cx="249" cy="82.2" r="1.1" fill="#2a1f1b"/>
-      <path d="M247 86.5c1 1.6 1 3-1 3.6" stroke="${SK[1]}" stroke-width="1" fill="none" stroke-linecap="round"/>
-      <path d="M242 91c2.4 2 6 2 8.4-.4" stroke="#8a3b2e" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M244 94c2 .8 4 .6 5.6-.2" stroke="${SK[1]}" stroke-width=".8" fill="none" opacity=".6"/>
-      <path d="M254 74c3 2 4 5 4 8" stroke="#f4a261" stroke-width="1.4" fill="none" opacity=".0"/>
-      <path d="M256 78l3-2M257 83l3 0" stroke="#7ec8ff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>
+      ${people}
       <!-- AI pose overlay -->
       <g stroke="#7ef0b8" stroke-width="2.4" stroke-linecap="round" opacity=".9">${skel}</g>
       <g fill="#fff" stroke="#3d84a8" stroke-width="1.5">${dots}</g>
       <path d="M${D.kn[0] - 12} ${D.kn[1]} A12 12 0 0 1 ${D.kn[0]} ${D.kn[1] + 12}" stroke="#ffd166" stroke-width="2" fill="none"/>
       <g class="float" filter="url(#soft)"><rect x="${D.kn[0] + 8}" y="${D.kn[1] - 34}" width="34" height="18" rx="9" fill="#1f2550"/><text x="${D.kn[0] + 25}" y="${D.kn[1] - 21.5}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" font-family="Outfit, sans-serif">92°</text></g>
       <path d="M${D.kn[0] + 50} ${D.kn[1] - 46}l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#f2c94c"/>
-      ${bubble(56, 30, 80, "เก่งมาก พ่อ!", 100)}
+      ${bubble(124, 52, 80, "เก่งมาก พ่อ!", 130)}
       ${bubble(270, 50, 96, "ย่อได้ลึกขึ้นแล้ว", 318)}
       <!-- cat napping on the rug -->
       ${shadowE(282, 220, 22, 3, 0.3)}
