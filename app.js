@@ -92,7 +92,7 @@
   }
 
   /* ---------- router ---------- */
-  const VIEWS = ["welcome", "home", "risk", "exercise", "tracking", "game", "fitness", "body", "transform", "consult", "tree", "food", "profile"];
+  const VIEWS = ["welcome", "home", "risk", "exercise", "tracking", "game", "fitness", "body", "transform", "consult", "tree", "food", "profile", "eval", "privacy"];
   let lastView = null;
   function route() {
     const hx = location.hash.slice(1);
@@ -106,10 +106,10 @@
     if (hx.startsWith("ex-") && (PROGRAMS[hx.slice(3)] || hx === "ex-mine" || hx === "ex-rx")) { exTab = hx.slice(3); renderExercise(); }
     const ptLink = /^consult\/pt\/[a-z0-9]{6,16}$/.test(hx); // physiotherapist joins a call from a shared link (no patient login needed)
     let v = ptLink ? "consult" : hx.startsWith("ex-") ? "exercise" : VIEWS.includes(hx) ? hx : "home";
-    if (!session() && v !== "welcome" && !ptLink) v = "welcome";
+    if (!session() && v !== "welcome" && v !== "privacy" && !ptLink) v = "welcome";
     document.body.classList.toggle("is-ptlink", ptLink && !session());
     if (session() && v === "welcome" && location.hash !== "#welcome") v = "home";
-    document.body.classList.toggle("is-welcome", v === "welcome");
+    document.body.classList.toggle("is-welcome", v === "welcome" || (v === "privacy" && !session()));
     VIEWS.forEach((x) => ($("#view-" + x).hidden = x !== v));
     $$(".nav a").forEach((a) => a.classList.toggle("active", a.dataset.view === v));
     if (v === "body") renderBody();

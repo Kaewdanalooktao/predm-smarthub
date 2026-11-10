@@ -12,4 +12,9 @@ window.PREDM_CONFIG = {
   // each other; it never sees picture, sound, chat or health data. Replace with your own server (e.g. coturn) to keep
   // even this inside the organisation, or use [] to allow calls only on the same local network.
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun.cloudflare.com:3478" }],
+  // LINE Official Account for reminders: the basic ID shown in LINE Official Account Manager, e.g. "@123abcde".
+  // Leave empty to hide the LINE connection. Setup steps: supabase/LINE_SETUP.md
+  lineOaId: "",
+  // Who people contact about their personal data (shown on the PDPA page), e.g. "รพ.สต. … โทร 0xx-xxx-xxxx".
+  privacyContact: "",
 };

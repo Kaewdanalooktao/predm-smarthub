@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=137">
+<link rel="stylesheet" href="styles.css?v=139">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -41,6 +41,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
       <a href="#food" data-view="food" aria-label="บันทึกอาหาร"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h18a9 9 0 0 1-18 0z"/><path d="M8 9c0-2 2-2 2-4M12 9c0-2 2-2 2-4M16 9c0-2 2-2 2-4"/></svg><span>บันทึกอาหาร</span></a>
       <a href="#tree" data-view="tree" aria-label="ต้นไม้สุขภาพ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-4 0-6.5-2.4-6.5-5.4C5.5 5.7 8.4 3 12 3s6.5 2.7 6.5 5.6c0 3-2.5 5.4-6.5 5.4z"/><path d="M8 21h8"/></svg><span>ต้นไม้ของฉัน</span></a>
       <a href="#consult" data-view="consult" aria-label="ปรึกษานักกายภาพ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3"/><path d="M15.5 10.5l6-3.5v10l-6-3.5"/><path d="M6.5 12h5M9 9.5v5"/></svg><span>ปรึกษานักกายภาพ</span></a>
+      <a href="#eval" data-view="eval" aria-label="ประเมินผลก่อน–หลัง"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/><path d="M15 6l3-3 3 3"/></svg><span>ประเมินผลก่อน–หลัง</span></a>
+      <a href="#privacy" data-view="privacy" aria-label="ความเป็นส่วนตัว (PDPA)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.6-3.2 8-8 9-4.8-1-8-4.4-8-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg><span>ความเป็นส่วนตัว (PDPA)</span></a>
     </nav>
     <div class="nav-foot">
       <button class="nav-btn theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>โหมดสว่าง/มืด</span></button>
@@ -71,6 +73,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <div id="welcomeGuide"></div>
         <a class="w-link" href="landing.html" id="tourLink">ดูภาพรวมระบบ Pre-DM (แพลตฟอร์มอ่อนหวานวิทยา) →</a>
         <a class="w-link" href="manual.html">📘 คู่มือการใช้งานระบบ →</a>
+        <a class="w-link" href="#privacy">🛡️ นโยบายความเป็นส่วนตัว (PDPA) →</a>
         <button class="w-link install-link" type="button" data-install hidden>📲 ติดตั้งเป็นแอปบนโทรศัพท์ →</button>
         <p class="w-desc">ระบบส่งเสริมการออกกำลังกายสำหรับกลุ่มเสี่ยงเบาหวาน ประเมินความเสี่ยงด้วย Thai Diabetes Risk Score ฝึกตามโปรแกรม 4 แบบ มี AI ตรวจท่าและนับครั้ง พร้อมติดตามสมรรถภาพกายและ Body Composition</p>
         <nav class="w-pillars" aria-label="ความสามารถหลักของระบบ"><a class="pillar" href="index.html#risk"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Smart Screening</a><a class="pillar" href="index.html#body"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 9a5.6 5.6 0 0 1 8 0M12 9.6l1.4-2"/></svg>Body Composition</a><a class="pillar" href="index.html#tracking"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 7M12 13l4 7M6 10l6-2 6 2"/></svg>AI Exercise</a><a class="pillar" href="index.html#transform"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-5 4 3 7-8"/><path d="M15 8h5v5"/></svg>AI Body Transformation</a></nav>
@@ -455,6 +458,27 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
       </header>
       <div id="profileRoot"></div>
       <div id="remindRoot"></div>
+      <div id="lineRoot"></div>
+    </section>
+
+    <!-- PRIVACY (PDPA) -->
+    <section id="view-privacy" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">PDPA · พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562</p>
+        <h1>ความเป็นส่วนตัวและข้อมูลของฉัน</h1>
+        <p class="lede">ระบบเก็บอะไร เก็บที่ไหน ใครเห็นได้ และคุณจัดการข้อมูลของตัวเองได้ที่นี่</p>
+      </header>
+      <div id="pdpaRoot"></div>
+    </section>
+
+    <!-- EVALUATION (pre / post) -->
+    <section id="view-eval" class="view" hidden>
+      <header class="page-head">
+        <p class="eyebrow">Pre–Post Evaluation · ประเมินผลก่อน–หลัง</p>
+        <h1>ประเมินผลก่อน–หลังเข้าร่วม</h1>
+        <p class="lede">วัดความรู้ พฤติกรรม และค่าสุขภาพ ก่อนเริ่มและหลังใช้ระบบ เพื่อดูว่าเปลี่ยนไปแค่ไหน</p>
+      </header>
+      <div id="evalRoot"></div>
     </section>
 
     <!-- FOOD -->
@@ -632,9 +656,9 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="guide.js?v=3"></script>
 <script src="care.js?v=1"></script>
 <script src="chatkb.js?v=7"></script>
-<script src="app.js?v=113"></script>
-<script src="config.js?v=5"></script>
-<script src="db.js?v=9"></script>
+<script src="app.js?v=114"></script>
+<script src="config.js?v=6"></script>
+<script src="db.js?v=10"></script>
 <script src="hub.js?v=8"></script>
 <script src="tree.js?v=2"></script>
 <script src="music.js?v=1"></script>
@@ -652,5 +676,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="aiplan.js?v=2"></script>
 <script src="pulse.js?v=1"></script>
 <script src="smartgoal.js?v=2"></script>
+<script src="pdpa.js?v=3"></script>
+<script src="evalpp.js?v=2"></script>
+<script src="line.js?v=2"></script>
 </body>
 </html>
