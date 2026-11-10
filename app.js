@@ -1874,12 +1874,12 @@ Return only the edited image.`;
       ${limb([[94, 136], G.kR], 9.5, "#34417a", "#1f2850", "#4a5a94")}${limb([G.kR, G.aR], 7.5, "#34417a", "#1f2850", "#4a5a94")}
       ${shoe(G.aL[0], G.aL[1] + 2, 0.82, "#fff", "#c9ced8")}${shoe(G.aR[0], G.aR[1] + 2, 0.82, "#fff", "#c9ced8")}
       ${torso([89, 128], G.hip, 22, 22, "#2f3b6b", "#1f2850")}
-      ${limb([[78, 102], [72, 123], [79, 106]], 5.2, SK[0], SK[1], SK[2])}<circle cx="79.5" cy="105" r="3.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
+      ${limb([[78, 102], [70, 117], [78, 130]], 5.6, SK[0], SK[1], SK[2])}<circle cx="79" cy="131" r="3.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width="1"/>
       ${torso(G.sh, G.waist, 25, 21, "url(#top)", "#c9553a")}
       <circle cx="77.5" cy="103" r="4.6" fill="url(#top)" stroke="#c9553a" stroke-width=".8"/><circle cx="100.5" cy="103" r="4.6" fill="url(#top)" stroke="#c9553a" stroke-width=".8"/>
       <path d="M78 126h22" stroke="#c9553a" stroke-width="1" opacity=".45"/>
-      ${limb([[101, 102], [108, 83], [112, 64]], 5.2, SK[0], SK[1], SK[2])}
-      <g transform="translate(113 59) rotate(-8)"><ellipse cx="0" cy="0" rx="3.6" ry="4.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width=".9"/><path d="M-2.6-3.4v-3.6M-.9-4.2v-4.2M.9-4.2v-4.2M2.6-3.4v-3M3.6 0l2.6-2" stroke="${SK[0]}" stroke-width="1.8" stroke-linecap="round"/></g>
+      ${limb([[101, 102], [107, 87], [110, 73]], 5.8, SK[0], SK[1], SK[2])}
+      <g transform="translate(111 68.5) rotate(-8) scale(.9)"><ellipse cx="0" cy="0" rx="3.6" ry="4.4" fill="${SK[0]}" stroke="${SK[1]}" stroke-width=".9"/><path d="M-2.6-3.4v-3.6M-.9-4.2v-4.2M.9-4.2v-4.2M2.6-3.4v-3M3.6 0l2.6-2" stroke="${SK[0]}" stroke-width="1.8" stroke-linecap="round"/></g>
       ${head(G.head[0], G.head[1], 7.2, 8.8, { hair: "pony", hc: "#2a1f1b", hl: "#5a463c", brow: "#2a1f1b", blush: true, teeth: true })}
       <!-- dad: far limbs first (in shadow) -->
       ${shadowE(256, 201, 28, 4.2, 0.4)}
