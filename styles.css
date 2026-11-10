@@ -1933,4 +1933,3 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
 .nd-res-top { display: flex; align-items: center; justify-content: center; gap: 10px; } .nd-res-top .nd-bowl { width: 190px; } .nd-av { font-size: 3.4rem; }
 .hand-on { margin: 8px 0; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, #5b8cff 12%, transparent); font-size: .84rem; font-weight: 600; }
 @media (max-width: 760px) { .hk-bowl { width: 62vw; bottom: 100px; } .hk-plate2.small { width: 140px; } }
-.aon-chips img { width: 20px; height: 20px; object-fit: contain; margin-left: -2px; }
