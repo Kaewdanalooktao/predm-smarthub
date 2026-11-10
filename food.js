@@ -232,6 +232,33 @@
     const kcal = Math.max(1300, Math.min(2400, Math.round((bmr * 1.4 - (bmi >= 23 ? 300 : 0)) / 50) * 50));
     return { kcal, carb: Math.round((kcal * 0.5) / 4), sugar: 24, na: 2000, fib: 25, sticky: 2 };
   }
+  /* ---------- dish photos: stay on this device (IndexedDB), never mirrored to the cloud ---------- */
+  const PIC = (() => {
+    let dbp = null; const urls = new Map();
+    const open = () => dbp || (dbp = new Promise((res, rej) => { const r = indexedDB.open("predm-foodpics", 1); r.onupgradeneeded = () => r.result.createObjectStore("pics"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }).catch((e) => { dbp = null; throw e; }));
+    const tx = async (mode, fn) => { const d = await open(); return new Promise((res, rej) => { const t = d.transaction("pics", mode), rq = fn(t.objectStore("pics")); t.oncomplete = () => res(rq?.result); t.onerror = t.onabort = () => rej(t.error); }); };
+    return {
+      async put(id, blob) { await tx("readwrite", (s) => s.put(blob, id)); if (urls.has(id)) URL.revokeObjectURL(urls.get(id)); urls.set(id, URL.createObjectURL(blob)); },
+      async url(id) { if (urls.has(id)) return urls.get(id); try { const b = await tx("readonly", (s) => s.get(id)); if (!b) return null; const u = URL.createObjectURL(b); urls.set(id, u); return u; } catch { return null; } },
+      async del(id) { if (urls.has(id)) { URL.revokeObjectURL(urls.get(id)); urls.delete(id); } try { await tx("readwrite", (s) => s.delete(id)); } catch { /* */ } },
+    };
+  })();
+  function shrink(file, max = 800, q = 0.72) { // phone photos are several MB: keep a small JPEG
+    return new Promise((res, rej) => {
+      if (!file || !file.type.startsWith("image/")) return rej(new Error("type"));
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => { try { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob((b) => (b ? res(b) : rej(new Error("blob"))), "image/jpeg", q); } catch (e) { rej(e); } };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("decode")); };
+      img.src = url;
+    });
+  }
+  async function setPic(id, blob) {
+    try { await PIC.put(id, blob); saveLogs(logs().map((l) => (l.id === id ? { ...l, pic: 1 } : l))); return true; }
+    catch { A().toast("เก็บรูปไม่สำเร็จ พื้นที่ในเครื่องอาจเต็ม"); return false; }
+  }
+  async function hydratePics() {
+    for (const im of $$("#foodRoot img[data-picid]")) { const u = await PIC.url(im.dataset.picid); if (u) im.src = u; else im.closest(".fd-thumb")?.remove(); }
+  }
   const logs = () => A().store.get("food", []);
   const saveLogs = (l) => A().store.set("food", l);
   function dayTotals(date) {
@@ -270,7 +297,7 @@
         <button type="button" class="pa" data-add="${k}" aria-label="หยิบกับข้าวจากตู้ใส่${k === "s" ? "ถาดของว่าง" : "พาข้าว" + label}">${trayDishes(items)}${items.length ? "" : `<span class="pa-empty">พายังว่าง<br><b>แตะเพื่อหยิบกับข้าว</b></span>`}</button>
         <button class="btn sm pa-add" type="button" data-add="${k}">🗄️ หยิบจากตู้กับข้าว</button>
         ${items.length ? ownLine(items, sc) : ""}
-        ${items.length ? `<ul class="fd-items">${items.map((x) => `<li><span class="fd-e">${FI(x.d.e, x.d.key)}</span><span class="fd-n"><b>${esc(x.d.n)}</b><small>${x.portion !== 1 ? `× ${x.portion} · ` : ""}${esc(x.d.unit || "")} · ${r0(x.d.kcal * x.portion)} kcal · คาร์บ ${r0(x.d.carb * x.portion)} ก.${x.ai ? " · 📷 AI" : ""}</small></span>${(x.d.flags || []).filter((f) => FLAG[f]).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}<button type="button" class="fd-del" data-del="${x.id}" aria-label="ลบ ${esc(x.d.n)}">✕</button></li>`).join("")}</ul>` : `<p class="fd-empty">ยังไม่ได้บันทึก</p>`}
+        ${items.length ? `<ul class="fd-items">${items.map((x) => `<li><span class="fd-e">${FI(x.d.e, x.d.key)}</span><span class="fd-n"><b>${esc(x.d.n)}</b><small>${x.portion !== 1 ? `× ${x.portion} · ` : ""}${esc(x.d.unit || "")} · ${r0(x.d.kcal * x.portion)} kcal · คาร์บ ${r0(x.d.carb * x.portion)} ก.${x.ai ? " · 📷 AI" : ""}</small></span>${(x.d.flags || []).filter((f) => FLAG[f]).map((f) => `<i class="fd-flag" style="--fc:${FLAG[f][1]}">${FLAG[f][0]}</i>`).join("")}${x.pic ? `<button type="button" class="fd-thumb" data-pic="${x.id}" aria-label="ดูรูป ${esc(x.d.n)}"><img data-picid="${x.id}" alt=""></button>` : `<button type="button" class="fd-cam" data-snapfor="${x.id}" aria-label="ถ่ายรูป ${esc(x.d.n)} เก็บไว้">📷</button>`}<button type="button" class="fd-del" data-del="${x.id}" aria-label="ลบ ${esc(x.d.n)}">✕</button></li>`).join("")}</ul>` : `<p class="fd-empty">ยังไม่ได้บันทึก</p>`}
       </section>`;
     }).join("");
     root.innerHTML = `
@@ -295,8 +322,10 @@
         </aside>
       </div>
       <p class="disclaimer">ค่าสารอาหารเป็นค่าประมาณต่อ 1 ที่เสิร์ฟทั่วไป ขึ้นกับสูตรและปริมาณจริง ใช้เพื่อติดตามพฤติกรรม ไม่ใช่ผลตรวจทางโภชนาการ</p>
+      <input id="fdSnapLater" type="file" accept="image/*" capture="environment" hidden>
+      ${F.view ? `<div class="fd-lightbox" role="dialog" aria-modal="true" aria-label="รูปอาหาร"><div class="fd-lb-in"><img data-picid="${F.view}" alt="รูปอาหารที่บันทึกไว้"><div class="btns"><button class="btn" type="button" data-snapfor="${F.view}">📷 ถ่ายใหม่</button><button class="btn" type="button" data-picdel="${F.view}">ลบรูป</button><button class="btn primary" type="button" data-lbclose>ปิด</button></div><p class="hint">รูปเก็บไว้ในเครื่องนี้เท่านั้น</p></div></div>` : ""}
       ${F.add ? addPanel() : ""}`;
-    drawWeek();
+    drawWeek(); hydratePics();
   }
   // dishes laid out around the tray; sticky rice sits in a กระติบ
   function trayDishes(items) {
@@ -361,6 +390,7 @@
           <div class="fd-por">${PORTIONS.map(([v, l]) => `<button type="button" aria-pressed="${v === F.portion}" data-por="${v}">${l}</button>`).join("")}</div>
           <div class="fd-nut"><span>${r0(pick.kcal * F.portion)} <small>kcal</small></span><span>คาร์บ ${r0(pick.carb * F.portion)} ก.</span><span>น้ำตาล ${r0(pick.sugar * F.portion)} ก.</span><span>โซเดียม ${r0(pick.na * F.portion)} มก.</span></div>
           ${pick.tip ? `<p class="fd-tip">💡 ${esc(pick.tip)}</p>` : ""}
+          <div class="fd-snap">${F.photo ? `<img src="${F.photo.url}" alt="รูปอาหารที่ถ่าย"><span><b>แนบรูปแล้ว</b><small>เก็บไว้ในเครื่องนี้เท่านั้น</small></span><label class="btn sm" for="fdSnap">ถ่ายใหม่</label><button class="btn sm" type="button" data-snapclear>เอาออก</button>` : `<label class="btn fd-snap-b" for="fdSnap">📷 ถ่ายรูปอาหารจานนี้เก็บไว้ <small>(ไม่บังคับ)</small></label>`}<input id="fdSnap" type="file" accept="image/*" capture="environment" hidden></div>
           <button class="btn primary" type="button" data-save>วางลง${meal[0] === "s" ? "ถาดของว่าง" : "พาข้าว" + meal[1]}</button></div>` : ""}`}
     </div></div>`;
   }
@@ -410,33 +440,44 @@
     img.src = url;
   }
   function addEntry(key, portion, meal, ai) {
-    const l = logs(); l.push({ id: "f" + Date.now() + Math.random().toString(36).slice(2, 6), date: F.date, meal, key, portion, ai: !!ai, at: new Date().toISOString() }); saveLogs(l.slice(-3000));
+    const id = "f" + Date.now() + Math.random().toString(36).slice(2, 6);
+    const l = logs(); l.push({ id, date: F.date, meal, key, portion, ai: !!ai, at: new Date().toISOString() }); saveLogs(l.slice(-3000));
+    return id;
   }
+  const clearPhoto = () => { if (F.photo) { URL.revokeObjectURL(F.photo.url); F.photo = null; } };
+  const dataUrlBlob = (du) => { const [h, b] = du.split(","), bin = atob(b), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return new Blob([u8], { type: h.match(/:(.*?);/)[1] }); };
 
   /* ---------- events ---------- */
   document.addEventListener("click", (e) => {
     const root = $("#foodRoot"); if (!root || !root.contains(e.target)) return;
     const t = (s) => e.target.closest(s);
     if (t("[data-day]")) { const n = addDays(F.date, +t("[data-day]").dataset.day); if (n <= todayISO()) { F.date = n; render(); } return; }
-    if (t("[data-add]")) { F.add = t("[data-add]").dataset.add; F.pick = null; F.portion = 1; F.q = ""; F.ai = null; render(); $("#fdQ")?.focus(); return; }
-    if (t("[data-close]") || e.target.classList.contains("fd-modal")) { F.add = null; F.ai = null; return render(); }
-    if (t("[data-del]")) { saveLogs(logs().filter((l) => l.id !== t("[data-del]").dataset.del)); return render(); }
+    if (t("[data-add]")) { F.add = t("[data-add]").dataset.add; F.pick = null; F.portion = 1; F.q = ""; F.ai = null; clearPhoto(); render(); $("#fdQ")?.focus(); return; }
+    if (t("[data-lbclose]") || e.target.classList.contains("fd-lightbox")) { F.view = null; return render(); }
+    if (t("[data-picdel]")) { const id = t("[data-picdel]").dataset.picdel; PIC.del(id); saveLogs(logs().map((l) => { if (l.id !== id) return l; const { pic, ...rest } = l; return rest; })); F.view = null; A().toast("ลบรูปแล้ว"); return render(); }
+    if (t("[data-snapfor]")) { F.snapFor = t("[data-snapfor]").dataset.snapfor; $("#fdSnapLater")?.click(); return; }
+    if (t("[data-pic]")) { F.view = t("[data-pic]").dataset.pic; return render(); }
+    if (t("[data-snapclear]")) { clearPhoto(); return render(); }
+    if (t("[data-close]") || e.target.classList.contains("fd-modal")) { F.add = null; F.ai = null; clearPhoto(); return render(); }
+    if (t("[data-del]")) { const id = t("[data-del]").dataset.del; PIC.del(id); saveLogs(logs().filter((l) => l.id !== id)); return render(); }
     if (t("[data-mode]")) { F.ai = t("[data-mode]").dataset.mode === "photo" ? F.ai || {} : null; return render(); }
     if (t("[data-cat]")) { F.cat = t("[data-cat]").dataset.cat; return render(); }
     if (t("[data-pick]")) { F.pick = t("[data-pick]").dataset.pick; F.portion = 1; render(); $(".fd-pick")?.scrollIntoView({ block: "nearest" }); return; }
     if (t("[data-por]")) { F.portion = +t("[data-por]").dataset.por; return render(); }
-    if (t("[data-save]")) { addEntry(F.pick, F.portion, F.add, false); A().toast(`บันทึก ${byKey[F.pick].n} แล้ว`); F.add = null; return render(); }
+    if (t("[data-save]")) { const id = addEntry(F.pick, F.portion, F.add, false), ph = F.photo; A().toast(`บันทึก ${byKey[F.pick].n} แล้ว${ph ? " พร้อมรูป" : ""}`); F.add = null; F.photo = null; render(); if (ph) setPic(id, ph.blob).then(() => { URL.revokeObjectURL(ph.url); render(); }); return; }
     if (t("[data-aigo]")) return analyze();
     if (t("[data-aireset]")) { F.ai = {}; return render(); }
     if (t("[data-aipor]")) { const [i, v] = t("[data-aipor]").dataset.aipor.split(":"); F.ai.results[+i].portion = +v; return render(); }
-    if (t("[data-aisave]")) { const on = F.ai.results.filter((r) => r.on); on.forEach((r) => addEntry(r.key, r.portion, F.add, true)); A().toast(`บันทึก ${on.length} เมนูจากรูปแล้ว`); F.add = null; F.ai = null; return render(); }
+    if (t("[data-aisave]")) { const on = F.ai.results.filter((r) => r.on), ids = on.map((r) => addEntry(r.key, r.portion, F.add, true)), pv = F.ai.preview; A().toast(`บันทึก ${on.length} เมนูจากรูปแล้ว`); F.add = null; F.ai = null; render(); if (ids[0] && pv) { try { setPic(ids[0], dataUrlBlob(pv)).then(render); } catch { /* */ } } return; }
   });
   document.addEventListener("change", (e) => {
     if (e.target.id === "fdPhoto") loadPhoto(e.target.files[0]);
+    if (e.target.id === "fdSnap") { shrink(e.target.files[0]).then((blob) => { clearPhoto(); F.photo = { blob, url: URL.createObjectURL(blob) }; render(); $(".fd-pick")?.scrollIntoView({ block: "nearest" }); }).catch(() => A().toast("เปิดรูปนี้ไม่ได้ ลองถ่ายใหม่อีกครั้ง")); }
+    if (e.target.id === "fdSnapLater") { const id = F.snapFor, f = e.target.files[0]; F.snapFor = null; if (id && f) shrink(f).then((blob) => setPic(id, blob)).then((ok) => { if (ok) A().toast("เก็บรูปแล้ว"); render(); }).catch(() => A().toast("เปิดรูปนี้ไม่ได้ ลองถ่ายใหม่อีกครั้ง")); }
     if (e.target.dataset?.aion != null) { F.ai.results[+e.target.dataset.aion].on = e.target.checked; render(); }
   });
   document.addEventListener("input", (e) => { if (e.target.id === "fdQ") { F.q = e.target.value; const pos = e.target.selectionStart; render(); const q = $("#fdQ"); q.focus(); q.setSelectionRange(pos, pos); } });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && F.add) { F.add = null; F.ai = null; render(); } });
+  document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; if (F.view) { F.view = null; render(); } else if (F.add) { F.add = null; F.ai = null; clearPhoto(); render(); } });
   window.addEventListener("predm:view", (e) => { if (e.detail === "food") render(); });
   if ($("#view-food") && !$("#view-food").hidden) render();
   window.PreDMFood = { DB, dayTotals, targets, add: (key, portion, meal) => { F.date = todayISO(); addEntry(key, portion, meal, false); render(); } };

@@ -6,8 +6,29 @@
   const KEY = "predm.v1.";
   const store = {
     get(k, d) { try { const v = localStorage.getItem(KEY + k); return v ? JSON.parse(v) : d; } catch { return d; } },
-    set(k, v) { try { localStorage.setItem(KEY + k, JSON.stringify(v)); } catch { /* storage unavailable */ } },
+    set(k, v) {
+      try { localStorage.setItem(KEY + k, JSON.stringify(v)); }
+      catch (e) { // storage full or blocked: tell the user once instead of losing data silently
+        if (!store._warned) { store._warned = true; setTimeout(() => { try { toast("พื้นที่เก็บข้อมูลในเครื่องเต็มหรือถูกปิด ข้อมูลล่าสุดอาจไม่ถูกบันทึก"); } catch { /* */ } }, 0); }
+      }
+    },
   };
+  /* ---------- safety net: one failing part must not take the whole app down ---------- */
+  function noteError(msg) { // kept on this device only (last 20), for troubleshooting
+    try { const k = KEY + "errlog", l = JSON.parse(localStorage.getItem(k) || "[]"); l.push({ at: new Date().toISOString(), msg: String(msg).slice(0, 300), view: location.hash }); localStorage.setItem(k, JSON.stringify(l.slice(-20))); } catch { /* */ }
+  }
+  window.addEventListener("error", (e) => {
+    const el = e.target;
+    if (el && el !== window && el.tagName === "SCRIPT" && el.src && el.src.startsWith(location.origin)) { // a script did not arrive (weak signal): reload once
+      noteError("load " + el.src);
+      let tried = false; try { tried = !!sessionStorage.getItem("predm.reloaded"); sessionStorage.setItem("predm.reloaded", "1"); } catch { tried = true; }
+      if (!tried && navigator.onLine) setTimeout(() => location.reload(), 800);
+      return;
+    }
+    if (e.message) noteError(e.message + " @" + (e.filename || "").split("/").pop() + ":" + e.lineno);
+  }, true);
+  window.addEventListener("unhandledrejection", (e) => { noteError("promise " + (e.reason?.message || e.reason)); });
+  window.addEventListener("offline", () => { try { toast("ออฟไลน์อยู่ ใช้งานต่อได้ ข้อมูลเก็บในเครื่อง"); } catch { /* */ } });
   const todayISO = () => new Date().toISOString().slice(0, 10);
   const thDate = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" });
   const fmt = (n, d = 1) => (n == null || n === "" || isNaN(n) ? "–" : Number(n).toFixed(d));
@@ -2021,7 +2042,9 @@ Return only the edited image.`;
   if (!document.getElementById("view-home")) return; // admin page: data only, no patient UI
   seedIfEmpty();
   $("#tArt").innerHTML = skeletonArt(P.squat); $("#gArt").innerHTML = fig(P.reach, `<circle cx="18" cy="14" r="9" fill="#5aaae6" opacity=".7"/><circle cx="86" cy="10" r="7" fill="#f0b440" opacity=".85"/><circle cx="84" cy="40" r="8" fill="#e05246" opacity=".7"/><circle cx="12" cy="44" r="6" fill="#5aaae6" opacity=".6"/>`, 1, { noBlob: true });
-  initZoom(); initBanners(); initWelcome(); initRisk(); initExercise(); initFitness(); initBody(); initTransform(); initChat(); initChatDock(); renderBadges();
-  window.addEventListener("hashchange", route); route();
+  [initZoom, initBanners, initWelcome, initRisk, initExercise, initFitness, initBody, initTransform, initChat, initChatDock, renderBadges].forEach((f) => { try { f(); } catch (e) { console.error(f.name, e); noteError("init " + f.name + ": " + e.message); } });
+  const safeRoute = () => { try { route(); } catch (e) { console.error(e); noteError("route: " + e.message); } };
+  window.addEventListener("hashchange", safeRoute); safeRoute();
+  setTimeout(() => { try { sessionStorage.removeItem("predm.reloaded"); } catch { /* */ } }, 15000); // loaded fine: allow one auto-reload again later
   window.PreDM = { store, addLog, toast, profile, renderBadges, renderHome, speak, speakTrack, calcRisk, PROGRAMS, TYPE_TH, openPlayer, normItem, estSecs, targetText }; // the last four are used by the AI plan (aiplan.js)
 })();
