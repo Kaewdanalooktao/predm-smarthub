@@ -1898,7 +1898,7 @@ Return only the edited image.`;
     toast("ยินดีต้อนรับ " + d.name); location.hash = "home";
   }
   function initWelcome() {
-    $("#sceneArt").innerHTML = sceneArt();
+    if (!$("#sceneArt").classList.contains("scene-photo")) $("#sceneArt").innerHTML = sceneArt(); // the sign-in page now uses a real photo
     renderDemo();
     $("#roleSwitch").addEventListener("click", (e) => {
       const b = e.target.closest("[data-role]"); if (!b) return;
