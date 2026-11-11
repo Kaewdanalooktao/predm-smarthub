@@ -15,6 +15,10 @@ window.PREDM_CONFIG = {
   // LINE Official Account for reminders: the basic ID shown in LINE Official Account Manager, e.g. "@123abcde".
   // Leave empty to hide the LINE connection. Setup steps: supabase/LINE_SETUP.md
   lineOaId: "@405uxbox",
+  // "Sign in with LINE": the Channel ID (numbers) of the LINE Login channel (LINE Developers → Basic settings).
+  // The Channel ID is public; the Channel secret is NOT and lives only in Supabase. Empty = hide the button.
+  // Setup steps: deploy/line-setup/LINE-LOGIN-วิธีตั้งค่า.md
+  lineLoginChannelId: "",
   // Who people contact about their personal data (shown on the PDPA page), e.g. "รพ.สต. … โทร 0xx-xxx-xxxx".
   privacyContact: "",
 };

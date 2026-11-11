@@ -128,10 +128,33 @@
     D.user = null; setStatus("local");
   }
 
+  /* ---------- sign in with LINE (LINE Login channel + Edge Function "line-login") ---------- */
+  const LINE_ID = String(CFG.lineLoginChannelId || "").trim(), LINE_KEY = "predm.lineLogin";
+  const lineRedirect = () => location.origin + location.pathname.replace(/[^/]*$/, "") + "index.html"; // not the bare folder address: that one opens the landing page
+  // back from LINE with ?code=…&state=… : swap the code for a session. Returns true when signed in.
+  async function lineReturn() {
+    const q = new URLSearchParams(location.search); if (!q.has("state") || !(q.has("code") || q.has("error"))) return false;
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(LINE_KEY) || "null"); localStorage.removeItem(LINE_KEY); } catch { /* */ }
+    history.replaceState(null, "", location.pathname + "#welcome");
+    const fail = (t) => { D.lineErr = t; const m = $("#c-lmsg"); if (m) { m.textContent = t; m.hidden = false; } return false; };
+    if (!saved || saved.st !== q.get("state") || Date.now() - saved.at > 15 * 60000) return fail("การเข้าสู่ระบบด้วย LINE หมดเวลาหรือไม่ได้เริ่มจากเครื่องนี้ กรุณากดปุ่มอีกครั้ง");
+    if (q.has("error")) return fail("ยกเลิกการเข้าสู่ระบบด้วย LINE แล้ว");
+    setStatus("local", "กำลังเข้าสู่ระบบด้วย LINE…");
+    try {
+      const { data, error } = await D.sb.functions.invoke("line-login", { body: { code: q.get("code"), redirect_uri: saved.redirect, nonce: saved.nonce } });
+      if (error) { let msg = ""; try { msg = (await error.context?.json?.())?.error || ""; } catch { /* */ } throw new Error(msg || "เชื่อมต่อระบบ LINE ไม่ได้ กรุณาลองใหม่อีกครั้ง"); }
+      const v = await D.sb.auth.verifyOtp({ token_hash: data.token_hash, type: "magiclink" }); if (v.error) throw v.error;
+      await adoptUser(v.data.user, { fresh: true }); location.hash = "home"; location.reload(); return true;
+    } catch (e) { return fail(String(e?.message || e)); }
+  }
+
   /* ---------- UI on the welcome page ---------- */
   function cloudUI() {
     const form = $("#l-phone")?.closest("form"); if (!form || $("#cloudBox")) return;
     form.insertAdjacentHTML("afterend", `<section class="card cloud-box" id="cloudBox"><h2 class="cloud-h">☁️ บัญชีจริง <small>ข้อมูลซิงก์กับฐานข้อมูล</small></h2>
+      ${LINE_ID ? `<button type="button" class="btn line-login" id="c-line"><span class="ln-logo" aria-hidden="true">LINE</span> เข้าสู่ระบบด้วย LINE</button>
+      <small class="cloud-note">กดครั้งเดียว ไม่ต้องจำรหัสผ่าน · ระบบได้รับเฉพาะชื่อและรหัสผู้ใช้ LINE ของคุณ (<a href="#privacy">นโยบาย PDPA</a>)</small>
+      <p class="cloud-msg" id="c-lmsg" role="alert" hidden></p><div class="cloud-or"><span>หรือใช้อีเมล</span></div>` : ""}
       <div class="cloud-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-ct="in">เข้าสู่ระบบด้วยอีเมล</button><button type="button" role="tab" aria-selected="false" data-ct="up">สมัครบัญชีใหม่</button></div>
       <form id="cloudForm" class="cloud-form" novalidate>
         <div class="cloud-up" hidden><label>ชื่อ-สกุล<input id="c-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี"></label><label>เบอร์โทร<input id="c-phone" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxx"></label></div>
@@ -143,6 +166,14 @@
         <button type="button" class="link cloud-forgot" id="c-forgot">ลืมรหัสผ่าน?</button>
         <small class="cloud-note">☁️ บัญชีจริง: ข้อมูลซิงก์ขึ้นฐานข้อมูล ใช้ได้ทุกเครื่อง และรับโปรแกรมจากนักกายภาพอัตโนมัติ</small>
       </form></section>`);
+    $("#c-line")?.addEventListener("click", () => {
+      const rnd = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (x) => x.toString(16).padStart(2, "0")).join("");
+      const st = rnd(), nonce = rnd(), redirect = lineRedirect();
+      try { localStorage.setItem(LINE_KEY, JSON.stringify({ st, nonce, redirect, at: Date.now() })); } catch { /* */ }
+      $("#c-line").disabled = true;
+      location.href = "https://access.line.me/oauth2/v2.1/authorize?" + new URLSearchParams({ response_type: "code", client_id: LINE_ID, redirect_uri: redirect, state: st, scope: "profile openid", nonce, bot_prompt: "normal" });
+    });
+    if (D.lineErr) { const m = $("#c-lmsg"); if (m) { m.textContent = D.lineErr; m.hidden = false; } }
     // forgot password: Supabase emails a reset link that brings the user back here
     $("#c-forgot").addEventListener("click", async () => {
       const msg = $("#c-msg"), say = (t, ok) => { msg.textContent = t; msg.hidden = false; msg.dataset.ok = ok ? "1" : ""; };
@@ -205,6 +236,7 @@
     D.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "predm.auth" } });
     // came back from a password-reset email: ask for the new password
     D.sb.auth.onAuthStateChange((ev) => { if (ev === "PASSWORD_RECOVERY") setTimeout(newPasswordUI, 300); });
+    if (LINE_ID && await lineReturn()) return;
     const { data } = await D.sb.auth.getSession();
     const sess = JSON.parse(raw.get("session") || "null");
     if (data.session?.user) {

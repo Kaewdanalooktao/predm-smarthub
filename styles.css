@@ -2182,3 +2182,9 @@ a.ar-cta { text-decoration: none; }
 .ap-check { display: flex !important; flex-direction: row !important; gap: 8px; align-items: flex-start; font-weight: 400; } .ap-check input { width: auto; margin-top: 4px; }
 .ap-ok { margin: 0; padding: 10px 12px; border-radius: 12px; background: #dcfce7; color: #14532d; line-height: 1.6; }
 .ap-otp-how { margin: 0; padding: 10px 12px; border-radius: 12px; background: #fff7d6; color: #5b4300; font-size: .9rem; line-height: 1.6; }
+
+/* sign in with LINE */
+.line-login { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 52px; border: 0; border-radius: 14px; background: #06c755; color: #fff; font-weight: 800; font-size: 1.05rem; cursor: pointer; }
+.line-login:hover { background: #05b34c; } .line-login:disabled { opacity: .6; }
+.line-login .ln-logo { background: #fff; color: #06c755; }
+.cloud-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .8rem; } .cloud-or::before, .cloud-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
