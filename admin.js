@@ -350,7 +350,19 @@
         <label>รหัสผ่าน<input id="apPass" type="password" autocomplete="current-password"></label>
         <p class="form-error" id="apCloudErr" role="alert" hidden></p>
         <button class="btn primary" type="submit" id="apCloudGo">ถัดไป: ส่งรหัส OTP ทางอีเมล</button>
-        <small class="hint">🔒 ยืนยัน 2 ขั้น: รหัสผ่าน + รหัส OTP ที่ส่งไปทางอีเมล · ใช้บัญชีที่มีบทบาท physio หรือ admin</small></form>` : ""}
+        <small class="hint">🔒 ยืนยัน 2 ขั้น: รหัสผ่าน + รหัส OTP ที่ส่งไปทางอีเมล · ใช้บัญชีที่มีบทบาท physio หรือ admin</small></form>
+      <details class="ap-signup" id="apSignup"><summary>🆕 ยังไม่มีบัญชี? สมัครบัญชีผู้ดูแล / เจ้าหน้าที่</summary>
+        <form id="apSignF" class="form" novalidate>
+          <label>ชื่อ-นามสกุล<input id="apSName" autocomplete="name"></label>
+          <label>อีเมล<input id="apSEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+          <label>ตั้งรหัสผ่าน (อย่างน้อย 8 ตัว)<input id="apSPass" type="password" autocomplete="new-password" minlength="8"></label>
+          <label>พิมพ์รหัสผ่านอีกครั้ง<input id="apSPass2" type="password" autocomplete="new-password"></label>
+          <label class="ap-check"><input type="checkbox" id="apSConsent"><span>ยินยอมให้เก็บชื่อและอีเมลเพื่อใช้ยืนยันตัวตน (<a href="index.html#privacy" target="_blank" rel="noopener">นโยบาย PDPA</a>)</span></label>
+          <p class="form-error" id="apSignErr" role="alert" hidden></p>
+          <p class="ap-ok" id="apSignOk" role="status" hidden></p>
+          <button class="btn primary" type="submit" id="apSignGo">สมัครบัญชี</button>
+          <small class="hint">หลังสมัคร บัญชีจะยังเข้าหน้าผู้ดูแลไม่ได้ จนกว่าเจ้าของระบบจะกำหนดสิทธิ์เป็น admin หรือ physio ให้</small>
+        </form></details>` : ""}
       <p class="ap-warn">${CL.on ? "บัญชีทดลองด้านบนใช้ข้อมูลตัวอย่างในเบราว์เซอร์เท่านั้น" : "ระบบล็อกอินนี้เป็นแบบทดลองในเบราว์เซอร์ ก่อนใช้งานจริงต้องเชื่อมระบบยืนยันตัวตนและฐานข้อมูลฝั่งเซิร์ฟเวอร์"}</p>
       <a class="link" href="index.html">← กลับไปหน้าแอปผู้ใช้</a> · <a class="link" href="manual.html#staff" target="_blank" rel="noopener">📘 คู่มือสำหรับผู้ดูแล</a>
     </section>`;
@@ -366,6 +378,26 @@
       go.disabled = true; go.textContent = "กำลังตรวจสอบและส่งรหัส…";
       try { await cloudLoginStep1(email, pass); renderOtp(email); }
       catch (x) { er.textContent = authMsg(x); er.hidden = false; go.disabled = false; go.textContent = "ถัดไป: ส่งรหัส OTP ทางอีเมล"; }
+    });
+    $("#apSignF")?.addEventListener("submit", async (e) => {
+      e.preventDefault(); const er = $("#apSignErr"), ok = $("#apSignOk"), go = $("#apSignGo"); er.hidden = true; ok.hidden = true;
+      const fail = (m) => { er.textContent = m; er.hidden = false; };
+      const full_name = $("#apSName").value.trim(), email = $("#apSEmail").value.trim(), pass = $("#apSPass").value;
+      if (!full_name) return fail("กรอกชื่อ-นามสกุล");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("อีเมลไม่ถูกต้อง");
+      if (pass.length < 8) return fail("รหัสผ่านต้องยาวอย่างน้อย 8 ตัว");
+      if (pass !== $("#apSPass2").value) return fail("รหัสผ่านสองช่องไม่ตรงกัน");
+      if (!$("#apSConsent").checked) return fail("กรุณาติ๊กยินยอมก่อนสมัคร");
+      go.disabled = true; go.textContent = "กำลังสมัคร…";
+      try {
+        const sb = await cloud(); if (!sb) throw new Error("ยังไม่ได้เชื่อมฐานข้อมูล");
+        const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name, consent: "true" }, emailRedirectTo: location.origin + location.pathname } });
+        if (error) throw error;
+        if (data?.user && !(data.user.identities || []).length) throw new Error("already registered");
+        const needConfirm = !data?.session; if (data?.session) await sb.auth.signOut();
+        ok.innerHTML = "✅ สมัครสำเร็จ<br>" + (needConfirm ? "1) เปิดอีเมลแล้วกดลิงก์ยืนยัน<br>2) " : "1) ") + "ให้เจ้าของระบบกำหนดสิทธิ์ admin (รันไฟล์ setup-all.sql ใน Supabase)<br>" + (needConfirm ? "3) " : "2) ") + "กลับมาเข้าสู่ระบบที่ช่อง “บัญชีจริง” ด้านบน";
+        ok.hidden = false; $("#apSignF").reset(); $("#apEmail").value = email; go.textContent = "สมัครแล้ว";
+      } catch (x) { const m = String(x?.message || x); fail(/already registered/i.test(m) ? "อีเมลนี้มีบัญชีอยู่แล้ว ใช้ช่อง “บัญชีจริง” ด้านบนเข้าสู่ระบบได้เลย" : /rate limit/i.test(m) ? "ส่งอีเมลบ่อยเกินไป รอสักครู่แล้วลองใหม่" : /database error/i.test(m) ? "ฐานข้อมูลยังไม่ได้ติดตั้งตาราง กรุณารันไฟล์ setup-all.sql ใน Supabase ก่อน แล้วสมัครใหม่" : authMsg(x)); go.disabled = false; go.textContent = "สมัครบัญชี"; }
     });
     $$("[data-acc]").forEach((b) => b.addEventListener("click", () => { const a = ADMINS[+b.dataset.acc]; $("#apUser").value = a.user; $("#apPin").value = a.pin; $("#apPin").focus(); }));
   }
