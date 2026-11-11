@@ -226,6 +226,8 @@
   // Admin sign-in is two steps: (1) email + password, (2) a one-time code sent to that email.
   // Only the OTP session is kept, and the database grants staff access only to sessions signed in by OTP
   // (supabase/admin_otp.sql), so a stolen password alone cannot open patient data.
+  // config.js `adminEmailCode: false` turns step 2 off (password only); the database must then run supabase/admin_password_only.sql.
+  const OTP_ON = CFG.adminEmailCode === true;
   const ADMIN_MAX_H = 12; // hours before an admin must sign in (and get a new code) again
   async function staffProfile(sb, uid) {
     const { data: prof, error } = await sb.from("profiles").select("full_name, role").eq("id", uid).maybeSingle(); if (error) throw error;
@@ -239,7 +241,11 @@
   }
   async function cloudLoginStep1(email, password) {
     const sb = await cloud(); const { data, error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error;
-    await staffProfile(sb, data.user.id);
+    const prof = await staffProfile(sb, data.user.id);
+    if (!OTP_ON) { // password-only mode: keep this session
+      store().set("adminSession", { cloud: true, otp: false, uid: data.user.id, name: prof.full_name || data.user.email, role: prof.role === "admin" ? "ผู้ดูแลระบบ" : "นักกายภาพบำบัด", rawRole: prof.role, at: Date.now() });
+      CL.patients = null; CL.dash = null; CL.rx = {}; return;
+    }
     await sb.auth.signOut(); // the password session is not kept; only the OTP session is
     await sendOtp(email);
   }
@@ -361,12 +367,12 @@
         <button class="btn primary" type="submit">เข้าสู่ระบบ</button>
       </form>
       <div class="ap-demo"><small>บัญชีทดลอง (PIN 1234)</small>${ADMINS.map((a, i) => `<button type="button" class="demo" data-acc="${i}"><span class="code ${i ? "green" : "blue"}">${i ? "PT" : "AD"}</span><span><b>${a.name}</b><small>${a.user} · ${a.role}</small></span></button>`).join("")}</div>
-      ${CL.on ? `<form id="apCloudF" class="form ap-cloud" novalidate><h3>☁️ บัญชีจริง (ฐานข้อมูล)</h3><div class="ap-steps" aria-hidden="true"><span class="on">1 รหัสผ่าน</span><span>2 รหัส OTP</span></div>
-        <label>อีเมล<input id="apEmail" type="email" autocomplete="username" placeholder="physio@example.com"></label>
+      ${CL.on ? `<form id="apCloudF" class="form ap-cloud" novalidate><h3>☁️ บัญชีจริง (ฐานข้อมูล)</h3>${OTP_ON ? `<div class="ap-steps" aria-hidden="true"><span class="on">1 รหัสผ่าน</span><span>2 รหัส OTP</span></div>` : ""}
+        <label>ชื่อผู้ใช้ (อีเมล)<input id="apEmail" type="email" autocomplete="username" placeholder="physio@example.com"></label>
         <label>รหัสผ่าน<input id="apPass" type="password" autocomplete="current-password"></label>
         <p class="form-error" id="apCloudErr" role="alert" hidden></p>
-        <button class="btn primary" type="submit" id="apCloudGo">ถัดไป: ส่งรหัส OTP ทางอีเมล</button>
-        <small class="hint">🔒 ยืนยัน 2 ขั้น: รหัสผ่าน + รหัส OTP ที่ส่งไปทางอีเมล · ใช้บัญชีที่มีบทบาท physio หรือ admin</small></form>
+        <button class="btn primary" type="submit" id="apCloudGo">${OTP_ON ? "ถัดไป: ส่งรหัส OTP ทางอีเมล" : "เข้าสู่ระบบ"}</button>
+        <small class="hint">${OTP_ON ? "🔒 ยืนยัน 2 ขั้น: รหัสผ่าน + รหัส OTP ที่ส่งไปทางอีเมล · " : "🔒 "}ใช้บัญชีที่มีบทบาท physio หรือ admin${OTP_ON ? "" : " · ระบบจะให้เข้าสู่ระบบใหม่ทุก 12 ชั่วโมง"}</small></form>
       <details class="ap-signup" id="apSignup"><summary>🆕 ยังไม่มีบัญชี? สมัครบัญชีผู้ดูแล / เจ้าหน้าที่</summary>
         <form id="apSignF" class="form" novalidate>
           <label>ชื่อ-นามสกุล<input id="apSName" autocomplete="name"></label>
@@ -391,9 +397,9 @@
       e.preventDefault(); const er = $("#apCloudErr"), go = $("#apCloudGo"); er.hidden = true;
       const email = $("#apEmail").value.trim(), pass = $("#apPass").value;
       if (!email || !pass) { er.textContent = "กรอกอีเมลและรหัสผ่าน"; er.hidden = false; return; }
-      go.disabled = true; go.textContent = "กำลังตรวจสอบและส่งรหัส…";
-      try { await cloudLoginStep1(email, pass); renderOtp(email); }
-      catch (x) { er.textContent = authMsg(x); er.hidden = false; go.disabled = false; go.textContent = "ถัดไป: ส่งรหัส OTP ทางอีเมล"; }
+      go.disabled = true; go.textContent = OTP_ON ? "กำลังตรวจสอบและส่งรหัส…" : "กำลังเข้าสู่ระบบ…";
+      try { await cloudLoginStep1(email, pass); if (OTP_ON) renderOtp(email); else { AD.src = "cloud"; AD._srcSet = true; toast("เข้าสู่ระบบสำเร็จ"); boot(); } }
+      catch (x) { er.textContent = authMsg(x); er.hidden = false; go.disabled = false; go.textContent = OTP_ON ? "ถัดไป: ส่งรหัส OTP ทางอีเมล" : "เข้าสู่ระบบ"; }
     });
     $("#apSignF")?.addEventListener("submit", async (e) => {
       e.preventDefault(); const er = $("#apSignErr"), ok = $("#apSignOk"), go = $("#apSignGo"); er.hidden = true; ok.hidden = true;
@@ -773,9 +779,9 @@
       return;
     }
     if (!adminSession()) return renderLogin();
-    if (isCloud() && (!adminSession().otp || Date.now() - (adminSession().at || 0) > ADMIN_MAX_H * 3600e3)) { // old password-only login, or too old
+    if (isCloud() && ((OTP_ON && !adminSession().otp) || Date.now() - (adminSession().at || 0) > ADMIN_MAX_H * 3600e3)) { // old password-only login, or too old
       cloud().then((sb) => sb?.auth.signOut()).catch(() => {}); store().set("adminSession", null);
-      toast("กรุณาเข้าสู่ระบบใหม่ด้วยรหัส OTP"); return renderLogin();
+      toast(OTP_ON ? "กรุณาเข้าสู่ระบบใหม่ด้วยรหัส OTP" : "กรุณาเข้าสู่ระบบใหม่"); return renderLogin();
     }
     if (isCloud()) { // make sure the stored cloud login is still valid
       if (!AD._srcSet) { AD.src = "cloud"; AD._srcSet = true; }

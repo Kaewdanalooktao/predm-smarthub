@@ -19,6 +19,9 @@ window.PREDM_CONFIG = {
   // The Channel ID is public; the Channel secret is NOT and lives only in Supabase. Empty = hide the button.
   // Setup steps: deploy/line-setup/LINE-LOGIN-วิธีตั้งค่า.md
   lineLoginChannelId: "2012550959",
+  // Admin page sign-in. false = email + password only. true = also a one-time code sent by email (safer).
+  // The database must match: false → run supabase/admin_password_only.sql · true → run supabase/admin_otp.sql
+  adminEmailCode: false,
   // Who people contact about their personal data (shown on the PDPA page), e.g. "รพ.สต. … โทร 0xx-xxx-xxxx".
   privacyContact: "",
 };
