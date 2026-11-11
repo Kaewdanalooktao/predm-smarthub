@@ -18,7 +18,7 @@ window.PREDM_CONFIG = {
   // "Sign in with LINE": the Channel ID (numbers) of the LINE Login channel (LINE Developers → Basic settings).
   // The Channel ID is public; the Channel secret is NOT and lives only in Supabase. Empty = hide the button.
   // Setup steps: deploy/line-setup/LINE-LOGIN-วิธีตั้งค่า.md
-  lineLoginChannelId: "",
+  lineLoginChannelId: "2012550959",
   // Who people contact about their personal data (shown on the PDPA page), e.g. "รพ.สต. … โทร 0xx-xxx-xxxx".
   privacyContact: "",
 };
