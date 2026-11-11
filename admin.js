@@ -234,7 +234,7 @@
   }
   async function sendOtp(email) {
     const sb = await cloud();
-    const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } });
     if (error) throw error;
   }
   async function cloudLoginStep1(email, password) {
@@ -247,6 +247,18 @@
     const sb = await cloud(); const { data, error } = await sb.auth.verifyOtp({ email, token, type: "email" }); if (error) throw error;
     const prof = await staffProfile(sb, data.user.id);
     store().set("adminSession", { cloud: true, otp: true, uid: data.user.id, name: prof.full_name || data.user.email, role: prof.role === "admin" ? "ผู้ดูแลระบบ" : "นักกายภาพบำบัด", rawRole: prof.role, at: Date.now() });
+    CL.patients = null; CL.dash = null; CL.rx = {};
+  }
+  // The email may carry a sign-in link instead of a code (Supabase's default template). Opening it lands here with the
+  // session in the URL hash; it is the same one-time email proof as typing the code, so finish the login the same way.
+  const linkInUrl = () => CL.on && /(^|[#&])(access_token|error_description)=/.test(location.hash);
+  async function cloudLoginLink() {
+    const h = new URLSearchParams(location.hash.slice(1)), bad = h.get("error_description");
+    const sb = await cloud(); const { data } = await sb.auth.getSession();
+    history.replaceState(null, "", location.pathname + location.search);
+    if (bad || !data.session) throw new Error("ลิงก์ในอีเมลใช้ไม่ได้หรือหมดอายุแล้ว (ลิงก์ใช้ได้ครั้งเดียว) กรุณาเข้าสู่ระบบใหม่เพื่อรับอีเมลฉบับใหม่");
+    const u = data.session.user, prof = await staffProfile(sb, u.id);
+    store().set("adminSession", { cloud: true, otp: true, uid: u.id, name: prof.full_name || u.email, role: prof.role === "admin" ? "ผู้ดูแลระบบ" : "นักกายภาพบำบัด", rawRole: prof.role, at: Date.now() });
     CL.patients = null; CL.dash = null; CL.rx = {};
   }
   const authMsg = (x) => { const m = String(x?.message || x);
@@ -312,7 +324,8 @@
   function renderOtp(email) {
     const f = $("#apCloudF"); if (!f) return;
     f.outerHTML = `<form id="apOtpF" class="form ap-cloud ap-otp" novalidate><h3>🔒 ยืนยันตัวตนด้วยรหัส OTP</h3><div class="ap-steps" aria-hidden="true"><span>1 รหัสผ่าน ✓</span><span class="on">2 รหัส OTP</span></div>
-      <p class="ap-otp-to">ส่งรหัสไปที่ <b>${maskEmail(email)}</b> แล้ว กรุณาเปิดอีเมลและกรอกรหัส (หมดอายุภายใน 1 ชั่วโมง)</p>
+      <p class="ap-otp-to">ส่งรหัสไปที่ <b>${maskEmail(email)}</b> แล้ว กรุณาเปิดอีเมล (หมดอายุภายใน 1 ชั่วโมง)</p>
+      <p class="ap-otp-how"><b>ถ้าอีเมลเป็นปุ่ม/ลิงก์ “Sign in”</b> ให้กดลิงก์นั้นบนเครื่องที่จะใช้งาน ระบบจะเข้าสู่ระบบให้เอง ไม่ต้องกรอกรหัส<br><b>ถ้าอีเมลมีรหัสตัวเลข</b> ให้กรอกด้านล่าง</p>
       <label>รหัส OTP<input id="apOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="••••••"></label>
       <p class="form-error" id="apOtpErr" role="alert" hidden></p>
       <button class="btn primary" type="submit" id="apOtpGo">ยืนยันและเข้าสู่ระบบ</button>
@@ -697,6 +710,13 @@
   function boot() {
     const th = store().get("theme", null); if (th) document.documentElement.dataset.theme = th;
     APP.tab = store().get("adminTab", "dash");
+    if (linkInUrl()) { // arrived from the sign-in link in the email
+      document.body.classList.add("ap-locked");
+      $("#apApp").innerHTML = `<section class="card ap-login"><h1>กำลังยืนยันตัวตน…</h1><p class="lede">กรุณารอสักครู่</p></section>`;
+      cloudLoginLink().then(() => { AD.src = "cloud"; AD._srcSet = true; toast("เข้าสู่ระบบสำเร็จ"); boot(); })
+        .catch((x) => { store().set("adminSession", null); history.replaceState(null, "", location.pathname + location.search); renderLogin(); const er = $("#apCloudErr"); if (er) { er.textContent = authMsg(x); er.hidden = false; er.scrollIntoView({ block: "center" }); } });
+      return;
+    }
     if (!adminSession()) return renderLogin();
     if (isCloud() && (!adminSession().otp || Date.now() - (adminSession().at || 0) > ADMIN_MAX_H * 3600e3)) { // old password-only login, or too old
       cloud().then((sb) => sb?.auth.signOut()).catch(() => {}); store().set("adminSession", null);

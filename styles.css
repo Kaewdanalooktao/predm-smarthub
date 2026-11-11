@@ -2181,3 +2181,4 @@ a.ar-cta { text-decoration: none; }
 .ap-signup .form { margin-top: 12px; } .ap-signup .form > .btn { width: 100%; } .ap-check span { flex: 1; }
 .ap-check { display: flex !important; flex-direction: row !important; gap: 8px; align-items: flex-start; font-weight: 400; } .ap-check input { width: auto; margin-top: 4px; }
 .ap-ok { margin: 0; padding: 10px 12px; border-radius: 12px; background: #dcfce7; color: #14532d; line-height: 1.6; }
+.ap-otp-how { margin: 0; padding: 10px 12px; border-radius: 12px; background: #fff7d6; color: #5b4300; font-size: .9rem; line-height: 1.6; }
