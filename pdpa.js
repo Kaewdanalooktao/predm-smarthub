@@ -134,8 +134,11 @@
   }
 
   /* ---------- first use: ask for consent ---------- */
+  let waited = 0;
   function gate() {
-    if (!sess() || consent().v === VERSION || $("#pdGate")) return;
+    if (!sess() || consent().v >= VERSION || $("#pdGate")) return; // asked once per account; again only if the notice itself gets a new version
+    // real account: wait until the saved answer has come back from the account before deciding to ask (max ~8 s)
+    if (sess().cloud && window.PreDMDB?.enabled && !window.PreDMDB.ready && waited < 16) { waited++; return void setTimeout(gate, 500); }
     modal(`<div class="care-head"><span class="care-ico">🛡️</span><div><h2>ก่อนเริ่มใช้งาน ขอความยินยอมนะคะ</h2><small>ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA)</small></div></div>
       <ul class="pd-list"><li>แอปนี้เก็บ<b>ข้อมูลสุขภาพ</b>ของคุณ เช่น น้ำหนัก รอบเอว ผลประเมินความเสี่ยง การออกกำลังกาย และอาหาร เพื่อช่วยดูแลและติดตามผล</li>
       <li>กล้องและ AI ทำงานในเครื่อง รูปอาหารเก็บในเครื่องนี้เท่านั้น</li>
@@ -153,11 +156,11 @@
     if (k === "delete") askDelete();
     if (k === "cancel") $("#pdDel")?.remove();
     if (k === "confirm") wipe();
-    if (k === "accept") { saveConsent({ health: true, research: $("#pgResearch").checked }); $("#pdGate").remove(); A().toast("บันทึกความยินยอมแล้ว ขอบคุณค่ะ 💗"); render(); }
+    if (k === "accept") { saveConsent({ health: true, research: $("#pgResearch").checked }); window.PreDMDB?.consented?.(consent()); $("#pdGate").remove(); A().toast("บันทึกความยินยอมแล้ว ขอบคุณค่ะ 💗"); render(); }
     if (k === "decline") { $("#pdGate").remove(); $("#logout")?.click(); }
     if (k === "read") { $("#pdGate").hidden = true; sessionStorage.setItem("predm.pdRead", "1"); }
   });
-  document.addEventListener("change", (e) => { if (e.target.id === "pdResearch") { saveConsent({ research: e.target.checked }); A().toast(e.target.checked ? "เปิดการใช้ผลประเมินแบบไม่ระบุตัวตนแล้ว" : "ปิดแล้ว"); render(); } });
+  document.addEventListener("change", (e) => { if (e.target.id === "pdResearch") { saveConsent({ research: e.target.checked }); window.PreDMDB?.consented?.(consent()); A().toast(e.target.checked ? "เปิดการใช้ผลประเมินแบบไม่ระบุตัวตนแล้ว" : "ปิดแล้ว"); render(); } });
 
   window.addEventListener("predm:view", (e) => {
     if (e.detail === "privacy") { render(); return; }

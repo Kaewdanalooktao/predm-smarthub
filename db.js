@@ -94,11 +94,21 @@
     const name = prof?.full_name || user.user_metadata?.full_name || user.email;
     const sess = { name, phone: prof?.phone || user.user_metadata?.phone || "", cloud: true, uid: user.id, role: prof?.role || "patient", at: Date.now() };
     if (fresh) await pull({ replace: true }); else await pull();
+    // PDPA consent is asked once per account: it was given when signing up (or at the first-use screen) and is kept with the
+    // account itself, so a new device, a fresh sign-in or a save that never reached user_data does not ask again.
+    const m = user.user_metadata || {}; let c = null; try { c = JSON.parse(raw.get("consent") || "null"); } catch { /* */ }
+    if (!c?.v && String(m.consent) === "true") { raw.set("consent", JSON.stringify({ v: +m.consent_v || 1, at: m.consent_at || user.created_at || new Date().toISOString(), health: true, research: String(m.consent_research) === "true" })); mark("consent"); }
     raw.set("session", JSON.stringify(sess));
     const p = JSON.parse(raw.get("profile") || "{}"); raw.set("profile", JSON.stringify({ ...p, name, ...(prof?.age ? { age: prof.age } : {}), ...(prof?.sex ? { sex: prof.sex } : {}), ...(prof?.height ? { height: prof.height } : {}) }));
     raw.set("seeded", "true");
     if (dirty().size) push();
     return sess;
+  }
+  // called when the person answers the consent screen or changes the research switch: save it now, with the account too
+  async function consented(c) {
+    if (!D.user || !c) return;
+    clearTimeout(D.timer); push();
+    try { await D.sb.auth.updateUser({ data: { consent: c.health ? "true" : "false", consent_v: c.v || 1, consent_at: c.at || new Date().toISOString(), consent_research: c.research ? "true" : "false" } }); } catch (e) { console.warn("[db] consent not saved with the account", e?.message || e); }
   }
   async function signIn(email, password) {
     const { data, error } = await D.sb.auth.signInWithPassword({ email, password });
@@ -211,6 +221,6 @@
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") push(); });
     if (D.user) setInterval(() => pullRx().catch(() => {}), 120000);
   }
-  window.PreDMDB = { enabled: true, get user() { return D.user; }, get client() { return D.sb; }, push, pull, signOut };
+  window.PreDMDB = { enabled: true, get user() { return D.user; }, get client() { return D.sb; }, get ready() { return !!D.ready; }, push, pull, signOut, consented };
   start();
 })();
