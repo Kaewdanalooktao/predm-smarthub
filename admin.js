@@ -256,7 +256,10 @@
     const h = new URLSearchParams(location.hash.slice(1)), bad = h.get("error_description");
     const sb = await cloud(); const { data } = await sb.auth.getSession();
     history.replaceState(null, "", location.pathname + location.search);
-    if (bad || !data.session) throw new Error("ลิงก์ในอีเมลใช้ไม่ได้หรือหมดอายุแล้ว (ลิงก์ใช้ได้ครั้งเดียว) กรุณาเข้าสู่ระบบใหม่เพื่อรับอีเมลฉบับใหม่");
+    if (bad || !data.session) { // say which case it is, so the person (and support) can tell a used link from a setup problem
+      const code = h.get("error_code") || (bad ? "link-error" : "no-session");
+      throw new Error((code === "otp_expired" ? "ลิงก์นี้ถูกใช้ไปแล้ว หมดอายุ หรือไม่ใช่อีเมลฉบับล่าสุด (แต่ละลิงก์ใช้ได้ครั้งเดียว และเมื่อขออีเมลใหม่ ลิงก์เก่าจะใช้ไม่ได้ทันที)" : "เข้าสู่ระบบด้วยลิงก์ไม่สำเร็จ") + " — กรอกอีเมลและรหัสผ่านด้านบนอีกครั้ง รอรับอีเมลฉบับใหม่ แล้วกดลิงก์ในฉบับล่าสุดเพียงครั้งเดียว [" + code + "]");
+    }
     const u = data.session.user, prof = await staffProfile(sb, u.id);
     store().set("adminSession", { cloud: true, otp: true, uid: u.id, name: prof.full_name || u.email, role: prof.role === "admin" ? "ผู้ดูแลระบบ" : "นักกายภาพบำบัด", rawRole: prof.role, at: Date.now() });
     CL.patients = null; CL.dash = null; CL.rx = {};
