@@ -8,7 +8,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const KEY = "predm.v1.";
   // keys mirrored to the cloud (never secrets such as geminiKey, never session/admin state)
-  const SYNC = ["profile", "riskInput", "riskHistory", "logs", "body", "fitness", "food", "tree", "certs", "myPrograms", "consults", "prefs", "bestScores", "bestScore", "showHands", "avatar", "memberSince", "parq", "reminders", "evalpp", "consent"];
+  const SYNC = ["profile", "riskInput", "riskHistory", "logs", "body", "fitness", "food", "tree", "certs", "myPrograms", "consults", "prefs", "bestScores", "bestScore", "showHands", "avatar", "memberSince", "parq", "reminders", "evalpp", "consent", "drinks", "mood", "missions", "missionDays", "labs", "labPlan"];
   const raw = { get: (k) => localStorage.getItem(KEY + k), set: (k, v) => localStorage.setItem(KEY + k, v), del: (k) => localStorage.removeItem(KEY + k) };
   const D = { sb: null, user: null, ready: false, pending: new Set(), timer: null, state: "local" };
 

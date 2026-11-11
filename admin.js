@@ -684,6 +684,57 @@
      SHELL
      ===================================================================== */
   const APP = { tab: "dash" };
+  /* ---------- follow-up: who has gone quiet (for village health volunteers / physios to phone) ---------- */
+  const FU = { last: null, err: "", loading: false, f: "all", q: "" };
+  const fuToday = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+  async function loadFollow() {
+    if (!CL.patients) await loadCloudPatients();
+    const sb = await cloud(), ids = CL.patients.map((p) => p.uid), last = {};
+    for (let i = 0; i < ids.length; i += 150) { // newest record per person, from the keys people write when they use the app
+      const { data, error } = await sb.from("user_data").select("user_id, updated_at").in("user_id", ids.slice(i, i + 150)).in("key", ["logs", "body", "drinks", "mood", "missions", "labs", "food"]).order("updated_at", { ascending: false }).limit(1000);
+      if (error) throw error;
+      (data || []).forEach((r) => { if (!last[r.user_id] || r.updated_at > last[r.user_id]) last[r.user_id] = r.updated_at; });
+    }
+    FU.last = last;
+  }
+  function followRows() {
+    const t = fuToday(), gap = (iso) => Math.round((new Date(t + "T00:00") - new Date(iso.slice(0, 10) + "T00:00")) / 864e5);
+    return patients().map((p, i) => {
+      let days = null;
+      if (isCloud()) { const l = FU.last?.[p.uid]; if (l) { const d = new Date(l); days = Math.max(0, gap(new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString())); } }
+      else days = [1, 9, 0, 5, 16, null, 3, 12, 30, 2][i % 10]; // demo accounts keep nothing on a server: show sample numbers
+      return { ...p, days, lv: days == null ? "never" : days <= 3 ? "ok" : days <= 7 ? "warn" : "crit" };
+    }).sort((a, b) => (b.days ?? 9999) - (a.days ?? 9999));
+  }
+  function renderFollow() {
+    const root = $("#apPanel"); if (!root) return;
+    if (isCloud() && !FU.last && !FU.err) {
+      root.innerHTML = `<div class="card"><p class="lede">⏳ กำลังโหลดข้อมูลการใช้งานล่าสุด…</p></div>`;
+      if (!FU.loading) { FU.loading = true; loadFollow().catch((e) => { FU.err = String(e.message || e); }).finally(() => { FU.loading = false; if (APP.tab === "follow") renderFollow(); }); }
+      return;
+    }
+    if (FU.err) { root.innerHTML = `<div class="card"><p class="form-error">โหลดไม่สำเร็จ: ${esc(FU.err)}</p><button class="btn sm" type="button" data-furefresh>ลองใหม่</button></div>`; return; }
+    const all = followRows(), n = (lv) => all.filter((r) => r.lv === lv).length, q = FU.q.trim().toLowerCase();
+    const rows = all.filter((r) => (FU.f === "all" || (FU.f === "call" ? r.lv === "crit" || r.lv === "never" : r.lv === FU.f)) && (!q || (r.name || "").toLowerCase().includes(q) || String(r.tel || r.phone || "").includes(q)));
+    const LV = { ok: ["🟢", "ใช้งานสม่ำเสมอ"], warn: ["🟡", "เริ่มห่าง"], crit: ["🔴", "ควรโทรหา"], never: ["⚪", "ยังไม่เคยบันทึก"] };
+    const tel = (r) => { const v = String(r.tel || (r.cloud ? "" : r.phone) || "").replace(/[^0-9+]/g, ""); return v.length >= 9 ? `<a class="btn sm" href="tel:${esc(v)}">📞 ${esc(v)}</a>` : `<span class="fu-none">ไม่มีเบอร์</span>`; };
+    root.innerHTML = `${isCloud() ? "" : `<p class="fu-demo">ℹ️ โหมดทดลอง: ตัวเลขในหน้านี้เป็น<b>ข้อมูลตัวอย่าง</b> เมื่อเข้าด้วยบัญชีผู้ดูแลจริงจะแสดงข้อมูลจากฐานข้อมูล</p>`}
+      <div class="fu-kpis">${[["all", "👥", "ทั้งหมด", all.length], ["ok", "🟢", "บันทึกใน 3 วัน", n("ok")], ["warn", "🟡", "ห่าง 4–7 วัน", n("warn")], ["call", "🔴", "ควรโทรหา (เกิน 7 วัน / ไม่เคย)", n("crit") + n("never")]].map(([k, ic, l, v]) => `<button type="button" class="fu-kpi" aria-pressed="${FU.f === k}" data-fuf="${k}"><span aria-hidden="true">${ic}</span><b>${v}</b><small>${l}</small></button>`).join("")}</div>
+      <div class="card"><div class="fu-tools"><input type="search" id="fuQ" placeholder="ค้นหาชื่อหรือเบอร์โทร" value="${esc(FU.q)}" aria-label="ค้นหา"><button class="btn sm" type="button" data-fucopy>📋 คัดลอกรายชื่อที่ต้องโทร</button>${isCloud() ? `<button class="btn sm" type="button" data-furefresh>↻ โหลดใหม่</button>` : ""}</div>
+        <div class="tbl-wrap"><table class="tbl fu-tbl"><thead><tr><th>ชื่อ</th><th>สถานะ</th><th>บันทึกล่าสุด</th><th>โทร</th></tr></thead><tbody>
+        ${rows.length ? rows.map((r) => `<tr><td><b>${esc(r.name)}</b>${r.age ? `<small> · ${esc(r.age)} ปี</small>` : ""}</td><td><span class="fu-lv ${r.lv}">${LV[r.lv][0]} ${LV[r.lv][1]}</span></td><td>${r.days == null ? "–" : r.days === 0 ? "วันนี้" : r.days + " วันก่อน"}</td><td>${tel(r)}</td></tr>`).join("") : `<tr><td colspan="4">ไม่มีรายชื่อในกลุ่มนี้</td></tr>`}
+        </tbody></table></div>
+        <p class="lede fu-foot">นับจากวันที่บันทึกข้อมูลครั้งล่าสุด (ออกกำลังกาย น้ำหนัก เครื่องดื่ม การนอน ภารกิจ ผลตรวจ) · ${isCloudAdmin() || !isCloud() ? "ผู้ดูแลระบบเห็นทุกคน" : "คุณเห็นเฉพาะคนที่ได้รับมอบหมายให้ดูแล"} · อสม. ใช้บัญชีบทบาทเดียวกับนักกายภาพ แล้วให้ผู้ดูแลระบบมอบหมายรายชื่อให้</p></div>`;
+  }
+  function initFollow() {
+    const root = $("#apPanel");
+    root.addEventListener("click", (e) => { if (APP.tab !== "follow") return; const t = (s) => e.target.closest(s);
+      if (t("[data-fuf]")) { FU.f = t("[data-fuf]").dataset.fuf; return renderFollow(); }
+      if (t("[data-furefresh]")) { FU.last = null; FU.err = ""; CL.patients = null; return renderFollow(); }
+      if (t("[data-fucopy]")) { const list = followRows().filter((r) => r.lv === "crit" || r.lv === "never").map((r) => `${r.name}\t${r.tel || (r.cloud ? "" : r.phone) || "-"}\t${r.days == null ? "ยังไม่เคยบันทึก" : "หายไป " + r.days + " วัน"}`).join("\n");
+        if (!list) return toast("ไม่มีใครต้องโทรหาในตอนนี้ 🎉"); navigator.clipboard?.writeText(list).then(() => toast("คัดลอกรายชื่อแล้ว"), () => toast("คัดลอกไม่ได้ในเบราว์เซอร์นี้")); } });
+    root.addEventListener("input", (e) => { if (APP.tab === "follow" && e.target.id === "fuQ") { FU.q = e.target.value; const pos = e.target.selectionStart; renderFollow(); const q = $("#fuQ"); q.focus(); q.setSelectionRange(pos, pos); } });
+  }
   function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), 2600); }
   function renderShell() {
     const s = adminSession();
@@ -693,6 +744,7 @@
         <nav class="ap-tabs" role="tablist" aria-label="เมนูผู้ดูแล">
           <button type="button" role="tab" aria-selected="${APP.tab === "dash"}" data-tab="dash">📊 ภาพรวมระบบ</button>
           <button type="button" role="tab" aria-selected="${APP.tab === "patients"}" data-tab="patients">🩺 ผู้ป่วยและโปรแกรม</button>
+          <button type="button" role="tab" aria-selected="${APP.tab === "follow"}" data-tab="follow">📞 ติดตามกลุ่ม</button>
           ${isCloudAdmin() ? `<button type="button" role="tab" aria-selected="${APP.tab === "team"}" data-tab="team">👥 ทีมและสิทธิ์</button>` : ""}
         </nav>
         <div class="ap-user"><span><b>${esc(s.name)}</b><small>${esc(s.role)}</small></span>
@@ -700,15 +752,15 @@
           <button class="btn sm" type="button" id="apLogout">ออกจากระบบ</button></div>
       </header>
       <main class="ap-main">
-        <div class="ap-head"><h1>${APP.tab === "dash" ? "Dashboard ภาพรวมระบบ" : APP.tab === "team" ? "ทีมและสิทธิ์การเข้าถึง" : "ผู้ป่วยและโปรแกรมออกกำลังกาย"}</h1>
-          <p class="lede">${APP.tab === "team" ? "จัดการบทบาทผู้ใช้ (ผู้ป่วย / นักกายภาพ / ผู้ดูแลระบบ) และดูว่าใครดูแลผู้ป่วยกี่คน" : APP.tab === "dash" ? "การใช้งานระบบ เวลาออกกำลังกายเฉลี่ย ท่ายอดนิยม และอัตราการเปลี่ยนแปลงของค่าสุขภาพ" : "เลือกผู้ป่วย ระบุปัญหา ระบบแนะนำท่าที่เหมาะสมและท่าที่ควรหลีกเลี่ยง ปรับจำนวนครั้ง แล้วมอบหมายให้ผู้ป่วย"}</p></div>
+        <div class="ap-head"><h1>${APP.tab === "follow" ? "ติดตามกลุ่ม: ใครหายไปนาน" : APP.tab === "dash" ? "Dashboard ภาพรวมระบบ" : APP.tab === "team" ? "ทีมและสิทธิ์การเข้าถึง" : "ผู้ป่วยและโปรแกรมออกกำลังกาย"}</h1>
+          <p class="lede">${APP.tab === "follow" ? "สำหรับ อสม. และนักกายภาพ ดูว่าใครไม่ได้บันทึกมานาน เพื่อโทรถามไถ่และชวนกลับมา (ไม่แสดงค่าสุขภาพในหน้านี้)" : APP.tab === "team" ? "จัดการบทบาทผู้ใช้ (ผู้ป่วย / นักกายภาพ / ผู้ดูแลระบบ) และดูว่าใครดูแลผู้ป่วยกี่คน" : APP.tab === "dash" ? "การใช้งานระบบ เวลาออกกำลังกายเฉลี่ย ท่ายอดนิยม และอัตราการเปลี่ยนแปลงของค่าสุขภาพ" : "เลือกผู้ป่วย ระบุปัญหา ระบบแนะนำท่าที่เหมาะสมและท่าที่ควรหลีกเลี่ยง ปรับจำนวนครั้ง แล้วมอบหมายให้ผู้ป่วย"}</p></div>
         <div id="apPanel">${APP.tab === "dash" ? `<div id="adRoot"></div>` : ""}</div>
       </main>`;
     $$("[data-tab]").forEach((b) => b.addEventListener("click", () => { APP.tab = b.dataset.tab; store().set("adminTab", APP.tab); renderShell(); }));
     $("#apLogout").addEventListener("click", async () => { if (isCloud()) { try { await (await cloud()).auth.signOut(); } catch { /* */ } CL.patients = null; CL.dash = null; CL.rx = {}; } store().set("adminSession", null); boot(); });
     $("#apTheme").addEventListener("click", () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; store().set("theme", r.dataset.theme); renderShell(); });
     if (APP.tab === "team" && !isCloudAdmin()) APP.tab = "dash";
-    if (APP.tab === "dash") { initAdmin(); renderAdmin(); } else if (APP.tab === "team") { initTeam(); renderTeam(); } else { initPatients(); renderPatients(); }
+    if (APP.tab === "follow") { initFollow(); renderFollow(); } else if (APP.tab === "dash") { initAdmin(); renderAdmin(); } else if (APP.tab === "team") { initTeam(); renderTeam(); } else { initPatients(); renderPatients(); }
   }
   function boot() {
     const th = store().get("theme", null); if (th) document.documentElement.dataset.theme = th;
