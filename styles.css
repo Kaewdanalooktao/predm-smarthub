@@ -2137,3 +2137,20 @@ html.fs-2 .hk-card b, html.fs-2 .ar-card b { font-size: .8rem; }
   body.print-eval .shell { display: block; } body.print-eval main { margin: 0; padding: 0; max-width: none; }
   body.print-eval .ev-row em, body.print-eval .ev-d { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- import exercise from other apps (import.js) ---------- */
+#impRoot:empty { display: none; }
+.imp-card { display: grid; gap: 12px; }
+.imp-drop { min-height: 130px; }
+.imp-drop img { max-height: 200px; }
+.imp-rows { display: grid; gap: 10px; }
+.imp-row { display: grid; grid-template-columns: auto 1.1fr 1.4fr 1.6fr .7fr; gap: 8px 10px; align-items: end; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--r-lg, 18px); background: var(--card); }
+.imp-row.off { opacity: .55; }
+.imp-row label { display: grid; gap: 4px; font-size: .78rem; font-weight: 600; color: var(--muted); min-width: 0; }
+.imp-row .imp-on { align-self: center; }
+.imp-row .imp-on input { width: 22px; height: 22px; padding: 0; accent-color: #2f4aa0; }
+.imp-flag { grid-column: 1 / -1; margin: 0; font-size: .8rem; color: var(--ink); background: color-mix(in srgb, #f5b942 22%, var(--card)); border-radius: 10px; padding: 6px 10px; }
+.imp-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.imp-raw summary { cursor: pointer; font-size: .8rem; color: var(--muted); }
+.imp-raw pre { white-space: pre-wrap; font-size: .76rem; background: var(--sub); border-radius: 12px; padding: 10px; max-height: 180px; overflow: auto; margin: 6px 0 0; }
+@media (max-width: 720px) { .imp-row { grid-template-columns: auto 1fr; } .imp-row label:not(.imp-on) { grid-column: 2; } .imp-row .imp-on { grid-row: 1; } }
