@@ -158,7 +158,7 @@
   }
 
   /* ---------- reading a file ---------- */
-  const S = { open: false, busy: false, pct: 0, status: "", rows: [], msg: "", bad: false, thumb: "", raw: "" };
+  const S = { open: false, res: false, busy: false, pct: 0, status: "", rows: [], msg: "", bad: false, thumb: "", raw: "" };
   let tessLoading = null;
   function loadTesseract() {
     if (window.Tesseract) return Promise.resolve();
@@ -222,13 +222,38 @@
       ${r.est || r.noDate ? `<p class="imp-flag">${r.est ? "⚠️ " + esc(r.est) + " กรุณาตรวจจำนวนนาที" : ""}${r.est && r.noDate ? " · " : ""}${r.noDate ? "📅 ไม่พบวันที่ จึงใส่เป็นวันนี้ แก้ได้ค่ะ" : ""}</p>` : ""}
     </div>`;
   }
+  const TYPE_TH = { aerobic: "แอโรบิก", strength: "เสริมแรง", flex: "ยืดเหยียด", balance: "ทรงตัว", game: "เกมส์" };
+  const imported = () => A().store.get("logs", []).filter((l) => l.source === "import" && !l.sample);
+  const thDay = (d) => new Date(d + "T00:00:00").toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" });
+  function resultHtml() {
+    const all = imported().slice().sort((x, y) => (x.date < y.date ? 1 : -1)), ws = weekStart();
+    const wkLogs = A().store.get("logs", []).filter((l) => l.date >= ws && !l.sample);
+    const aero = wkLogs.filter((l) => l.type === "aerobic" || l.type === "game").reduce((t, l) => t + (l.minutes || 0), 0);
+    const impWk = all.filter((l) => l.date >= ws), impAero = impWk.filter((l) => l.type === "aerobic").reduce((t, l) => t + (l.minutes || 0), 0);
+    const pct = Math.min(100, Math.round((aero / 150) * 100));
+    if (!all.length) return `<section class="card imp-card imp-res" aria-labelledby="impRH"><div class="card-head"><h2 id="impRH">📊 ผลการออกกำลังกายที่อัปโหลด</h2><button type="button" class="btn sm" data-imp="result">ปิด</button></div>
+      <p class="mine-empty">ยังไม่มีรายการที่อัปโหลดค่ะ กดปุ่ม “อัปโหลดผลออกกำลังกายจากแอปอื่น” ด้านบนเพื่อเริ่มได้เลย</p></section>`;
+    return `<section class="card imp-card imp-res" aria-labelledby="impRH"><div class="card-head"><h2 id="impRH">📊 ผลการออกกำลังกายที่อัปโหลด</h2><button type="button" class="btn sm" data-imp="result">ปิด</button></div>
+      <div class="imp-stats"><div><small>อัปโหลดสัปดาห์นี้</small><b>${impWk.length}</b><span>รายการ</span></div><div><small>แอโรบิกจากที่อัปโหลด</small><b>${impAero}</b><span>นาที (สัปดาห์นี้)</span></div><div><small>อัปโหลดทั้งหมด</small><b>${all.length}</b><span>รายการ</span></div></div>
+      <div class="imp-goal"><div class="imp-goal-t"><span>แอโรบิกรวมสัปดาห์นี้ (ในแอป + อัปโหลด)</span><b>${aero} / 150 นาที</b></div><div class="imp-goal-bar" role="img" aria-label="ทำได้ ${pct}% ของเป้าหมาย 150 นาที"><i style="width:${pct}%"></i></div>
+        <small>${aero >= 150 ? "🎉 ถึงเป้าหมาย 150 นาทีแล้ว เก่งมากค่ะ" : `อีก ${150 - aero} นาทีจะถึงเป้าหมายของสัปดาห์นี้ค่ะ`}</small></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันที่</th><th>กิจกรรม</th><th>ประเภท</th><th>นาที</th></tr></thead><tbody>
+      ${all.slice(0, 30).map((l) => `<tr><td>${thDay(l.date)}</td><td>${esc(l.name)}</td><td>${TYPE_TH[l.type] || esc(l.type)}</td><td>${l.minutes || 0}</td></tr>`).join("")}
+      </tbody></table></div>${all.length > 30 ? `<p class="hint">แสดง 30 รายการล่าสุด จากทั้งหมด ${all.length} รายการ</p>` : ""}
+      <p class="hint">ผลนี้นับรวมใน “กิจกรรมสัปดาห์นี้” แล้ว และนักกายภาพบำบัด/ผู้ดูแลระบบที่ดูแลคุณจะเห็นรายการนี้ด้วย (เฉพาะบัญชีจริง)</p></section>`;
+  }
   function render() {
     const el = $("#impRoot"); if (!el) return;
-    const head = `<div class="card-head"><div><h2 id="impH">นำเข้าการออกกำลังกายจากแอปอื่น</h2><p>เดิน วิ่ง ปั่น จาก Samsung Health, Strava, Garmin, Apple Fitness ฯลฯ นับรวมในกิจกรรมสัปดาห์นี้</p></div>
-      <button type="button" class="btn sm ${S.open ? "" : "primary"}" data-imp="toggle" aria-expanded="${S.open}">${S.open ? "ปิด" : "📥 อัปโหลดผลจากแอปอื่น"}</button></div>`;
-    if (!S.open) { el.innerHTML = `<section class="card imp-card" aria-labelledby="impH">${head}</section>`; return; }
+    const nImp = imported().length;
+    const hero = `<div class="imp-hero">
+      <button type="button" class="ar-cta imp-cta" data-imp="toggle" aria-expanded="${S.open}"><span class="ar-cta-ic" aria-hidden="true">📥</span><span><b>อัปโหลดผลออกกำลังกายจากแอปอื่น</b><small>เดิน วิ่ง ปั่น จาก Samsung Health, Strava, Garmin, Apple Fitness ฯลฯ ถ่ายรูปหน้าจอแล้วอัปโหลด ระบบอ่านให้และนับรวมในสัปดาห์นี้</small></span><span class="fq-card-go">${S.open ? "ปิด" : "อัปโหลด →"}</span></button>
+      <button type="button" class="imp-green" data-imp="result" aria-expanded="${S.res}">📊 ${S.res ? "ซ่อนผลที่อัปโหลด" : "แสดงผลที่อัปโหลด"}${nImp ? ` <span class="imp-n">${nImp} รายการ</span>` : ""}</button></div>`;
+    const res = S.res ? resultHtml() : "";
+    const head = `<div class="card-head"><div><h2 id="impH">นำเข้าการออกกำลังกายจากแอปอื่น</h2><p>เลือกรูปแคปหน้าจอสรุปผล หรือไฟล์จากแอป แล้วตรวจก่อนบันทึก</p></div>
+      <button type="button" class="btn sm" data-imp="toggle">ปิด</button></div>`;
+    if (!S.open) { el.innerHTML = hero + res; return; }
     const sel = S.rows.filter((r) => r.on), tot = sel.reduce((a, r) => a + (r.type === "aerobic" ? +r.minutes || 0 : 0), 0);
-    el.innerHTML = `<section class="card imp-card" aria-labelledby="impH">${head}
+    el.innerHTML = `${hero}<section class="card imp-card" aria-labelledby="impH">${head}
       <label class="tf-drop imp-drop${S.thumb ? " has" : ""}" id="impDrop" for="impFile">
         ${S.thumb ? `<img src="${S.thumb}" alt="รูปที่เลือก">` : `<span><b>📷 แตะเพื่อเลือกรูปแคปหน้าจอ หรือไฟล์จากแอปอื่น</b><small>รูปสรุปผลการออกกำลังกาย (เห็นเวลา ระยะทาง หรือจำนวนก้าว) · หรือไฟล์ .gpx .tcx .csv</small></span>`}
         <input type="file" id="impFile" accept="image/*,.gpx,.tcx,.csv,.tsv,.txt" ${S.busy ? "disabled" : ""}>
@@ -241,7 +266,7 @@
         <div class="imp-acts"><button type="button" class="btn primary" data-imp="save">บันทึกรวมกับกิจกรรมของฉัน</button><button type="button" class="btn sm" data-imp="add">+ เพิ่มรายการเอง</button><button type="button" class="btn sm" data-imp="clear">ล้าง</button></div>` : ""}
       ${!S.rows.length && !S.busy ? `<div class="imp-acts"><button type="button" class="btn sm" data-imp="add">✏️ กรอกเองโดยไม่ใช้รูป</button></div>` : ""}
       ${S.raw && !S.busy ? `<details class="imp-raw"><summary>ดูข้อความที่อ่านได้จากรูป</summary><pre>${esc(S.raw.slice(0, 1500))}</pre></details>` : ""}
-    </section>`;
+    </section>${res}`;
   }
   const sumText = (n, tot) => n ? `เลือก ${n} รายการ · แอโรบิกรวม ${tot} นาที (เป้าหมาย 150 นาทีต่อสัปดาห์) · ประเภทอื่นนับเป็นจำนวนวันที่ฝึก` : "ยังไม่ได้เลือกรายการ";
   function weekStart() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return iso(d); }
@@ -263,12 +288,14 @@
     });
     if (S.thumb) URL.revokeObjectURL(S.thumb);
     Object.assign(S, { rows: [], thumb: "", raw: "", bad: !n, msg: n ? `บันทึกแล้ว ${n} รายการ${wk ? ` · เพิ่มแอโรบิกสัปดาห์นี้ ${wk} นาที` : ""}${dup ? ` · ข้าม ${dup} รายการที่เคยบันทึกแล้ว` : ""} เก่งมากค่ะ 🎉` : "รายการนี้เคยบันทึกไว้แล้วค่ะ จึงไม่ได้เพิ่มซ้ำ" });
-    render(); if (n) P.toast(`นำเข้า ${n} รายการแล้ว`);
+    if (n) { S.open = false; S.res = true; }
+    render(); if (n) { P.toast(`นำเข้า ${n} รายการแล้ว`); const r = $("#impRoot .imp-res"); if (r) r.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
   }
 
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-imp]"); if (!b) return; const k = b.dataset.imp;
     if (k === "toggle") { S.open = !S.open; render(); if (S.open) $("#impRoot").scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    if (k === "result") { S.res = !S.res; render(); const r = $("#impRoot .imp-res"); if (r) r.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
     if (k === "add") { const r = row({ minutes: 0 }); r.noDate = false; S.rows.push(r); if (S.bad) { S.msg = ""; S.bad = false; } render(); const inp = $(`.imp-row[data-row="${S.rows.length - 1}"] [data-f="minutes"]`); if (inp) inp.focus(); }
     if (k === "clear") { if (S.thumb) URL.revokeObjectURL(S.thumb); Object.assign(S, { rows: [], msg: "", bad: false, thumb: "", raw: "" }); render(); }
     if (k === "save") save();

@@ -61,7 +61,9 @@
       u.base.risk = riskScore(u, wt0, waist0); u.last.risk = riskScore(u, wt1, waist1);
       users.push(u);
     }
-    SAMPLE = { users, days, logs, consults, sample: true };
+    const impN = ["เดิน (Samsung Health)", "วิ่ง (Strava)", "ปั่นจักรยาน (Garmin)", "เดินเร็ว (Apple Fitness)"];
+    const imports = logs.filter((l, i) => l.cat === "aerobic" && i % 11 === 0).map((l, i) => ({ date: l.date, user: l.user, who: "ผู้ใช้ตัวอย่าง #" + (l.user + 1), name: impN[i % impN.length], type: "aerobic", minutes: l.minutes }));
+    SAMPLE = { users, days, logs, consults, imports, sample: true };
     return SAMPLE;
   }
   function localData() {
@@ -77,7 +79,8 @@
     const mk = (b, f) => (b || f ? { weight: b?.weight, waist: b?.waist, bmi: b?.weight && (b.height || u.ht) ? b.weight / ((b.height || u.ht) / 100) ** 2 : undefined, fat: b?.fat, visc: b?.visc, risk: b?.weight && b?.waist ? riskScore(u, b.weight, b.waist) : undefined, chair30: f?.chair30, tug: f?.tug, sls: f?.sls } : null);
     if (body.length || fit.length) { u.base = mk(body[0], fit[0]); u.last = mk(body[body.length - 1], fit[fit.length - 1]); }
     const consults = store().get("consults", []).filter((c) => c.status === "done").map((c) => ({ date: c.date, user: 0 }));
-    return { users: [u], days, logs, consults, sample: false };
+    const imports = store().get("logs", []).filter((l) => l.source === "import" && !l.sample).map((l) => ({ date: l.date, user: 0, who: pr.name || "ผู้ใช้เครื่องนี้", name: l.name, type: l.type, minutes: Number(l.minutes) || 0 }));
+    return { users: [u], days, logs, consults, imports, sample: false };
   }
 
   function aggregate(D, range) {
@@ -85,6 +88,8 @@
     const dates = []; for (let i = range - 1; i >= 0; i--) dates.push(addDays(end, -i));
     const daily = dates.map((d) => ({ d, dau: D.days[d]?.users.size || 0, ses: D.days[d]?.sessions || 0 }));
     const activeUsers = new Set(); Object.entries(D.days).forEach(([d, o]) => { if (inR(d)) o.users.forEach((u) => activeUsers.add(u)); });
+    const impRows = (D.imports || []).filter((l) => inR(l.date)).sort((a, b) => (a.date < b.date ? 1 : -1));
+    const imp = { n: impRows.length, users: new Set(impRows.map((l) => l.user)).size, min: impRows.reduce((t, l) => t + (l.minutes || 0), 0), rows: impRows };
     const logs = D.logs.filter((l) => inR(l.date)), totalMin = logs.reduce((t, l) => t + l.minutes, 0), weeks = range / 7;
     const perUser = {}; logs.forEach((l) => (perUser[l.user] = (perUser[l.user] || 0) + l.minutes));
     const nAct = Math.max(1, activeUsers.size), avgWeek = totalMin / nAct / weeks, meet150 = Object.values(perUser).filter((m) => m / weeks >= 150).length;
@@ -107,7 +112,7 @@
     const consults = D.consults.filter((c) => inR(c.date)).length;
     const newUsers = D.users.filter((u) => u.join && inR(u.join)).length;
     const retained = D.users.filter((u) => { const a = [...u.active].filter(inR); return a.length >= 2 && a.some((d) => d >= addDays(end, -6)); }).length;
-    return { dates, daily, total: D.users.length, active: activeUsers.size, newUsers, retained, sessions, totalMin, avgWeek, meet150, nAct, views, top, byCat, wk, changes, rb, rl, consults, logsN: logs.length };
+    return { dates, daily, total: D.users.length, active: activeUsers.size, newUsers, retained, sessions, totalMin, avgWeek, meet150, nAct, views, top, byCat, wk, changes, rb, rl, consults, logsN: logs.length, imp };
   }
 
   function chartTheme() { const cs = getComputedStyle(document.documentElement); return { ink: cs.getPropertyValue("--muted").trim() || "#6b7280", line: cs.getPropertyValue("--line").trim() || "#e5e7eb", text: cs.getPropertyValue("--ink").trim() || "#111" }; }
@@ -139,6 +144,7 @@
         ${kpi("ออกกำลังกายเฉลี่ย", `${fmt(G.avgWeek, 0)} <small>นาที/สัปดาห์</small>`, `ต่อผู้ใช้งาน 1 คน · เป้าหมาย 150`, G.avgWeek >= 150 ? "green" : "amber")}
         ${kpi("ผ่านเกณฑ์ 150 นาที", `${G.nAct ? fmt((G.meet150 / G.nAct) * 100, 0) : 0}%`, `${G.meet150} จาก ${G.active} คน`, "green")}
         ${kpi("ปรึกษานักกายภาพ", G.consults.toLocaleString(), `ครั้งในช่วง ${AD.range} วัน`, "pink")}
+        ${kpi("อัปโหลดจากแอปอื่น", G.imp.n.toLocaleString(), `${G.imp.users} คน · รวม ${G.imp.min.toLocaleString()} นาที`, "green")}
       </div>
       <div class="ad-grid">
         <section class="card ad-wide"><h3>การใช้งานรายวัน</h3><div class="ad-chart"><canvas id="adDaily"></canvas></div></section>
@@ -147,6 +153,12 @@
         <section class="card ad-wide"><h3>ท่าออกกำลังกายยอดนิยม Top 10 <small>(จำนวนครั้งที่ฝึก)</small></h3><div class="ad-chart tall"><canvas id="adTop"></canvas></div></section>
         <section class="card"><h3>เวลาออกกำลังกายเฉลี่ยต่อคน รายสัปดาห์</h3><div class="ad-chart"><canvas id="adWeek"></canvas></div></section>
         <section class="card"><h3>ระดับความเสี่ยงเบาหวาน: ครั้งแรก vs ล่าสุด</h3><div class="ad-chart"><canvas id="adRisk"></canvas></div></section>
+        <section class="card ad-wide"><h3>📥 ผลออกกำลังกายที่ผู้ใช้อัปโหลดจากแอปอื่น <small>(${G.imp.n} รายการ · ${G.imp.users} คน · ${G.imp.min.toLocaleString()} นาที ในช่วง ${AD.range} วัน)</small></h3>
+          ${G.imp.n ? `<div class="ad-table-wrap"><table class="ad-table"><thead><tr><th>วันที่</th><th>ผู้ใช้</th><th>กิจกรรม</th><th>ประเภท</th><th>นาที</th></tr></thead><tbody>
+          ${G.imp.rows.slice(0, 50).map((l) => `<tr><td>${thDate(l.date)}</td><th scope="row">${esc(l.who || "–")}</th><td>${esc(l.name)}</td><td>${CAT_TH[l.type] || esc(l.type || "–")}</td><td>${l.minutes}</td></tr>`).join("")}
+          </tbody></table></div>${G.imp.n > 50 ? `<p class="ad-foot">แสดง 50 รายการล่าสุด จากทั้งหมด ${G.imp.n} รายการ (ส่งออก CSV เพื่อดูทั้งหมด)</p>` : ""}` : `<p class="ad-imp-none">ยังไม่มีผู้ใช้อัปโหลดผลจากแอปอื่นในช่วงนี้</p>`}
+          <p class="ad-foot">รายการเหล่านี้ผู้ใช้อัปโหลดเอง (รูปแคปหน้าจอหรือไฟล์จาก Samsung Health, Strava, Garmin ฯลฯ) และถูกนับรวมในนาทีออกกำลังกายด้านบนแล้ว</p>
+        </section>
         <section class="card ad-wide"><h3>อัตราการเปลี่ยนแปลงของค่าต่าง ๆ <small>(ค่าเฉลี่ย ครั้งแรก → ล่าสุด)</small></h3>
           <div class="ad-table-wrap"><table class="ad-table"><thead><tr><th>ตัวชี้วัด</th><th>ครั้งแรก</th><th>ล่าสุด</th><th>เปลี่ยนแปลง</th><th>ดีขึ้น</th><th>n</th></tr></thead><tbody>
           ${G.changes.map((c) => { const goodDir = c.n && (c.l - c.b) * c.good > 0; return `<tr><th scope="row">${c.label}${c.unit ? ` <small>(${c.unit})</small>` : ""}</th><td>${c.n ? fmt(c.b, c.dp) : "–"}</td><td>${c.n ? fmt(c.l, c.dp) : "–"}</td>
@@ -183,6 +195,7 @@
     rows.push(["สรุป", "ผู้ใช้ทั้งหมด", G.total], ["สรุป", "ผู้ใช้งาน", G.active], ["สรุป", "การเข้าใช้งาน", G.sessions], ["สรุป", "นาทีออกกำลังกายเฉลี่ย/สัปดาห์", fmt(G.avgWeek, 1)], ["สรุป", "ผ่านเกณฑ์ 150 นาที (คน)", G.meet150]);
     G.daily.forEach((x) => rows.push(["รายวัน", x.d, `${x.dau} ผู้ใช้ / ${x.ses} ครั้ง`]));
     G.top.forEach((x, i) => rows.push(["ท่ายอดนิยม", `${i + 1}. ${x.n}`, `${x.c} ครั้ง / ${x.m} นาที`]));
+    G.imp.rows.forEach((l) => rows.push(["อัปโหลดจากแอปอื่น", `${l.date} · ${l.who || ""} · ${l.name}`, `${l.minutes} นาที`]));
     G.changes.forEach((c) => rows.push(["การเปลี่ยนแปลง", c.label, c.n ? `${fmt(c.b, 2)} → ${fmt(c.l, 2)} (${fmt(c.pct, 1)}%) n=${c.n}` : "–"]));
     const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = `predm-dashboard-${AD.src}-${AD.range}d.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
@@ -256,12 +269,12 @@
   async function loadCloudDash() {
     const sb = await cloud(), since = addDays(todayISO(), -120);
     const res = await Promise.all([
-      sb.from("profiles").select("id, age, sex, height, created_at").eq("role", "patient"),
+      sb.from("profiles").select("id, full_name, age, sex, height, created_at").eq("role", "patient"),
       sb.from("v_exercise_logs").select("user_id, day, name, type, minutes").gte("day", since).limit(20000),
       sb.from("v_body_records").select("user_id, day, weight, waist, fat, visc, height").order("day").limit(20000),
       sb.from("v_fitness_tests").select("user_id, day, chair30, tug, sls").order("day").limit(20000),
       sb.from("usage_events").select("user_id, day, kind, count").gte("day", since).limit(20000),
-      sb.from("user_data").select("user_id, key, value").in("key", ["riskInput", "consults"])]);
+      sb.from("user_data").select("user_id, key, value").in("key", ["riskInput", "consults", "logs"])]);
     const bad = res.find((r) => r.error); if (bad) throw bad.error;
     const [pr, lg, bd, ft, ev, ud] = res.map((r) => r.data || []);
     const P = A().PROGRAMS || {}, nameCat = {}; Object.entries(P).forEach(([k, v]) => v.list.forEach((e) => (nameCat[e.n] = k)));
@@ -270,8 +283,8 @@
     ev.forEach((e) => { const o = dayOf(e.day); o.users.add(e.user_id); if (e.kind === "session") o.sessions += e.count; else if (e.kind.startsWith("view:")) { const k = e.kind.slice(5); o.views[k] = (o.views[k] || 0) + e.count; } });
     const logs = lg.map((l) => ({ date: l.day, user: l.user_id, cat: nameCat[l.name] || (known.has(l.type) ? l.type : "other"), name: l.name, minutes: Number(l.minutes) || 0 }));
     logs.forEach((l) => dayOf(l.date).users.add(l.user));
-    const ri = {}, consults = [];
-    ud.forEach((r) => { if (r.key === "riskInput") ri[r.user_id] = r.value || {}; if (r.key === "consults" && Array.isArray(r.value)) r.value.filter((c) => c.status === "done").forEach((c) => consults.push({ date: c.date, user: r.user_id })); });
+    const ri = {}, consults = [], imports = [], nameOf = {}; pr.forEach((x) => (nameOf[x.id] = x.full_name || "(ไม่ระบุชื่อ)"));
+    ud.forEach((r) => { if (r.key === "logs" && Array.isArray(r.value)) r.value.filter((l) => l && l.source === "import" && !l.sample && nameOf[r.user_id]).forEach((l) => imports.push({ date: l.date, user: r.user_id, who: nameOf[r.user_id], name: l.name, type: l.type, minutes: Number(l.minutes) || 0 })); if (r.key === "riskInput") ri[r.user_id] = r.value || {}; if (r.key === "consults" && Array.isArray(r.value)) r.value.filter((c) => c.status === "done").forEach((c) => consults.push({ date: c.date, user: r.user_id })); });
     const group = (rows) => rows.reduce((m, r) => ((m[r.user_id] = m[r.user_id] || []).push(r), m), {});
     const B = group(bd), Fz = group(ft), num = (v) => (v == null || v === "" ? undefined : Number(v));
     const users = pr.map((x) => {
@@ -283,7 +296,7 @@
       if (b.length || f.length) { u.base = mk(b[0], f[0]); u.last = mk(b[b.length - 1], f[f.length - 1]); }
       return u;
     });
-    CL.dash = { users, days, logs, consults, sample: false, cloud: true }; CL.at = new Date();
+    CL.dash = { users, days, logs, consults, imports, sample: false, cloud: true }; CL.at = new Date();
   }
   const dashData = () => (AD.src === "sample" ? sampleData() : AD.src === "cloud" ? CL.dash : localData());
 

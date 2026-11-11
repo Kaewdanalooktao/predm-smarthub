@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=141">
+<link rel="stylesheet" href="styles.css?v=142">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -108,13 +108,14 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
         <div class="hello"><span class="avatar" id="helloAvatar" aria-hidden="true">ส</span><div><small id="today"></small><b id="helloName">สวัสดีครับ</b></div></div>
         <span class="top-acts"><button class="btn sm install-btn" type="button" data-install hidden>📲 ติดตั้งแอป</button><button class="icon-btn m-only theme-btn" type="button" aria-label="สลับโหมดสว่าง/มืด"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button><button class="icon-btn m-only" type="button" id="logoutM" aria-label="ออกจากระบบ"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg></button><a class="icon-btn dot" href="#chat" aria-label="ถามโค้ช"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15.5 6 9zM10 20.5a2 2 0 0 0 4 0"/></svg></a></span>
       </header>
+      <div id="impRoot"></div>
+      <a class="ar-cta pt-cta" href="#consult"><span class="ar-cta-ic" aria-hidden="true">📹</span><span><b>วิดีโอคอลปรึกษานักกายภาพบำบัด</b><small>จองคิว เล่าอาการ แล้วคุยกับนักกายภาพบำบัดผ่านวิดีโอคอลได้จากที่บ้าน</small></span><span class="fq-card-go">ปรึกษาเลย →</span></a>
       <button type="button" class="ar-cta sg-cta" data-smartgoal><span class="ar-cta-ic" aria-hidden="true">🎯</span><span><b>เป้าหมาย SMART ของฉัน</b><small>ตั้งเป้าหมายที่ทำได้จริง ติดตามผลในแอป และพิมพ์เป็นการ์ดติดบ้าน</small></span><span class="fq-card-go">ตั้งเลย →</span></button>
       <button type="button" class="ar-cta ai-cta home-ai" data-aiplan><span class="ar-cta-ic" aria-hidden="true">🤖</span><span><b>AI จัดตารางฝึกให้ (ตามความชอบของคุณ)</b><small>ตอบ 5 ข้อ AI ดูประวัติการฝึก เกมที่ชอบ และเป้าหมาย แล้วจัดตาราง 7 วันพร้อมเหตุผล ประมวลผลในเครื่อง</small></span><span class="fq-card-go">จัดเลย →</span></button>
       <div id="homeReminder"></div>
       <div id="homeGuide" hidden></div>
       <div id="treeMini"></div>
       <div class="home-grid" id="homeGrid"></div>
-      <div id="impRoot"></div>
       <div class="card">
         <div class="card-head"><h2>บันทึกการออกกำลังกายล่าสุด</h2></div>
         <div class="tbl-wrap"><table class="tbl" id="logTable"></table></div>
@@ -680,6 +681,6 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="pdpa.js?v=5"></script>
 <script src="evalpp.js?v=2"></script>
 <script src="line.js?v=3"></script>
-<script src="import.js?v=1"></script>
+<script src="import.js?v=2"></script>
 </body>
 </html>
