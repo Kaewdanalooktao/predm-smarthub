@@ -119,8 +119,8 @@
     document.body.classList.toggle("is-welcome", v === "welcome" || (v === "privacy" && !session()));
     VIEWS.forEach((x) => ($("#view-" + x).hidden = x !== v));
     $$(".nav a").forEach((a) => a.classList.toggle("active", a.dataset.view === v));
-    const cur = $(".nav nav a.active"), bar = cur?.parentElement; // phone: keep the current page's button in view
-    if (bar && bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: cur.offsetLeft - (bar.clientWidth - cur.offsetWidth) / 2, behavior: "smooth" });
+    const cur = $(".nav nav a.active"); // phone: the "เมนู" button lights up when the page is not one of the 5 buttons
+    $("#navMore")?.classList.toggle("on", !!cur && !cur.hasAttribute("data-main")); $(".nav")?.classList.remove("open"); $("#navMore")?.setAttribute("aria-expanded", "false");
     if (v === "body") renderBody();
     if (v === "transform") renderTransform();
     if (v === "home") renderHome();
@@ -299,6 +299,14 @@
       <ul class="breakdown"><li><span>สูตรที่ใช้</span><b>${r.withLab ? "ใช้ผลคอเลสเตอรอล" : "ใช้รอบเอวและส่วนสูง"}</b></li></ul>
       <div class="advice"><b>คำแนะนำ</b><ul>${tips.map((x) => `<li>${x}</li>`).join("")}</ul></div>
       <p class="field-hint">ผลนี้เป็นการคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยโรค คำนวณในเครื่องของคุณเท่านั้น</p>`;
+  }
+  function initNavMore() { // phone: bottom menu shows 5 buttons, the last one opens every page
+    const nav = $(".nav"), btn = $("#navMore"); if (!nav || !btn) return;
+    const set = (open) => { nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", String(open)); };
+    btn.addEventListener("click", (e) => { e.stopPropagation(); set(!nav.classList.contains("open")); });
+    nav.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
+    document.addEventListener("click", (e) => { if (nav.classList.contains("open") && !nav.contains(e.target)) { e.preventDefault(); set(false); } }, true);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
   }
   function initCV() {
     const form = $("#cvForm"); if (!form) return;
@@ -2120,7 +2128,7 @@ Return only the edited image.`;
   if (!document.getElementById("view-home")) return; // admin page: data only, no patient UI
   seedIfEmpty();
   $("#tArt").innerHTML = skeletonArt(P.squat); $("#gArt").innerHTML = fig(P.reach, `<circle cx="18" cy="14" r="9" fill="#5aaae6" opacity=".7"/><circle cx="86" cy="10" r="7" fill="#f0b440" opacity=".85"/><circle cx="84" cy="40" r="8" fill="#e05246" opacity=".7"/><circle cx="12" cy="44" r="6" fill="#5aaae6" opacity=".6"/>`, 1, { noBlob: true });
-  [initZoom, initBanners, initWelcome, initRisk, initCV, initExercise, initFitness, initBody, initTransform, initChat, initChatDock, renderBadges].forEach((f) => { try { f(); } catch (e) { console.error(f.name, e); noteError("init " + f.name + ": " + e.message); } });
+  [initZoom, initBanners, initNavMore, initWelcome, initRisk, initCV, initExercise, initFitness, initBody, initTransform, initChat, initChatDock, renderBadges].forEach((f) => { try { f(); } catch (e) { console.error(f.name, e); noteError("init " + f.name + ": " + e.message); } });
   const safeRoute = () => { try { route(); } catch (e) { console.error(e); noteError("route: " + e.message); } };
   window.addEventListener("hashchange", safeRoute); safeRoute();
   setTimeout(() => { try { sessionStorage.removeItem("predm.reloaded"); } catch { /* */ } }, 15000); // loaded fine: allow one auto-reload again later
