@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=150">
+<link rel="stylesheet" href="styles.css?v=151">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -161,6 +161,37 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
           <button class="btn primary" type="submit">คำนวณความเสี่ยง</button>
         </form>
         <div class="card" id="riskResult"></div>
+      </div>
+      <header class="page-head" id="cv-head" style="margin-top:28px">
+        <p class="eyebrow">ความเสี่ยงโรคหัวใจและหลอดเลือดใน 10 ปี</p>
+        <h1>Thai CV risk score</h1>
+        <p class="lede">สูตรของคณะแพทยศาสตร์โรงพยาบาลรามาธิบดี สำหรับคนไทยอายุ 35–70 ปี ที่ยังไม่เคยเป็นโรคหัวใจหรือหลอดเลือดสมอง</p>
+      </header>
+      <div class="grid2">
+        <form class="card form" id="cvForm" novalidate>
+          <label>อายุ (ปี)<input id="cv-age" type="number" inputmode="numeric" min="35" max="70" placeholder="เช่น 52" required></label>
+          <fieldset><legend>เพศ</legend>
+            <label class="chip"><input type="radio" name="cv-sex" value="m" required>ชาย</label>
+            <label class="chip"><input type="radio" name="cv-sex" value="f">หญิง</label>
+          </fieldset>
+          <label>ความดันโลหิตตัวบน (มม.ปรอท)<small class="field-hint">ตัวเลขตัวแรกที่เครื่องวัดแสดง เช่น 130/80 ให้กรอก 130</small><input id="cv-sbp" type="number" inputmode="numeric" min="70" max="220" placeholder="เช่น 130" required></label>
+          <fieldset><legend>ปัจจุบันสูบบุหรี่</legend>
+            <label class="chip"><input type="radio" name="cv-smoke" value="1" required>สูบ</label>
+            <label class="chip"><input type="radio" name="cv-smoke" value="0">ไม่สูบ</label>
+          </fieldset>
+          <fieldset><legend>เป็นโรคเบาหวาน</legend>
+            <label class="chip"><input type="radio" name="cv-dm" value="1" required>เป็น</label>
+            <label class="chip"><input type="radio" name="cv-dm" value="0">ไม่เป็น</label>
+          </fieldset>
+          <label>คอเลสเตอรอลรวม (มก./ดล.) ถ้ามีผลเลือด<small class="field-hint">ถ้าไม่มีผลเลือด เว้นว่างไว้ แล้วกรอกรอบเอวกับส่วนสูงแทน</small><input id="cv-tc" type="number" inputmode="numeric" min="100" max="400" placeholder="เช่น 210"></label>
+          <div class="row2">
+            <label>รอบเอว (ซม.)<input id="cv-waist" type="number" inputmode="decimal" step="0.1" min="40" max="200" placeholder="เช่น 85"></label>
+            <label>ส่วนสูง (ซม.)<input id="cv-ht" type="number" inputmode="decimal" step="0.1" min="100" max="220" placeholder="เช่น 160"></label>
+          </div>
+          <p class="form-error" id="cvError" role="alert" tabindex="-1" hidden></p>
+          <button class="btn primary" type="submit">คำนวณความเสี่ยงหัวใจและหลอดเลือด</button>
+        </form>
+        <div class="card" id="cvResult"></div>
       </div>
     </section>
 
@@ -660,7 +691,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="guide.js?v=3"></script>
 <script src="care.js?v=1"></script>
 <script src="chatkb.js?v=7"></script>
-<script src="app.js?v=117"></script>
+<script src="app.js?v=118"></script>
 <script src="config.js?v=10"></script>
 <script src="db.js?v=14"></script>
 <script src="hub.js?v=8"></script>

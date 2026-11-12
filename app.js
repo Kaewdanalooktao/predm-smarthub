@@ -268,6 +268,72 @@
       <div class="advice"><b>คำแนะนำ</b><ul>${advice.map((x) => `<li>${x}</li>`).join("")}</ul></div>
       <a class="btn primary" href="#exercise" style="text-align:center;text-decoration:none">ไปที่โปรแกรมออกกำลังกาย</a>`;
   }
+  /* ---------- Thai CV risk score (RAMA-EGAT, official calculator v2.5) ---------- */
+  function calcCV(f) {
+    const sex = f.sex === "m" ? 1 : 0, S0 = 0.964588;
+    const withLab = f.tc > 0;
+    const score = withLab
+      ? 0.08183 * f.age + 0.39499 * sex + 0.02084 * f.sbp + 0.69974 * f.dm + 0.00212 * f.tc + 0.41916 * f.smoke
+      : 0.079 * f.age + 0.128 * sex + 0.019350987 * f.sbp + 0.58454 * f.dm + 3.512566 * (f.waist / f.ht) + 0.459 * f.smoke;
+    const risk = (1 - Math.pow(S0, Math.exp(score - (withLab ? 7.04423 : 7.712325)))) * 100;
+    const lv = risk < 10 ? ["ความเสี่ยงต่ำ", "low"] : risk < 20 ? ["ความเสี่ยงปานกลาง", "mod"] : risk <= 30 ? ["ความเสี่ยงสูง", "high"] : ["ความเสี่ยงสูงมาก", "crit"];
+    return { risk, withLab, level: lv[0], cls: lv[1] };
+  }
+  function renderCV(r, f) {
+    const tips = ["ออกกำลังกายสม่ำเสมอ และกินผักผลไม้เป็นประจำ"];
+    if (f.smoke) tips.push("เลิกสูบบุหรี่");
+    if (f.dm) tips.push("รักษาระดับน้ำตาลในเลือดให้อยู่ในเกณฑ์");
+    if (f.sbp >= 140) tips.push("ควบคุมความดันโลหิตให้ดี");
+    if (f.tc >= 220) tips.push("พบแพทย์เพื่อดูแลระดับคอเลสเตอรอล");
+    if (!r.withLab && (f.sex === "m" ? f.waist >= 90 : f.waist >= 80)) tips.push("ลดรอบเอวและน้ำหนักให้อยู่ในเกณฑ์");
+    tips.push(r.risk >= 20 ? "ควรปรึกษาแพทย์เพื่อวางแผนลดความเสี่ยง" : "ตรวจสุขภาพประจำปีอย่างสม่ำเสมอ");
+    const shown = r.risk > 30 ? "มากกว่า 30" : r.risk.toFixed(1);
+    $("#cvResult").innerHTML = `
+      <h2>ผลการประเมิน</h2>
+      <div class="risk-score ${r.cls}"><b>${r.level}</b><div class="score-big">${shown}<small> %</small></div>
+      <small>โอกาสเกิดโรคหัวใจขาดเลือดหรือหลอดเลือดสมองใน 10 ปีข้างหน้า</small></div>
+      <div class="gauge"><div class="gauge-bar cv"><div class="gauge-mark" style="left:${Math.min(r.risk, 40) / 40 * 100}%"></div></div>
+        <div class="gauge-scale"><span>0</span><span>10</span><span>20</span><span>30</span><span>40+</span></div></div>
+      <ul class="breakdown"><li><span>สูตรที่ใช้</span><b>${r.withLab ? "ใช้ผลคอเลสเตอรอล" : "ใช้รอบเอวและส่วนสูง"}</b></li></ul>
+      <div class="advice"><b>คำแนะนำ</b><ul>${tips.map((x) => `<li>${x}</li>`).join("")}</ul></div>
+      <p class="field-hint">ผลนี้เป็นการคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยโรค คำนวณในเครื่องของคุณเท่านั้น</p>`;
+  }
+  function initCV() {
+    const form = $("#cvForm"); if (!form) return;
+    const ri = { ...(store.get("riskInput", null) || {}), ...(store.get("cvInput", null) || {}) }, pr = store.get("profile", null) || {};
+    const pre = (id, v) => { if (v && !$(id).value) $(id).value = v; };
+    pre("#cv-age", ri.age || pr.age); pre("#cv-waist", ri.waist); pre("#cv-ht", ri.ht || pr.height); pre("#cv-sbp", ri.sbp); pre("#cv-tc", ri.tc);
+    const sx = ri.sex || pr.sex; if (sx) { const el = $(`input[name="cv-sex"][value="${sx}"]`); if (el) el.checked = true; }
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const num = (id) => ($(id).value === "" ? NaN : +$(id).value), pick = (n) => $(`input[name="${n}"]:checked`)?.value;
+      const f = { age: num("#cv-age"), sex: pick("cv-sex"), sbp: num("#cv-sbp"), smoke: pick("cv-smoke"), dm: pick("cv-dm"), tc: num("#cv-tc"), waist: num("#cv-waist"), ht: num("#cv-ht") };
+      const hasTc = !Number.isNaN(f.tc);
+      const checks = [
+        [!(f.age >= 35 && f.age <= 70), "#cv-age", "อายุ (35–70 ปี)"], [!f.sex, null, "เพศ"],
+        [!(f.sbp >= 70 && f.sbp <= 220), "#cv-sbp", "ความดันตัวบน (70–220)"], [!f.smoke, null, "การสูบบุหรี่"], [!f.dm, null, "โรคเบาหวาน"],
+        [hasTc && !(f.tc >= 100 && f.tc <= 400), "#cv-tc", "คอเลสเตอรอลรวม (100–400)"],
+        [!hasTc && !(f.waist >= 40 && f.waist <= 200), "#cv-waist", "รอบเอว (40–200 ซม.) หรือคอเลสเตอรอลรวม"],
+        [!hasTc && !(f.ht >= 100 && f.ht <= 220), "#cv-ht", "ส่วนสูง (100–220 ซม.)"],
+      ];
+      $$("#cvForm input").forEach((i) => i.removeAttribute("aria-invalid"));
+      const bad = checks.filter((c) => c[0]), err = $("#cvError");
+      if (bad.length) {
+        bad.forEach((c) => c[1] && $(c[1]).setAttribute("aria-invalid", "true"));
+        err.textContent = "กรุณากรอกให้ครบ: " + bad.map((c) => c[2]).join(", "); err.hidden = false;
+        (bad[0][1] ? $(bad[0][1]) : err).focus(); return;
+      }
+      err.hidden = true;
+      f.smoke = +f.smoke; f.dm = +f.dm; if (!hasTc) f.tc = 0;
+      const r = calcCV(f); renderCV(r, f);
+      store.set("cvInput", { age: f.age, sex: f.sex, sbp: f.sbp, tc: f.tc || "", waist: f.waist || "", ht: f.ht || "" });
+      const h = store.get("cvHistory", []); h.unshift({ date: todayISO(), risk: +r.risk.toFixed(1), level: r.level, cls: r.cls }); store.set("cvHistory", h.slice(0, 50));
+      toast("บันทึกผลการประเมินแล้ว");
+    });
+    form.addEventListener("input", (e) => { if (e.target.matches("input")) e.target.removeAttribute("aria-invalid"); });
+    $("#cvResult").innerHTML = `<h2>ผลการประเมิน</h2><p class="lede">กรอกข้อมูลแล้วกดคำนวณ ผลจะแสดงที่นี่ ถ้ามีผลเลือดให้กรอกคอเลสเตอรอลรวม ถ้าไม่มีให้กรอกรอบเอวกับส่วนสูง</p>
+      <ul class="breakdown"><li><span>น้อยกว่า 10%</span><b>ความเสี่ยงต่ำ</b></li><li><span>10–19%</span><b>ปานกลาง</b></li><li><span>20–30%</span><b>สูง</b></li><li><span>มากกว่า 30%</span><b>สูงมาก</b></li></ul>`;
+  }
   function initRisk() {
     $("#riskForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -2052,7 +2118,7 @@ Return only the edited image.`;
   if (!document.getElementById("view-home")) return; // admin page: data only, no patient UI
   seedIfEmpty();
   $("#tArt").innerHTML = skeletonArt(P.squat); $("#gArt").innerHTML = fig(P.reach, `<circle cx="18" cy="14" r="9" fill="#5aaae6" opacity=".7"/><circle cx="86" cy="10" r="7" fill="#f0b440" opacity=".85"/><circle cx="84" cy="40" r="8" fill="#e05246" opacity=".7"/><circle cx="12" cy="44" r="6" fill="#5aaae6" opacity=".6"/>`, 1, { noBlob: true });
-  [initZoom, initBanners, initWelcome, initRisk, initExercise, initFitness, initBody, initTransform, initChat, initChatDock, renderBadges].forEach((f) => { try { f(); } catch (e) { console.error(f.name, e); noteError("init " + f.name + ": " + e.message); } });
+  [initZoom, initBanners, initWelcome, initRisk, initCV, initExercise, initFitness, initBody, initTransform, initChat, initChatDock, renderBadges].forEach((f) => { try { f(); } catch (e) { console.error(f.name, e); noteError("init " + f.name + ": " + e.message); } });
   const safeRoute = () => { try { route(); } catch (e) { console.error(e); noteError("route: " + e.message); } };
   window.addEventListener("hashchange", safeRoute); safeRoute();
   setTimeout(() => { try { sessionStorage.removeItem("predm.reloaded"); } catch { /* */ } }, 15000); // loaded fine: allow one auto-reload again later
