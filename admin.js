@@ -228,6 +228,7 @@
   // (supabase/admin_otp.sql), so a stolen password alone cannot open patient data.
   // config.js `adminEmailCode: false` turns step 2 off (password only); the database must then run supabase/admin_password_only.sql.
   const OTP_ON = CFG.adminEmailCode === true;
+  const DEMO_OK = !CL.on || (CFG.demoAccounts !== false || (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && !/[?&]nodemo\b/.test(location.search))); // trial admin accounts (hidden for real testing)
   const ADMIN_MAX_H = 12; // hours before an admin must sign in (and get a new code) again
   async function staffProfile(sb, uid) {
     const { data: prof, error } = await sb.from("profiles").select("full_name, role").eq("id", uid).maybeSingle(); if (error) throw error;
@@ -360,14 +361,14 @@
     $("#apApp").innerHTML = `<section class="card ap-login">
       <div class="ap-brand big">pre<b>DM</b> <span>ADMIN</span></div><p class="ap-pl">Pre-DM Smart Hub (แพลตฟอร์มอ่อนหวานวิทยา)</p>
       <h1>เข้าสู่ระบบผู้ดูแล</h1><p class="lede">สำหรับผู้ดูแลระบบและนักกายภาพบำบัด ดูภาพรวมการใช้งานและกำหนดโปรแกรมออกกำลังกายให้ผู้ป่วย</p>
-      <form id="apLoginF" class="form" novalidate>
+      ${DEMO_OK ? `<form id="apLoginF" class="form" novalidate>
         <label>ชื่อผู้ใช้<input id="apUser" autocomplete="username" placeholder="admin"></label>
         <label>รหัส PIN<input id="apPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••"></label>
         <p class="form-error" id="apLoginErr" role="alert" hidden></p>
         <button class="btn primary" type="submit">เข้าสู่ระบบ</button>
       </form>
-      <div class="ap-demo"><small>บัญชีทดลอง (PIN 1234)</small>${ADMINS.map((a, i) => `<button type="button" class="demo" data-acc="${i}"><span class="code ${i ? "green" : "blue"}">${i ? "PT" : "AD"}</span><span><b>${a.name}</b><small>${a.user} · ${a.role}</small></span></button>`).join("")}</div>
-      ${CL.on ? `<form id="apCloudF" class="form ap-cloud" novalidate><h3>☁️ บัญชีจริง (ฐานข้อมูล)</h3>${OTP_ON ? `<div class="ap-steps" aria-hidden="true"><span class="on">1 รหัสผ่าน</span><span>2 รหัส OTP</span></div>` : ""}
+      <div class="ap-demo"><small>บัญชีทดลอง (PIN 1234)</small>${ADMINS.map((a, i) => `<button type="button" class="demo" data-acc="${i}"><span class="code ${i ? "green" : "blue"}">${i ? "PT" : "AD"}</span><span><b>${a.name}</b><small>${a.user} · ${a.role}</small></span></button>`).join("")}</div>` : ""}
+      ${CL.on ? `<form id="apCloudF" class="form ap-cloud" novalidate><h3>${DEMO_OK ? "☁️ บัญชีจริง (ฐานข้อมูล)" : "บัญชีผู้ดูแล / นักกายภาพบำบัด"}</h3>${OTP_ON ? `<div class="ap-steps" aria-hidden="true"><span class="on">1 รหัสผ่าน</span><span>2 รหัส OTP</span></div>` : ""}
         <label>ชื่อผู้ใช้ (อีเมล)<input id="apEmail" type="email" autocomplete="username" placeholder="physio@example.com"></label>
         <label>รหัสผ่าน<input id="apPass" type="password" autocomplete="current-password"></label>
         <p class="form-error" id="apCloudErr" role="alert" hidden></p>
@@ -385,10 +386,10 @@
           <button class="btn primary" type="submit" id="apSignGo">สมัครบัญชี</button>
           <small class="hint">หลังสมัคร บัญชีจะยังเข้าหน้าผู้ดูแลไม่ได้ จนกว่าเจ้าของระบบจะกำหนดสิทธิ์เป็น admin หรือ physio ให้</small>
         </form></details>` : ""}
-      <p class="ap-warn">${CL.on ? "บัญชีทดลองด้านบนใช้ข้อมูลตัวอย่างในเบราว์เซอร์เท่านั้น" : "ระบบล็อกอินนี้เป็นแบบทดลองในเบราว์เซอร์ ก่อนใช้งานจริงต้องเชื่อมระบบยืนยันตัวตนและฐานข้อมูลฝั่งเซิร์ฟเวอร์"}</p>
+      <p class="ap-warn"${DEMO_OK ? "" : " hidden"}>${CL.on ? "บัญชีทดลองด้านบนใช้ข้อมูลตัวอย่างในเบราว์เซอร์เท่านั้น" : "ระบบล็อกอินนี้เป็นแบบทดลองในเบราว์เซอร์ ก่อนใช้งานจริงต้องเชื่อมระบบยืนยันตัวตนและฐานข้อมูลฝั่งเซิร์ฟเวอร์"}</p>
       <a class="link" href="index.html">← กลับไปหน้าแอปผู้ใช้</a> · <a class="link" href="manual.html#staff" target="_blank" rel="noopener">📘 คู่มือสำหรับผู้ดูแล</a>
     </section>`;
-    $("#apLoginF").addEventListener("submit", (e) => {
+    $("#apLoginF")?.addEventListener("submit", (e) => {
       e.preventDefault(); const u = $("#apUser").value.trim().toLowerCase(), p = $("#apPin").value, a = ADMINS.find((x) => x.user === u);
       const err = $("#apLoginErr"); if (!a || a.pin !== p) { err.textContent = "ชื่อผู้ใช้หรือรหัส PIN ไม่ถูกต้อง"; err.hidden = false; return; }
       store().set("adminSession", { user: a.user, name: a.name, role: a.role, at: Date.now() }); boot();

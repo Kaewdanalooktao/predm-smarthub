@@ -22,6 +22,9 @@ window.PREDM_CONFIG = {
   // Admin page sign-in. false = email + password only. true = also a one-time code sent by email (safer).
   // The database must match: false → run supabase/admin_password_only.sql · true → run supabase/admin_otp.sql
   adminEmailCode: false,
+  // Trial (demo) accounts on the sign-in pages. false = hide them, so people sign in with a real account only
+  // (use this for real testing with users). true = show the trial accounts again.
+  demoAccounts: false,
   // Who people contact about their personal data (shown on the PDPA page), e.g. "รพ.สต. … โทร 0xx-xxx-xxxx".
   privacyContact: "",
 };

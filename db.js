@@ -154,9 +154,15 @@
   }
 
   /* ---------- UI on the welcome page ---------- */
+  const DEMO_OK = (CFG.demoAccounts !== false || (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && !/[?&]nodemo\b/.test(location.search)));
+  function hideDemo() { // real testing: only real accounts can sign in; keep the admin link reachable
+    const form = $("#l-phone")?.closest("form"), box = $("#cloudBox"); if (DEMO_OK || !form || !box) return;
+    const admin = form.querySelector(".admin-link"); if (admin) box.append(admin);
+    form.hidden = true;
+  }
   function cloudUI() {
     const form = $("#l-phone")?.closest("form"); if (!form || $("#cloudBox")) return;
-    form.insertAdjacentHTML("afterend", `<section class="card cloud-box" id="cloudBox"><h2 class="cloud-h">☁️ บัญชีจริง <small>ข้อมูลซิงก์กับฐานข้อมูล</small></h2>
+    form.insertAdjacentHTML("afterend", `<section class="card cloud-box" id="cloudBox"><h2 class="cloud-h">${DEMO_OK ? "☁️ บัญชีจริง <small>ข้อมูลซิงก์กับฐานข้อมูล</small>" : "เข้าสู่ระบบ"}</h2>
       ${LINE_ID ? `<button type="button" class="btn line-login" id="c-line"><span class="ln-logo" aria-hidden="true">LINE</span> เข้าสู่ระบบด้วย LINE</button>
       <small class="cloud-note">กดครั้งเดียว ไม่ต้องจำรหัสผ่าน · ระบบได้รับเฉพาะชื่อและรหัสผู้ใช้ LINE ของคุณ (<a href="#privacy">นโยบาย PDPA</a>)</small>
       <p class="cloud-msg" id="c-lmsg" role="alert" hidden></p><div class="cloud-or"><span>หรือใช้อีเมล</span></div>` : ""}
@@ -236,7 +242,7 @@
 
   /* ---------- start ---------- */
   async function start() {
-    hookStore(); cloudUI();
+    hookStore(); cloudUI(); hideDemo();
     try { await loadLib(); } catch { setStatus("err", "⚠️ โหลดตัวเชื่อมฐานข้อมูลไม่สำเร็จ · ใช้ข้อมูลในเครื่อง"); return; }
     D.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "predm.auth" } });
     // came back from a password-reset email: ask for the new password
@@ -250,6 +256,7 @@
       const after = JSON.stringify(SYNC.map((k) => raw.get(k)));
       if (before !== after && !sessionStorage.getItem("predm.pulled")) { sessionStorage.setItem("predm.pulled", "1"); location.reload(); return; }
     } else if (sess?.cloud) { raw.del("session"); location.hash = "welcome"; } // token expired
+    else if (sess && !DEMO_OK) { raw.del("session"); location.hash = "welcome"; } // trial accounts are switched off
     else setStatus("local", "💾 บัญชีทดลอง · เก็บข้อมูลในเครื่องนี้");
     D.ready = true;
     // logout buttons: also end the cloud session
