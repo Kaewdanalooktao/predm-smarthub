@@ -2287,3 +2287,16 @@ a.ar-cta { text-decoration: none; }
 .fu-none { color: var(--muted); font-size: .85rem; } .fu-foot { font-size: .82rem; margin: 12px 0 0; } .fu-demo { padding: 10px 14px; border-radius: 12px; background: #fff4d6; color: #6b4a00; margin: 0 0 14px; }
 :root[data-theme="dark"] .px-tile.crit b { color: #ff9c8f; } :root[data-theme="dark"] .px-tile.crit { border-color: #b3665c; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .px-tile.crit b { color: #ff9c8f; } :root:not([data-theme="light"]) .px-tile.crit { border-color: #b3665c; } }
+
+/* home top bar on phones: keep the greeting readable beside the round buttons */
+.hello { min-width: 0; flex: 1 1 auto; } .hello > div { min-width: 0; }
+@media (max-width: 520px) {
+  .topbar { gap: 8px; } .hello { gap: 9px; }
+  .hello .avatar { width: 40px; height: 40px; font-size: 1.05rem; }
+  .hello small { font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hello b { display: block; font-size: 1rem; line-height: 1.25; white-space: nowrap; }
+  .hello-nm { display: block; overflow: hidden; text-overflow: ellipsis; }
+  .top-acts { gap: 6px; flex: none; } .top-acts .icon-btn { width: 38px; height: 38px; }
+  .top-acts .icon-btn .ico { width: 20px; height: 20px; }
+}
+@media (max-width: 430px) { .hello .avatar { display: none; } }

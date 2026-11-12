@@ -114,13 +114,13 @@
     const { data, error } = await D.sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
     await adoptUser(data.user, { fresh: true });
-    location.hash = "home"; location.reload();
+    location.hash = nextHash(); location.reload();
   }
   async function signUp({ email, password, full_name, phone, consent }) {
     const { data, error } = await D.sb.auth.signUp({ email, password, options: { data: { full_name, phone, consent: consent ? "true" : "false" }, emailRedirectTo: location.origin + location.pathname } });
     if (error) throw error;
     if (!data.session) return "confirm"; // email confirmation required
-    await adoptUser(data.user, { fresh: true }); location.hash = "home"; location.reload(); return "ok";
+    await adoptUser(data.user, { fresh: true }); location.hash = nextHash(); location.reload(); return "ok";
   }
   async function signOut() {
     try { await push(); await D.sb.auth.signOut(); } catch { /* */ }
@@ -128,6 +128,11 @@
     D.user = null; setStatus("local");
   }
 
+  // page to open after sign-in: the one a LINE menu link asked for (kept by app.js while signed out), else home
+  function nextHash() {
+    try { const n = JSON.parse(sessionStorage.getItem("predm-next") || "null"); sessionStorage.removeItem("predm-next"); if (n && Date.now() - n.at < 30 * 60e3 && /^[a-z-]{2,20}$/.test(n.h)) return n.h; } catch { /* */ }
+    return "home";
+  }
   /* ---------- sign in with LINE (LINE Login channel + Edge Function "line-login") ---------- */
   const LINE_ID = String(CFG.lineLoginChannelId || "").trim(), LINE_KEY = "predm.lineLogin";
   const lineRedirect = () => location.origin + location.pathname.replace(/[^/]*$/, "") + "index.html"; // not the bare folder address: that one opens the landing page
@@ -144,7 +149,7 @@
       const { data, error } = await D.sb.functions.invoke("line-login", { body: { code: q.get("code"), redirect_uri: saved.redirect, nonce: saved.nonce } });
       if (error) { let msg = ""; try { msg = (await error.context?.json?.())?.error || ""; } catch { /* */ } throw new Error(msg || "เชื่อมต่อระบบ LINE ไม่ได้ กรุณาลองใหม่อีกครั้ง"); }
       const v = await D.sb.auth.verifyOtp({ token_hash: data.token_hash, type: "magiclink" }); if (v.error) throw v.error;
-      await adoptUser(v.data.user, { fresh: true }); location.hash = "home"; location.reload(); return true;
+      await adoptUser(v.data.user, { fresh: true }); location.hash = nextHash(); location.reload(); return true;
     } catch (e) { return fail(String(e?.message || e)); }
   }
 

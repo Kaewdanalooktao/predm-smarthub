@@ -94,9 +94,16 @@
   /* ---------- router ---------- */
   const VIEWS = ["welcome", "home", "risk", "exercise", "tracking", "game", "fitness", "body", "transform", "consult", "tree", "food", "profile", "eval", "privacy"];
   let lastView = null;
+  const NEXT_KEY = "predm-next"; // page to open right after sign-in (deep link from the LINE menu)
+  function keepNext(h) { try { sessionStorage.setItem(NEXT_KEY, JSON.stringify({ h, at: Date.now() })); } catch { /* private mode */ } }
+  function takeNext() {
+    try { const n = JSON.parse(sessionStorage.getItem(NEXT_KEY) || "null"); sessionStorage.removeItem(NEXT_KEY); if (n && Date.now() - n.at < 30 * 60e3 && /^[a-z-]{2,20}$/.test(n.h)) return n.h; } catch { /* */ }
+    return null;
+  }
   function route() {
     const hx = location.hash.slice(1);
     if (hx === "chat") { // the chat is a floating window now: open it over the current page
+      if (!session()) keepNext("chat");
       history.replaceState(null, "", "#" + (lastView || "home"));
       if (session()) setTimeout(() => window.PreDMChat?.open(), 0);
       if (lastView) return; return route();
@@ -106,7 +113,7 @@
     if (hx.startsWith("ex-") && (PROGRAMS[hx.slice(3)] || hx === "ex-mine" || hx === "ex-rx")) { exTab = hx.slice(3); renderExercise(); }
     const ptLink = /^consult\/pt\/[a-z0-9]{6,16}$/.test(hx); // physiotherapist joins a call from a shared link (no patient login needed)
     let v = ptLink ? "consult" : hx.startsWith("ex-") ? "exercise" : VIEWS.includes(hx) ? hx : "home";
-    if (!session() && v !== "welcome" && v !== "privacy" && !ptLink) v = "welcome";
+    if (!session() && v !== "welcome" && v !== "privacy" && !ptLink) { if (v !== "home") keepNext(hx); v = "welcome"; } // remember the page a LINE menu link asked for
     document.body.classList.toggle("is-ptlink", ptLink && !session());
     if (session() && v === "welcome" && location.hash !== "#welcome") v = "home";
     document.body.classList.toggle("is-welcome", v === "welcome" || (v === "privacy" && !session()));
@@ -160,7 +167,7 @@
   }
   function renderHome() {
     queueMicrotask(() => window.dispatchEvent(new Event("predm:home")));
-    const nm = profile().name || "คุณ"; $("#helloName").textContent = "สวัสดีครับ, " + nm; $("#helloAvatar").textContent = nm.replace(/^(คุณ|อสม\.)\s*/, "").charAt(0) || "ส";
+    const nm = profile().name || "คุณ"; { const hn = $("#helloName"), sp = document.createElement("span"); hn.textContent = "สวัสดีครับ, "; sp.className = "hello-nm"; sp.textContent = nm; hn.append(sp); } $("#helloAvatar").textContent = nm.replace(/^(คุณ|อสม\.)\s*/, "").charAt(0) || "ส";
     $("#today").textContent = new Date().toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
     const w = weekStats(), risk = store.get("riskHistory", [])[0], body = store.get("body", []).slice().sort((a, b) => a.date.localeCompare(b.date));
     const last = body[body.length - 1], first = body[0];
@@ -2007,7 +2014,10 @@ Return only the edited image.`;
   function login(d) {
     store.set("session", { name: d.name, phone: d.phone, staff: !!d.staff, at: Date.now() });
     saveProfile({ name: d.name, age: d.age, sex: d.sex, height: d.height });
-    toast("ยินดีต้อนรับ " + d.name); location.hash = "home";
+    toast("ยินดีต้อนรับ " + d.name);
+    const next = takeNext();
+    if (next === "chat") { location.hash = "home"; setTimeout(() => { location.hash = "chat"; }, 400); }
+    else { const to = !d.staff && next ? next : "home"; if (location.hash === "#" + to) safeRoute(); else location.hash = to; } // same hash fires no hashchange
   }
   function initWelcome() {
     $("#sceneArt").innerHTML = sceneArt();
