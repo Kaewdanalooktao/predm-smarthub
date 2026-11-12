@@ -119,6 +119,8 @@
     document.body.classList.toggle("is-welcome", v === "welcome" || (v === "privacy" && !session()));
     VIEWS.forEach((x) => ($("#view-" + x).hidden = x !== v));
     $$(".nav a").forEach((a) => a.classList.toggle("active", a.dataset.view === v));
+    const cur = $(".nav nav a.active"), bar = cur?.parentElement; // phone: keep the current page's button in view
+    if (bar && bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: cur.offsetLeft - (bar.clientWidth - cur.offsetWidth) / 2, behavior: "smooth" });
     if (v === "body") renderBody();
     if (v === "transform") renderTransform();
     if (v === "home") renderHome();
