@@ -91,7 +91,7 @@
   async function adoptUser(user, { fresh } = {}) {
     D.user = user;
     const { data: prof } = await D.sb.from("profiles").select("full_name,phone,age,sex,height,role").eq("id", user.id).maybeSingle();
-    const name = prof?.full_name || user.user_metadata?.full_name || user.email;
+    const name = prof?.full_name || user.user_metadata?.full_name || user.user_metadata?.phone || user.email;
     const sess = { name, phone: prof?.phone || user.user_metadata?.phone || "", cloud: true, uid: user.id, role: prof?.role || "patient", at: Date.now() };
     if (fresh) await pull({ replace: true }); else await pull();
     // PDPA consent is asked once per account: it was given when signing up (or at the first-use screen) and is kept with the
@@ -110,14 +110,26 @@
     clearTimeout(D.timer); push();
     try { await D.sb.auth.updateUser({ data: { consent: c.health ? "true" : "false", consent_v: c.v || 1, consent_at: c.at || new Date().toISOString(), consent_research: c.research ? "true" : "false" } }); } catch (e) { console.warn("[db] consent not saved with the account", e?.message || e); }
   }
+  const phoneMail = (phone) => phone + "@kaewdanalooktao.github.io";
   async function signIn(email, password) {
     const { data, error } = await D.sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
     await adoptUser(data.user, { fresh: true });
     location.hash = nextHash(); location.reload();
   }
-  async function signUp({ email, password, full_name, phone, consent }) {
-    const { data, error } = await D.sb.auth.signUp({ email, password, options: { data: { full_name, phone, consent: consent ? "true" : "false" }, emailRedirectTo: location.origin + location.pathname } });
+  async function phoneTaken(phone) { try { const q = await D.sb.rpc("phone_taken", { p_phone: phone }); return !q.error && q.data === true; } catch { return false; } }
+  async function signInPhone(phone, pin) {
+    let r = await D.sb.auth.signInWithPassword({ email: phoneMail(phone), password: pin });
+    if (r.error && /Invalid login/i.test(r.error.message)) { // maybe an account that also gave an e-mail: look it up with the PIN
+      const q = await D.sb.rpc("phone_login_id", { p_phone: phone, p_pin: pin });
+      if (q.error && /locked/i.test(q.error.message)) throw new Error("ใส่ PIN ผิดหลายครั้ง กรุณารอ 15 นาทีแล้วลองใหม่");
+      if (!q.error && q.data) r = await D.sb.auth.signInWithPassword({ email: q.data, password: pin });
+    }
+    if (r.error) throw r.error;
+    await adoptUser(r.data.user, { fresh: true }); location.hash = nextHash(); location.reload();
+  }
+  async function signUp({ email, password, full_name, phone, consent, extra }) {
+    const { data, error } = await D.sb.auth.signUp({ email, password, options: { data: { full_name, phone, consent: consent ? "true" : "false", ...(extra || {}) }, emailRedirectTo: location.origin + location.pathname } });
     if (error) throw error;
     if (!data.session) return "confirm"; // email confirmation required
     await adoptUser(data.user, { fresh: true }); location.hash = nextHash(); location.reload(); return "ok";
@@ -165,16 +177,18 @@
     form.insertAdjacentHTML("afterend", `<section class="card cloud-box" id="cloudBox"><h2 class="cloud-h">${DEMO_OK ? "☁️ บัญชีจริง <small>ข้อมูลซิงก์กับฐานข้อมูล</small>" : "เข้าสู่ระบบ"}</h2>
       ${LINE_ID ? `<button type="button" class="btn line-login" id="c-line"><span class="ln-logo" aria-hidden="true">LINE</span> เข้าสู่ระบบด้วย LINE</button>
       <small class="cloud-note">กดครั้งเดียว ไม่ต้องจำรหัสผ่าน · ระบบได้รับเฉพาะชื่อและรหัสผู้ใช้ LINE ของคุณ (<a href="#privacy">นโยบาย PDPA</a>)</small>
-      <p class="cloud-msg" id="c-lmsg" role="alert" hidden></p><div class="cloud-or"><span>หรือใช้อีเมล</span></div>` : ""}
-      <div class="cloud-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-ct="in">เข้าสู่ระบบด้วยอีเมล</button><button type="button" role="tab" aria-selected="false" data-ct="up">สมัครบัญชีใหม่</button></div>
+      <p class="cloud-msg" id="c-lmsg" role="alert" hidden></p><div class="cloud-or"><span>หรือใช้เบอร์โทร</span></div>` : ""}
+      <div class="cloud-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-ct="in">เข้าสู่ระบบ</button><button type="button" role="tab" aria-selected="false" data-ct="up">สมัครบัญชีใหม่</button></div>
       <form id="cloudForm" class="cloud-form" novalidate>
-        <div class="cloud-up" hidden><label>ชื่อ-สกุล<input id="c-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี"></label><label>เบอร์โทร<input id="c-phone" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxx"></label></div>
-        <label>อีเมล<input id="c-email" type="email" autocomplete="email" placeholder="you@example.com"></label>
-        <label>รหัสผ่าน<input id="c-pass" type="password" autocomplete="current-password" placeholder="อย่างน้อย 8 ตัว"></label>
+        <div class="cloud-up" hidden><label>ชื่อ-สกุล<input id="c-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี"></label></div>
+        <label><span id="c-idl">เบอร์โทรศัพท์</span><input id="c-email" type="text" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxx"></label>
+        <label><span id="c-pwl">รหัส PIN 6 หลัก</span><input id="c-pass" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" placeholder="ตัวเลข 6 หลัก"></label>
+        <label class="cloud-up" hidden>อีเมล (ถ้ามี · ไม่มีก็เว้นว่างได้)<input id="c-rmail" type="email" inputmode="email" autocomplete="email" placeholder="ใช้รับลิงก์ตั้ง PIN ใหม่เมื่อลืม"></label>
         <label class="cloud-consent cloud-up" hidden><input type="checkbox" id="c-consent"><span>ยินยอมให้เก็บและใช้ข้อมูลสุขภาพของฉัน (ผลประเมิน การออกกำลังกาย อาหาร สัดส่วนร่างกาย) เพื่อการดูแลสุขภาพ และให้นักกายภาพบำบัดในโครงการเข้าถึงได้ ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล</span></label>
         <p class="cloud-msg" id="c-msg" role="alert" hidden></p>
         <button class="btn grad" type="submit" id="c-go">เข้าสู่ระบบ</button>
-        <button type="button" class="link cloud-forgot" id="c-forgot">ลืมรหัสผ่าน?</button>
+        <button type="button" class="link cloud-forgot" id="c-forgot">ลืม PIN?</button>
+        <button type="button" class="link cloud-forgot" id="c-usemail">บัญชีเดิมที่สมัครด้วยอีเมล กดที่นี่</button>
         <small class="cloud-note">☁️ บัญชีจริง: ข้อมูลซิงก์ขึ้นฐานข้อมูล ใช้ได้ทุกเครื่อง และรับโปรแกรมจากนักกายภาพอัตโนมัติ</small>
       </form></section>`);
     $("#c-line")?.addEventListener("click", () => {
@@ -189,35 +203,53 @@
     $("#c-forgot").addEventListener("click", async () => {
       const msg = $("#c-msg"), say = (t, ok) => { msg.textContent = t; msg.hidden = false; msg.dataset.ok = ok ? "1" : ""; };
       const email = $("#c-email").value.trim();
+      if (!byMail) {
+        if (mode === "up") return say("กดแท็บ “เข้าสู่ระบบ” ก่อน แล้วกด “ลืม PIN?” อีกครั้ง");
+        byMail = true; $("#c-email").value = ""; $("#c-pass").value = ""; idMode(); $("#c-email").focus();
+        return say("ถ้าตอนสมัครใส่อีเมลไว้: กรอกอีเมลนั้นในช่องด้านบน แล้วกด “ลืมรหัสผ่าน?” อีกครั้ง ระบบจะส่งลิงก์ตั้ง PIN ใหม่ไปที่อีเมล · ถ้าไม่ได้ใส่อีเมลไว้ ให้ติดต่อเจ้าหน้าที่โครงการ");
+      }
       if (!/^\S+@\S+\.\S+$/.test(email)) { $("#c-email").focus(); return say("กรอกอีเมลของบัญชีก่อน แล้วกด “ลืมรหัสผ่าน?” อีกครั้ง"); }
       if (!D.sb) return say("ยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง");
       $("#c-forgot").disabled = true;
       const { error } = await D.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
       $("#c-forgot").disabled = false;
       if (error) return say(/rate limit|security purposes/i.test(error.message) ? "ขอรีเซ็ตบ่อยเกินไป กรุณารอสักครู่" : error.message);
-      say("ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลแล้ว เปิดอีเมลแล้วกดลิงก์ (ดูในจดหมายขยะด้วย)", true);
+      say("ส่งลิงก์ตั้ง PIN/รหัสผ่านใหม่ไปที่อีเมลแล้ว เปิดอีเมลแล้วกดลิงก์ (ดูในจดหมายขยะด้วย)", true);
     });
-    let mode = "in";
+    let mode = "in", byMail = false; // byMail: an older account that signed up with an e-mail address
+    const idMode = () => {
+      const id = $("#c-email"), pw = $("#c-pass"); if (mode === "up") byMail = false;
+      $("#c-idl").textContent = byMail ? "อีเมล" : "เบอร์โทรศัพท์"; id.inputMode = byMail ? "email" : "tel"; id.placeholder = byMail ? "you@example.com" : "08xxxxxxxx";
+      $("#c-pwl").textContent = byMail ? "รหัสผ่าน" : mode === "up" ? "ตั้งรหัส PIN 6 หลัก (ตัวเลข จำให้ได้)" : "รหัส PIN 6 หลัก"; pw.inputMode = byMail ? "text" : "numeric"; pw.placeholder = byMail ? "รหัสผ่าน" : "ตัวเลข 6 หลัก";
+      if (byMail) pw.removeAttribute("maxlength"); else { pw.maxLength = 6; pw.value = pw.value.replace(/\D/g, "").slice(0, 6); }
+      $("#c-forgot").textContent = byMail ? "ลืมรหัสผ่าน?" : "ลืม PIN?"; $("#c-usemail").hidden = mode === "up";
+      $("#c-usemail").textContent = byMail ? "กลับไปใช้เบอร์โทร + PIN" : "บัญชีเดิมที่สมัครด้วยอีเมล กดที่นี่";
+    };
+    $("#c-usemail").addEventListener("click", () => { byMail = !byMail; $("#c-email").value = ""; $("#c-pass").value = ""; $("#c-msg").hidden = true; idMode(); $("#c-email").focus(); });
     $("#cloudBox").addEventListener("click", (e) => { const t = e.target.closest("[data-ct]"); if (!t) return; mode = t.dataset.ct;
       document.querySelectorAll("[data-ct]").forEach((b) => b.setAttribute("aria-selected", String(b === t))); document.querySelectorAll(".cloud-up").forEach((x) => (x.hidden = mode !== "up"));
-      $("#c-go").textContent = mode === "up" ? "สมัครและเข้าสู่ระบบ" : "เข้าสู่ระบบ"; $("#c-pass").autocomplete = mode === "up" ? "new-password" : "current-password"; });
+      $("#c-go").textContent = mode === "up" ? "สมัครและเข้าสู่ระบบ" : "เข้าสู่ระบบ"; $("#c-pass").autocomplete = mode === "up" ? "new-password" : "current-password"; idMode(); });
     $("#cloudForm").addEventListener("submit", async (e) => {
       e.preventDefault(); const msg = $("#c-msg"), say = (t, ok) => { msg.textContent = t; msg.hidden = false; msg.dataset.ok = ok ? "1" : ""; };
-      const email = $("#c-email").value.trim(), password = $("#c-pass").value;
-      if (!/^\S+@\S+\.\S+$/.test(email)) return say("กรุณากรอกอีเมลให้ถูกต้อง");
-      if (password.length < 8) return say("รหัสผ่านอย่างน้อย 8 ตัวอักษร");
-      $("#c-go").disabled = true;
+      const raw = $("#c-email").value.trim(), password = $("#c-pass").value, phone = raw.replace(/\D/g, "");
+      if (byMail) { if (!/^\S+@\S+\.\S+$/.test(raw)) return say("กรุณากรอกอีเมลให้ถูกต้อง"); if (password.length < 6) return say("กรุณากรอกรหัสผ่าน"); }
+      else { if (!/^0\d{9}$/.test(phone)) return say("กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก เช่น 0812345678"); if (!/^\d{6}$/.test(password)) return say("รหัส PIN ต้องเป็นตัวเลข 6 หลัก"); }
+      const email = byMail ? raw : phoneMail(phone);
+      $("#c-go").disabled = true; let usedMail = "";
       try {
         if (mode === "up") {
-          const full_name = $("#c-name").value.trim(), phone = $("#c-phone").value.replace(/\D/g, "");
+          const full_name = $("#c-name").value.trim();
           if (!full_name) throw new Error("กรุณากรอกชื่อ-สกุล");
           if (!$("#c-consent").checked) throw new Error("กรุณาให้ความยินยอมก่อนสมัคร");
-          const r = await signUp({ email, password, full_name, phone, consent: true });
-          if (r === "confirm") say("สมัครสำเร็จ! กรุณายืนยันอีเมลจากกล่องจดหมาย แล้วกลับมาเข้าสู่ระบบ", true);
-        } else await signIn(email, password);
+          const rmail = $("#c-rmail").value.trim(); usedMail = rmail;
+          if (rmail && !/^\S+@\S+\.\S+$/.test(rmail)) throw new Error("อีเมลไม่ถูกต้อง ถ้าไม่มีอีเมลให้เว้นว่างไว้");
+          if (await phoneTaken(phone)) throw new Error("เบอร์นี้สมัครแล้ว กด “เข้าสู่ระบบ” แล้วใส่ PIN เดิม");
+          const r = await signUp({ email: rmail || email, password, full_name, phone, consent: true, extra: rmail ? { pin: "1", pin_phone: phone } : { pin: "1" } });
+          if (r === "confirm") say("ระบบยังไม่ได้เปิดการสมัครด้วยเบอร์โทร กรุณาแจ้งเจ้าหน้าที่โครงการ");
+        } else if (byMail) await signIn(email, password); else await signInPhone(phone, password);
       } catch (err) {
         const m = String(err?.message || err);
-        say(/Invalid login/i.test(m) ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง" : /Email not confirmed/i.test(m) ? "ยังไม่ได้ยืนยันอีเมล กรุณาเปิดลิงก์ในอีเมลก่อน" : /already registered/i.test(m) ? "อีเมลนี้สมัครแล้ว ลองเข้าสู่ระบบ" : m);
+        say(/Invalid login/i.test(m) ? (byMail ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง" : "เบอร์โทรหรือ PIN ไม่ถูกต้อง ถ้ายังไม่เคยสมัคร กด “สมัครบัญชีใหม่”") : /Email not confirmed/i.test(m) ? "ยังไม่ได้ยืนยันอีเมล กรุณาเปิดลิงก์ในอีเมลก่อน" : /already registered/i.test(m) ? (usedMail ? "อีเมลนี้ใช้สมัครแล้ว ลองเข้าสู่ระบบ หรือเว้นช่องอีเมลว่างไว้" : "เบอร์นี้สมัครแล้ว กด “เข้าสู่ระบบ” แล้วใส่ PIN เดิม") : /password/i.test(m) && /(least|weak|should)/i.test(m) ? "ระบบยังไม่รับ PIN 6 หลัก กรุณาแจ้งเจ้าหน้าที่โครงการ" : /email.*invalid|invalid.*email/i.test(m) ? "ระบบยังไม่รับการสมัครด้วยเบอร์โทร กรุณาแจ้งเจ้าหน้าที่โครงการ" : m);
       } finally { $("#c-go").disabled = false; }
     });
   }
@@ -225,18 +257,19 @@
   function newPasswordUI() {
     if (document.getElementById("pwReset")) return;
     document.body.insertAdjacentHTML("beforeend", `<div class="care-modal" id="pwReset" role="dialog" aria-modal="true" aria-labelledby="pwH"><div class="care-box">
-      <div class="care-head"><span class="care-ico">🔑</span><div><h2 id="pwH">ตั้งรหัสผ่านใหม่</h2><small>สำหรับบัญชีจริงของคุณ</small></div></div>
-      <form id="pwForm" class="form" novalidate><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัว)<input id="pw1" type="password" autocomplete="new-password" autofocus></label>
-        <label>ยืนยันรหัสผ่านใหม่<input id="pw2" type="password" autocomplete="new-password"></label>
-        <p class="care-err" id="pwErr" role="alert" hidden></p><div class="care-foot"><button class="btn primary" type="submit">บันทึกรหัสผ่านใหม่</button></div></form></div></div>`);
+      <div class="care-head"><span class="care-ico">🔑</span><div><h2 id="pwH">ตั้ง PIN / รหัสผ่านใหม่</h2><small>สำหรับบัญชีจริงของคุณ</small></div></div>
+      <form id="pwForm" class="form" novalidate><label>PIN ใหม่ ตัวเลข 6 หลัก <small>(บัญชีอีเมลแบบเดิม: รหัสผ่านอย่างน้อย 8 ตัว)</small><input id="pw1" type="password" autocomplete="new-password" autofocus></label>
+        <label>พิมพ์ซ้ำอีกครั้ง<input id="pw2" type="password" autocomplete="new-password"></label>
+        <p class="care-err" id="pwErr" role="alert" hidden></p><div class="care-foot"><button class="btn primary" type="submit">บันทึก</button></div></form></div></div>`);
     document.body.classList.add("care-open"); setTimeout(() => $("#pw1").focus(), 50);
     $("#pwForm").addEventListener("submit", async (e) => {
       e.preventDefault(); const er = $("#pwErr"), p1 = $("#pw1").value, p2 = $("#pw2").value;
       const bad = (t) => { er.textContent = t; er.hidden = false; };
-      if (p1.length < 8) return bad("รหัสผ่านอย่างน้อย 8 ตัวอักษร"); if (p1 !== p2) return bad("รหัสผ่านทั้งสองช่องไม่ตรงกัน");
+      let isPin = false; try { isPin = (await D.sb.auth.getUser()).data.user?.user_metadata?.pin === "1"; } catch { /* treat as a password account */ }
+      if (isPin ? !/^\d{6}$/.test(p1) : p1.length < 8) return bad(isPin ? "PIN ต้องเป็นตัวเลข 6 หลัก" : "รหัสผ่านอย่างน้อย 8 ตัวอักษร"); if (p1 !== p2) return bad("ทั้งสองช่องไม่ตรงกัน");
       const { error } = await D.sb.auth.updateUser({ password: p1 }); if (error) return bad(error.message);
       $("#pwReset").remove(); document.body.classList.remove("care-open"); history.replaceState(null, "", location.pathname + "#home");
-      window.PreDM?.toast?.("ตั้งรหัสผ่านใหม่เรียบร้อย"); location.reload();
+      window.PreDM?.toast?.("ตั้งใหม่เรียบร้อย"); location.reload();
     });
   }
 

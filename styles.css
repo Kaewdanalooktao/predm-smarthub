@@ -2355,3 +2355,4 @@ body:has(.fd-modal) .chat-fab, body:has(.fd-modal) .sos, body:has(.fd-modal) .ch
 @keyframes sbSteam { 0%, 100% { opacity: .15; transform: translateY(6px); } 50% { opacity: .6; transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .sb-steam { animation: none; } }
 @media (max-width: 640px) { .hk-modes { overflow-x: auto; scrollbar-width: none; gap: 5px; } .hk-modes::-webkit-scrollbar { display: none; } .hk-modes button { flex: none; white-space: nowrap; padding: 6px 10px; font-size: .76rem; } }
+
