@@ -17,7 +17,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pre-DM">
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
-<link rel="stylesheet" href="styles.css?v=154">
+<link rel="stylesheet" href="styles.css?v=155">
 <script src="vendor/chart.umd.min.js"></script>
 </head>
 <body>
@@ -262,6 +262,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
       <button type="button" class="ar-cta" data-arfit><span class="ar-cta-ic" aria-hidden="true"><img src="vendor/fit3d/person_running.webp" alt=""></span><span><b>🕶️ โหมด AR · เลือกท่าฝึกเอง</b><small>เปิดกล้อง ชี้นิ้วแตะการ์ดเลือกโหมด เสริมแรง แอโรบิก ทรงตัว ยืดเหยียด หรือเกม AR แล้ว AI นับท่าให้</small></span><span class="fq-card-go">เปิด →</span></button>
       <div class="fq-cards"><a class="fq-card hand" href="#food" data-handgame="market"><span class="fq-card-ico" aria-hidden="true">🧺</span><span><b>ตลาดแตะมือ (VR)</b><small>เลือกเมนูมื้อเย็น แล้วเดินตลาด 5 แผง หยิบวัตถุดิบด้วยนิ้ว (หรือเมาส์/แตะจอ)</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card hand" href="#food" data-handgame="noodle"><span class="fq-card-ico" aria-hidden="true">🍜</span><span><b>ร้านก๋วยเตี๋ยวแตะมือ (VR)</b><small>ลูกค้า 3 คน แต่ละคนมีโรคประจำตัว เลือกเส้น น้ำซุป เนื้อ ผัก แล้วปรุงเอง ทดสอบความรอบรู้เรื่องหวาน มัน เค็ม</small></span><span class="fq-card-go">เล่น →</span></a>
+      <a class="fq-card hand" href="#food" data-handgame="shabu"><span class="fq-card-ico" aria-hidden="true">🍲</span><span><b>ร้านชาบูแตะมือ (VR)</b><small>ลูกค้า 3 คน เลือกน้ำซุป เนื้อ ผัก และน้ำจิ้มให้เหมาะกับโรค</small></span></a>
       <a class="fq-card hand" href="#food" data-handgame="somtam"><span class="fq-card-ico" aria-hidden="true">🥗</span><span><b>ร้านส้มตำแตะมือ (VR)</b><small>ส้มตำ 12 ชนิด เครื่องปรุงกว่า 45 อย่าง ใช้มือตำ 10 ครั้ง ได้จานส้มตำเสิร์ฟพร้อมค่าโซเดียม น้ำตาล</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card hand" href="#food" data-handgame="plate"><span class="fq-card-ico" aria-hidden="true">🖐️</span><span><b>ครัวแตะมือ (AI กล้อง)</b><small>ชี้นิ้วแตะเมนูบนจอเพื่อจัดพาข้าว หรือยกมือตำส้มตำ · ประมวลผลในเครื่อง</small></span><span class="fq-card-go">เล่น →</span></a>
       <a class="fq-card" href="#food" data-kgame="plate"><span class="fq-card-ico" aria-hidden="true">🍽️</span><span><b>เกมจัดสำรับ</b><small>เลือกว่าจะกินอะไร ให้ได้จาน 2:1:1 · ไม่ใช้กล้อง</small></span><span class="fq-card-go">เล่น →</span></a>
@@ -606,7 +607,8 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
           <button type="button" class="btn kh-quiz alt" data-kgame="plate">🍽️ เกมจัดสำรับ <small>200 เมนู อีสาน ภาคกลาง เหนือ ใต้ นานาชาติ</small></button>
           <button type="button" class="btn kh-quiz hand" data-handgame="plate">🖐️ ครัวแตะมือ (กล้อง) <small>ชี้นิ้วแตะเมนูบนจอ เหมือน VR</small></button>
           <button type="button" class="btn kh-quiz hand" data-handgame="somtam">🥗 ร้านส้มตำแตะมือ <small>12 ชนิด ปรุงเอง ตำ 10 ครั้ง</small></button>
-          <button type="button" class="btn kh-quiz hand" data-handgame="noodle">🍜 ร้านก๋วยเตี๋ยวแตะมือ <small>ปรุงให้ลูกค้าตามโรค ทดสอบความรอบรู้</small></button></div>
+          <button type="button" class="btn kh-quiz hand" data-handgame="noodle">🍜 ร้านก๋วยเตี๋ยวแตะมือ <small>ปรุงให้ลูกค้าตามโรค ทดสอบความรอบรู้</small></button>
+          <button type="button" class="btn kh-quiz hand" data-handgame="shabu">🍲 ร้านชาบูแตะมือ <small>เลือกน้ำซุป เนื้อ ผัก น้ำจิ้ม ให้ลูกค้าตามโรค</small></button></div>
         </div>
         <div class="kh-chef" aria-hidden="true"><svg class="kh-hat" viewBox="0 0 60 40"><path d="M8 26c-8-2-9-14 0-16 1-8 12-11 17-5 5-8 18-6 19 3 9-1 12 12 3 16v8H8z" fill="#fff" stroke="#e6dccb" stroke-width="2"/><rect x="8" y="26" width="44" height="10" rx="3" fill="#f7f1e6" stroke="#e6dccb" stroke-width="2"/></svg><div id="khMascot"></div></div>
       </header>
@@ -707,7 +709,7 @@ if (/\/$/.test(location.pathname) && !location.hash) location.replace("landing.h
 <script src="cert.js?v=11"></script>
 <script src="profile.js?v=6"></script>
 <script type="module" src="pose.js?v=72"></script>
-<script type="module" src="handkitchen.js?v=25"></script>
+<script type="module" src="handkitchen.js?v=26"></script>
 <script src="arfit.js?v=12"></script>
 <script src="aiplan.js?v=2"></script>
 <script src="pulse.js?v=1"></script>

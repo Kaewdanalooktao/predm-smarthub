@@ -165,7 +165,7 @@ function shell() {
       <div class="hk-hud">
         <button type="button" class="hk-x" data-hk="close" aria-label="ปิดเกม">✕</button>
         <span class="hk-masc" id="hkMasc" aria-hidden="true"></span><div class="hk-title"><b id="hkTitle">ครัวแตะมือ</b><span id="hkSay">ชี้นิ้วชี้ค้างไว้ที่การ์ดเพื่อเลือก</span></div>
-        <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="market">🧺 จ่ายตลาด</button><button type="button" data-hkmode="noodle">🍜 ร้านก๋วยเตี๋ยว</button><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
+        <button type="button" class="hk-x hk-mu" data-voice aria-label="เปิด/ปิดเสียงพากย์">🗣️</button><button type="button" class="hk-x hk-mu" data-music aria-label="เปิด/ปิดเพลง">🎵</button><div class="hk-modes" role="tablist"><button type="button" data-hkmode="market">🧺 จ่ายตลาด</button><button type="button" data-hkmode="noodle">🍜 ร้านก๋วยเตี๋ยว</button><button type="button" data-hkmode="shabu">🍲 ร้านชาบู</button><button type="button" data-hkmode="plate">🍽️ จัดพาข้าว</button><button type="button" data-hkmode="somtam">🥗 ตำส้มตำ</button></div>
       </div>
       <div class="hk-mortar" id="hkMortar" hidden aria-hidden="true">
         <svg class="hk-m-back" viewBox="0 0 240 150"><ellipse cx="120" cy="34" rx="104" ry="26" fill="#9c5b2e"/><ellipse cx="120" cy="36" rx="88" ry="19" fill="#3d2112"/></svg>
@@ -204,7 +204,7 @@ function shell() {
 
 function open(mode) {
   shell(); G.mode = mode || G.mode;
-  $("#hkStartT").textContent = { market: "🧺 ตลาดแตะมือ", noodle: "🍜 ร้านก๋วยเตี๋ยวแตะมือ", somtam: "🥗 ร้านส้มตำแตะมือ" }[G.mode] || "ครัวแตะมือ";
+  $("#hkStartT").textContent = { market: "🧺 ตลาดแตะมือ", noodle: "🍜 ร้านก๋วยเตี๋ยวแตะมือ", shabu: "🍲 ร้านชาบูแตะมือ", somtam: "🥗 ร้านส้มตำแตะมือ" }[G.mode] || "ครัวแตะมือ";
   $("#hkModal").hidden = false; document.body.classList.add("care-open"); window.PreDMMusic?.start();
   $("#hkStart").hidden = false; $("#hkMsg").textContent = "";
   getLandmarker().catch(() => {}); // start getting the hand model ready while the player reads the start screen
@@ -244,9 +244,9 @@ function newRound() {
   $("#hkBg").className = "hk-bg " + G.mode;
   $("#hkMortar").hidden = G.mode !== "somtam"; $("#hkPestle").hidden = true; $("#hkServe").hidden = true; $("#hkMix").innerHTML = ""; $("#hkMortar").classList.remove("gone");
   G.mk = { phase: "menu", recipe: null, stall: 0, page: 0, menuPage: 0, cart: [], combo: 0, t0: 0 };
-  G.score = 0; $("#hkList").hidden = true; if (G.mode === "noodle") ndNew(); ndBowl();
-  $("#hkShop").hidden = G.mode !== "noodle"; $("#hkCust").hidden = true; $("#hkRecipe").hidden = true;
-  if (G.mode !== "noodle" && window.PreDMMascot) $("#hkMasc").innerHTML = PreDMMascot.svg(); // mascot back in the other modes
+  G.score = 0; $("#hkList").hidden = true; if (isShop()) { ndNew(); const sg = $("#hkShop .nd-sign"); if (sg) sg.innerHTML = `${SH().sign} <small>ปรุงพอดี ใส่ใจสุขภาพ</small>`; } ndBowl();
+  $("#hkShop").hidden = !isShop(); $("#hkCust").hidden = true; $("#hkRecipe").hidden = true;
+  if (!isShop() && window.PreDMMascot) $("#hkMasc").innerHTML = PreDMMascot.svg(); // mascot back in the other modes
   if (G.mode === "plate") { const kg = window.PreDMKitchenGames; G.sc = kg?.scenes ? kg.scenes[Math.floor(Math.random() * kg.scenes.length)] : { t: "มื้อกลางวัน", meal: "l", cap: 650, ic: "☀️" }; }
   layout();
 }
@@ -271,12 +271,12 @@ function layout() {
       say(`${st.t}${st.n > 1 ? ` (เลือกแล้ว ${have}/${st.n})` : ""} — ชี้นิ้วค้างไว้ที่การ์ด`);
       if (G.spoke !== "pl" + G.step) { G.spoke = "pl" + G.step; window.PreDMVoice?.say({ rice: "pl_rice", pro: "pl_pro", veg: "pl_veg", drink: "pl_drink" }[st.kind]); }
     }
-  } else if (G.mode === "noodle") items = noodleItems();
+  } else if (isShop()) items = noodleItems();
   else if (G.pound) { items = []; $("#hkTitle").textContent = `🥗 ${STT[G.st.type].n} · ตำเลย!`; }
   else items = somtamItems();
   // big screens: cards on an arc so the middle (the player's face) stays clear; phones: a tidy grid
   const n = items.length, narrow = ($("#hkStage").clientWidth || innerWidth) < 760;
-  const lifted = (G.mode === "market" && G.mk?.phase === "shop") || G.mode === "somtam" || G.mode === "noodle"; // leave room for the list strip / mortar / bowl
+  const lifted = (G.mode === "market" && G.mk?.phase === "shop") || G.mode === "somtam" || isShop(); // leave room for the list strip / mortar / bowl
   box.innerHTML = items.map((c, i) => {
     let x, y;
     if (narrow) { const cols = 3, rows = Math.ceil(n / cols), r = Math.floor(i / cols), inRow = Math.min(cols, n - r * cols), col = i - r * cols; x = 50 + (col - (inRow - 1) / 2) * 32; y = rows === 1 ? 48 : 31 + (r * (lifted ? 34 : 44)) / (rows - 1); }
@@ -288,9 +288,9 @@ function layout() {
 }
 function tray() {
   if (G.mode === "market") return marketTray();
-  if (G.mode === "noodle") { // what is in the bowl so far + tips earned
-    const chips = ND_STEPS.flatMap((st) => ndPicked(st.k).map((id) => st.items.find((i) => i.id === id))).map((x) => `<span class="hk-chip">${img(x.e)}<small>${esc(x.n)}</small></span>`);
-    $("#hkTray").innerHTML = `<span class="hk-tray-l">🍜 ในชาม</span>${chips.join("") || `<small class="hk-empty">ยังว่างอยู่</small>`}<span class="hk-money">💰 ${G.nd?.coins || 0} บาท</span>`;
+  if (isShop()) { // what is in the bowl so far + tips earned
+    const chips = ndSteps().flatMap((st) => ndPicked(st.k).map((id) => st.items.find((i) => i.id === id))).map((x) => `<span class="hk-chip">${img(x.e)}<small>${esc(x.n)}</small></span>`);
+    $("#hkTray").innerHTML = `<span class="hk-tray-l">${SH().tray}</span>${chips.join("") || `<small class="hk-empty">ยังว่างอยู่</small>`}<span class="hk-money">💰 ${G.nd?.coins || 0} บาท</span>`;
     return;
   }
   const DB = window.PreDMFood?.DB || [];
@@ -314,7 +314,7 @@ function choose(id, el) {
     if (id === "skip" || have >= st.n) G.step++;
     pop(); layout(); return;
   }
-  if (G.mode === "noodle") return noodleChoose(id, el);
+  if (isShop()) return noodleChoose(id, el);
   if (G.mode === "somtam" && somtamNav(id)) return;
   if (id === "pound") { window.PreDMMusic?.stop(); window.PreDMVoice?.say("st_pound"); G.pound = { n: 0, goal: POUNDS, dir: 0, ext: null }; G.pY = null; $("#hkPestle").hidden = false; $("#hkPestle").style.setProperty("--k", 0); say(`ตำ ๆ ๆ! ยกมือขึ้น–ลงแรง ๆ เหมือนจับสาก ${POUNDS} ครั้ง`); layout(); return; }
   const k = G.picks.findIndex((p) => p.id === id);
@@ -592,6 +592,55 @@ const ND_CUST = [ // [name, avatar, condition, what they ask, limits]
   ["ยายบุญ", "👵", "ไตเสื่อม ต้องจำกัดเค็ม", "เค็มน้อย ๆ นะหลาน", { na: 900 }], ["ครูนิด", "👩", "ไขมันในเลือดสูง", "ไม่เอามัน ๆ นะคะ", { fat: 10 }],
   ["ตาเพิ่ม", "👴", "เบาหวาน + ความดัน", "ไม่หวาน ไม่เค็ม แต่อร่อยนะ", { sug: 2, na: 1100, carb: 35 }], ["พี่แบงค์", "🧔", "สุขภาพดี ออกกำลังกาย", "ขอโปรตีนเยอะ ๆ", { pro: 2 }],
 ].map(([n, av, cond, ask, lim]) => ({ n, av, cond, ask, lim, face: { "ป้าแดง": "old_woman", "ลุงสม": "old_man", "น้องเมย์": "girl", "พี่ต้น": "person", "ยายบุญ": "old_woman", "ครูนิด": "woman_teacher", "ตาเพิ่ม": "old_man", "พี่แบงค์": "man_beard" }[n] }));
+/* ------------------------------------------------------------------ ร้านชาบูแตะมือ (same engine as the noodle shop)
+   broth → meat → vegetables → rice/noodles → dipping sauce and drink. Values are per portion eaten, rounded estimates for the game. */
+const SB_STEPS = [
+  { k: "broth", t: "เลือกน้ำซุป", n: 1, items: [["clear","🍲","น้ำซุปใส",20,1,0,500,1,1,"เค็มน้อยที่สุด ถ้าไม่ซดน้ำจนหมด"],["herb","🍲","น้ำซุปสมุนไพร",20,2,0,450,0,1,"หอมข่า ตะไคร้ ไม่ต้องพึ่งเค็ม"],["tomyum","🍲","น้ำต้มยำ",60,5,3,900,3,-1,"มีน้ำพริกเผา เค็มและมัน"],["mala","🥘","น้ำหม่าล่า",150,4,2,1200,14,-2,"น้ำมันเยอะ เค็มจัด"],["black","🥘","น้ำดำ (ซีอิ๊วหวาน)",80,14,12,1100,0,-2,"ใส่น้ำตาลและซีอิ๊ว หวานและเค็ม"],["pork","🍲","น้ำซุปกระดูกหมูข้น",120,3,1,900,10,-1,"ไขมันสูงจากกระดูกและมันหมู"]] },
+  { k: "meat", t: "เลือกเนื้อสัตว์ (สูงสุด 3)", n: 3, items: [["loin","🥩","หมูสันนอกสไลซ์",90,0,0,50,4,1,"โปรตีนดี ไขมันน้อย"],["chicken","🍗","อกไก่สไลซ์",70,0,0,45,1,1,"โปรตีนดี ไขมันต่ำ"],["fish","🐟","เนื้อปลา",70,0,0,60,1,2,"โปรตีนดีมาก ไขมันต่ำ"],["shrimp","🦐","กุ้ง",60,0,0,120,1,1,"โปรตีนดี ไขมันต่ำ"],["tofu","🧈","เต้าหู้",60,2,0,20,3,1,"โปรตีนจากพืช"],["egg","🥚","ไข่ไก่",75,0,0,70,5,1,"โปรตีนราคาประหยัด"],["belly","🥓","หมูสามชั้นสไลซ์",200,0,0,40,19,-2,"ไขมันสูงมาก"],["beef","🥩","เนื้อวัวติดมัน",160,0,0,45,12,-1,"ไขมันสูง"],["ball","🍢","ลูกชิ้น ปูอัด",90,8,2,450,3,-1,"อาหารแปรรูป เค็มและมีแป้ง"],["bacon","🥓","เบคอน",150,0,0,500,13,-2,"เค็มและมัน"],["cheese","🧀","ลูกชิ้นชีส ไส้กรอก",130,5,1,480,10,-2,"แปรรูป เค็มและมัน"]] },
+  { k: "veg", t: "เลือกผัก (เลือกได้หลายอย่าง)", n: 4, items: [["cabbage","🥬","ผักกาดขาว",10,2,1,10,0,1,"ใยอาหาร น้ำซุปหวานเอง"],["mg","🌿","ผักบุ้ง",10,2,0,30,0,1,"ผักใบเขียว"],["mush","🍄","เห็ดรวม",15,3,0,5,0,1,"ใยอาหาร อิ่มนาน"],["kale","🥦","คะน้า กวางตุ้ง",10,2,0,20,0,1,"ใยอาหารและแคลเซียม"],["ivy","🍃","ตำลึง",10,1,0,5,0,1,"ผักพื้นบ้าน วิตามินสูง"],["double","🥬","ผักเพิ่มสองเท่า",25,5,1,20,0,2,"ผักครึ่งหม้อ ช่วยให้น้ำตาลขึ้นช้า"]] },
+  { k: "carb", t: "เลือกข้าว แป้ง เส้น (สูงสุด 2)", n: 2, items: [["none","🥬","ไม่เอาแป้ง เน้นผัก",0,0,0,0,0,1,"ได้แป้งจากผักและน้ำจิ้มอยู่แล้ว"],["brown","🍚","ข้าวกล้อง 1 ทัพพี",80,17,0,0,1,1,"ใยอาหารมากกว่าข้าวขาว"],["rice","🍚","ข้าวสวย 1 ทัพพี",80,18,0,0,0,0,"1 ทัพพี กำลังพอดี"],["glass","🍜","วุ้นเส้น",120,29,0,10,0,0,"ยังเป็นแป้ง กินแต่พอดี"],["corn","🌽","ข้าวโพดหวาน",70,15,5,5,1,0,"นับเป็นข้าวแป้ง ไม่ใช่ผัก"],["udon","🍜","อุด้ง",200,42,1,250,1,-1,"แป้งเยอะ"],["mama","🍜","บะหมี่กึ่งสำเร็จรูป",220,30,1,600,9,-2,"ทอดน้ำมัน โซเดียมสูง"]] },
+  { k: "season", t: "น้ำจิ้มและเครื่องดื่ม (เลือกได้หลายอย่าง)", n: 6, items: [["suki1","🫙","น้ำจิ้มสุกี้ 1 ช้อนโต๊ะ",20,4,3,300,0,-1,"1 ช้อนโต๊ะ ≈ 300 มก. โซเดียม"],["suki3","🫙","น้ำจิ้มสุกี้ 3 ช้อนโต๊ะ",60,12,9,900,1,-3,"หวานและเค็มเกินในมื้อเดียว"],["seafood","🌶️","น้ำจิ้มซีฟู้ด 1 ช้อนโต๊ะ",15,3,2,400,0,-1,"น้ำปลาเยอะ เค็ม"],["fresh","🧄","พริก กระเทียมสด",5,1,0,2,0,1,"เพิ่มรสโดยไม่เพิ่มเค็ม"],["lime","🍋","มะนาว",4,1,1,1,0,1,"เปรี้ยวแทนเค็ม"],["water","💧","น้ำเปล่า",0,0,0,0,0,1,"ดีที่สุด"],["tea","🍵","ชาไม่หวาน",0,0,0,5,0,1,"ไม่มีน้ำตาล"],["soda","🥤","น้ำอัดลมรีฟิล",140,35,35,15,0,-3,"น้ำตาลราว 9 ช้อนชาต่อแก้ว"],["bubble","🧋","ชานมหวาน",180,30,26,40,6,-3,"หวานและมัน"],["icecream","🍦","ไอศกรีมรีฟิล",140,17,14,50,7,-2,"หวานและมัน ปิดท้ายแต่น้อย"]] },
+].map((st) => ({ ...st, items: st.items.map(([id, e, n, kcal, carb, sug, na, fat, hp, tip]) => ({ id, e, n, kcal, carb, sug, na, fat, hp, tip })) }));
+const SB_CUST = [
+  ["ป้าแดง", "👵", "เป็นเบาหวาน", "ไม่หวานนะ แป้งไม่ต้องเยอะ", { sug: 4, carb: 40 }, "old_woman"], ["ลุงสม", "👴", "ความดันโลหิตสูง", "ช่วยลดเค็มให้ลุงหน่อย", { na: 1200 }, "old_man"],
+  ["น้องเมย์", "👧", "กำลังลดน้ำหนัก", "ขออิ่มแต่ไม่อ้วนนะคะ", { kcal: 450 }, "girl"], ["พี่ต้น", "🧑", "กลุ่มเสี่ยงเบาหวาน ชอบน้ำดำ", "อยากกินชาบูแต่ไม่อยากหวาน", { sug: 5, carb: 45 }, "person"],
+  ["ยายบุญ", "👵", "ไตเสื่อม ต้องจำกัดเค็ม", "เค็มน้อย ๆ นะหลาน", { na: 1000 }, "old_woman"], ["ครูนิด", "👩", "ไขมันในเลือดสูง", "ไม่เอามัน ๆ นะคะ", { fat: 12 }, "woman_teacher"],
+  ["ตาเพิ่ม", "👴", "เบาหวาน + ความดัน", "ไม่หวาน ไม่เค็ม แต่อร่อยนะ", { sug: 4, na: 1200, carb: 40 }, "old_man"], ["พี่แบงค์", "🧔", "สุขภาพดี ออกกำลังกาย", "ขอโปรตีนเยอะ ๆ", { pro: 3 }, "man_beard"],
+].map(([n, av, cond, ask, lim, face]) => ({ n, av, cond, ask, lim, face }));
+const SB_ALL = Object.fromEntries(SB_STEPS.flatMap((st) => st.items.map((x) => [x.id, x])));
+const SB_SOUP = { clear: "#f1dfa6", herb: "#e3d98f", tomyum: "#e9883f", mala: "#b3261a", black: "#4a2a18", pork: "#f3ead8" };
+const SHOPS = {
+  noodle: { steps: ND_STEPS, cust: ND_CUST, ic: "🍜", name: "ร้านก๋วยเตี๋ยว", sign: "🍜 ก๋วยเตี๋ยวอ่อนหวาน", tray: "🍜 ในชาม", unit: "ชาม", best: "noodleBest", need: ["noodle", "broth"], needMsg: "ยังไม่ได้เลือกเส้นหรือน้ำซุปค่ะ",
+    tipCarb: "ลองสั่งเส้นครึ่งเดียวหรือเกาเหลา", tipNa: "เลือกน้ำใสและไม่เติมน้ำปลา", tipFat: "หลีกเลี่ยงกากหมู กระเทียมเจียว เส้นใหญ่", tipVeg: "เพิ่มผักให้มากขึ้น เช่น ถั่วงอก ผักบุ้ง ผักเพิ่มสองเท่า", tipSoup: "น้ำซุปก๋วยเตี๋ยวเค็มมาก ไม่ควรซดน้ำจนหมดชาม",
+    remind: "น้ำตาล 1 ช้อนชา = 4 กรัม · น้ำปลา 1 ช้อนชา ≈ 450 มก. โซเดียม · ทั้งวันไม่ควรเกิน 2,000 มก. · ไม่ซดน้ำซุปจนหมด" },
+  shabu: { steps: SB_STEPS, cust: SB_CUST, ic: "🍲", name: "ร้านชาบู", sign: "🍲 ชาบูอ่อนหวาน", tray: "🍲 ในหม้อ", unit: "หม้อ", best: "shabuBest", need: ["broth", "meat"], needMsg: "ยังไม่ได้เลือกน้ำซุปหรือเนื้อสัตว์ค่ะ",
+    tipCarb: "ลองไม่สั่งแป้งเพิ่ม หรือเลือกข้าวกล้อง 1 ทัพพี", tipNa: "เลือกน้ำซุปใส จิ้มน้ำจิ้มแค่ 1 ช้อนโต๊ะ และเลี่ยงของแปรรูป", tipFat: "หลีกเลี่ยงหมูสามชั้น เบคอน น้ำหม่าล่า", tipVeg: "เพิ่มผักให้มากขึ้น เช่น ผักกาดขาว เห็ด ผักเพิ่มสองเท่า", tipSoup: "น้ำซุปชาบูยิ่งต้มยิ่งเค็ม ไม่ควรซดน้ำซุปตอนท้าย",
+    remind: "น้ำจิ้มสุกี้ 1 ช้อนโต๊ะ ≈ 300 มก. โซเดียม · ทั้งวันไม่ควรเกิน 2,000 มก. · ผักครึ่งหม้อ เนื้อไม่ติดมัน · น้ำเปล่าแทนน้ำหวานรีฟิล · ไม่ซดน้ำซุปตอนท้าย" },
+};
+const isShop = () => G.mode === "noodle" || G.mode === "shabu";
+const SH = () => SHOPS[G.mode === "shabu" ? "shabu" : "noodle"];
+const ndSteps = () => SH().steps;
+// the hot pot on its burner, seen from the side; what was picked floats in the broth
+function potSVG(broth, ids, cls) {
+  const r = rng("pot" + (broth || "") + ids.join()), soup = SB_SOUP[broth] || "#efe7d2";
+  const tops = ids.map((id) => picSrc(SB_ALL[id]?.e)).filter(Boolean).slice(0, 10).map((src, i, a) => { const ang = (i / a.length) * Math.PI * 2 + r(), d = 0.25 + r() * 0.6, sz = 48 + r() * 12; return `<image href="${src}" x="${(150 + Math.cos(ang) * d * 92 - sz / 2).toFixed(0)}" y="${(104 + Math.sin(ang) * d * 22 - sz / 2).toFixed(0)}" width="${sz.toFixed(0)}" height="${sz.toFixed(0)}"/>`; }).join("");
+  let bub = ""; if (broth) for (let i = 0; i < 9; i++) bub += `<circle cx="${(60 + r() * 180).toFixed(0)}" cy="${(92 + r() * 26).toFixed(0)}" r="${(2 + r() * 4).toFixed(1)}" fill="#fff" opacity=".45"/>`;
+  if (broth === "mala") for (let i = 0; i < 10; i++) bub += `<ellipse cx="${(60 + r() * 180).toFixed(0)}" cy="${(92 + r() * 26).toFixed(0)}" rx="7" ry="2.6" fill="#7d120c" transform="rotate(${Math.round(r() * 60 - 30)} 150 104)"/>`;
+  return `<svg class="nd-bowl sb-pot ${cls || ""}" viewBox="0 0 300 230" role="img" aria-label="หม้อชาบู"><defs><linearGradient id="sbp${cls}" x1="0" x2="1"><stop offset="0" stop-color="#8f98a6"/><stop offset=".5" stop-color="#e6eaf0"/><stop offset="1" stop-color="#7d8694"/></linearGradient></defs>
+    <ellipse cx="150" cy="216" rx="104" ry="11" fill="rgba(0,0,0,.28)"/><rect x="66" y="176" width="168" height="36" rx="10" fill="#2f3440"/><rect x="92" y="188" width="60" height="10" rx="5" fill="#ff8a3d"/><circle cx="196" cy="193" r="8" fill="#c9ced8"/>
+    <rect x="2" y="104" width="34" height="16" rx="8" fill="#3a404c"/><rect x="264" y="104" width="34" height="16" rx="8" fill="#3a404c"/>
+    <path d="M26 104c0 44 6 76 124 76s124-32 124-76z" fill="url(#sbp${cls})" stroke="#6d7684" stroke-width="2"/>
+    <ellipse cx="150" cy="104" rx="124" ry="32" fill="#dfe4ec" stroke="#6d7684" stroke-width="3"/><ellipse cx="150" cy="106" rx="112" ry="26" fill="${soup}"/>${bub}${tops}
+    <path class="sb-steam" d="M112 62q-12-16 0-30t0-28" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".55"/><path class="sb-steam s2" d="M188 66q-12-16 0-30t0-28" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".45"/></svg>`;
+}
+// card picture for the broth step: the pot from above, coloured by the broth
+function potTopSVG(broth) {
+  const r = rng("ptop" + broth), soup = SB_SOUP[broth] || "#f1dfa6"; let d = "";
+  for (let i = 0; i < 8; i++) d += `<circle cx="${(36 + r() * 48).toFixed(0)}" cy="${(36 + r() * 48).toFixed(0)}" r="${(2 + r() * 3).toFixed(1)}" fill="#fff" opacity=".5"/>`;
+  if (broth === "mala" || broth === "tomyum") for (let i = 0; i < 7; i++) d += `<ellipse cx="${(36 + r() * 48).toFixed(0)}" cy="${(36 + r() * 48).toFixed(0)}" rx="6" ry="2.4" fill="${broth === "mala" ? "#7d120c" : "#c8261b"}" transform="rotate(${Math.round(r() * 180)} 60 60)"/>`;
+  if (broth === "herb" || broth === "clear") for (let i = 0; i < 5; i++) d += `<ellipse cx="${(38 + r() * 44).toFixed(0)}" cy="${(38 + r() * 44).toFixed(0)}" rx="7" ry="3" fill="#5aa83c" transform="rotate(${Math.round(r() * 180)} 60 60)"/>`;
+  return `<svg class="nd-top" viewBox="0 0 120 120" aria-hidden="true"><rect x="0" y="52" width="120" height="16" rx="8" fill="#3a404c"/><circle cx="60" cy="64" r="52" fill="rgba(0,0,0,.18)"/><circle cx="60" cy="60" r="52" fill="#c9ced8" stroke="#6d7684" stroke-width="3"/><circle cx="60" cy="60" r="43" fill="${soup}"/>${d}</svg>`;
+}
 const ND_ROUND = 3;
 const face = (c, cls) => `<img class="${cls || "nd-face"}" src="vendor/people/${c.face}.webp" alt="${esc(c.n)}">`;
 // condiment jars drawn as SVG (the classic 4-jar noodle-shop set + MSG)
@@ -606,19 +655,19 @@ function jarSVG(kind) {
     <rect x="24" y="16" width="52" height="16" rx="6" fill="#e05a4a"/><rect x="44" y="4" width="12" height="16" rx="4" fill="#c9a26b"/></svg>`;
 }
 const ND_JAR = { sug1: "sug", sug2: "sug", sug3: "sug", fs1: "fs", fs2: "fs", chilip: "chili", vinegar: "vin", msg: "msg" };
-function ndNew() { const order = shuffle(ND_CUST).slice(0, ND_ROUND); G.nd = { order, ci: 0, step: 0, picks: {}, coins: 0, results: [] }; }
+function ndNew() { const order = shuffle(SH().cust).slice(0, ND_ROUND); G.nd = { order, ci: 0, step: 0, picks: {}, coins: 0, results: [] }; }
 const ndCur = () => G.nd.order[G.nd.ci];
 function ndPicked(k) { return G.nd.picks[k] || []; }
 function ndTotals() {
   const t = { kcal: 0, carb: 0, sug: 0, na: 0, fat: 0, pro: 0, veg: 0 };
-  ND_STEPS.forEach((st) => ndPicked(st.k).forEach((id) => { const x = st.items.find((i) => i.id === id); ["kcal", "carb", "sug", "na", "fat"].forEach((f) => (t[f] += x[f])); if (st.k === "meat" && x.hp >= 0) t.pro++; if (st.k === "veg") t.veg += x.id === "double" ? 2 : 1; }));
+  ndSteps().forEach((st) => ndPicked(st.k).forEach((id) => { const x = st.items.find((i) => i.id === id); ["kcal", "carb", "sug", "na", "fat"].forEach((f) => (t[f] += x[f])); if (st.k === "meat" && x.hp >= 0) t.pro++; if (st.k === "veg") t.veg += x.id === "double" ? 2 : 1; }));
   return t;
 }
 function noodleItems() {
   const N = G.nd, c = ndCur();
   if (N.done) return [];
-  const st = ND_STEPS[N.step], have = ndPicked(st.k);
-  $("#hkTitle").textContent = `🍜 ร้านก๋วยเตี๋ยว · ลูกค้า ${N.ci + 1}/${ND_ROUND} · ${st.t}`;
+  const S = SH(), st = ndSteps()[N.step], have = ndPicked(st.k);
+  $("#hkTitle").textContent = `${S.ic} ${S.name} · ลูกค้า ${N.ci + 1}/${ND_ROUND} · ${st.t}`;
   $("#hkMasc").innerHTML = face(c, "nd-hud"); // the customer's face sits in the top bar next to the request
   if (N.introFor !== N.ci) { // a new customer walks in: big greeting for a moment
     N.introFor = N.ci; const cp = $("#hkCust"); cp.hidden = false; cp.classList.remove("in"); void cp.offsetWidth; cp.classList.add("in");
@@ -626,13 +675,13 @@ function noodleItems() {
     clearTimeout(N.introT); N.introT = setTimeout(() => (cp.hidden = true), 2200);
   }
   say(`${c.av} ${c.n} (${c.cond}): “${c.ask}”`);
-  if (G.spoke !== "nd" + N.ci + N.step) { G.spoke = "nd" + N.ci + N.step; if (N.step === 0) window.PreDMVoice?.say(N.ci === 0 ? "nd_open" : "nd_next"); }
-  const pic = (x) => st.k === "noodle" ? topBowlSVG(x.id, "clear") : st.k === "broth" ? topBowlSVG("small", x.id) : ND_JAR[x.id] ? jarSVG(ND_JAR[x.id]) : null;
+  if (G.spoke !== "nd" + N.ci + N.step) { G.spoke = "nd" + N.ci + N.step; if (N.step === 0 && !(G.mode === "shabu" && N.ci === 0)) window.PreDMVoice?.say(N.ci === 0 ? "nd_open" : "nd_next"); }
+  const pic = G.mode === "shabu" ? (x) => (st.k === "broth" ? potTopSVG(x.id) : null) : (x) => st.k === "noodle" ? topBowlSVG(x.id, "clear") : st.k === "broth" ? topBowlSVG("small", x.id) : ND_JAR[x.id] ? jarSVG(ND_JAR[x.id]) : null;
   const ND_PER = 6, pages = Math.ceil(st.items.length / ND_PER); N.page = Math.min(N.page || 0, pages - 1);
   const items = st.items.slice(N.page * ND_PER, N.page * ND_PER + ND_PER).map((x) => { const inn = have.includes(x.id); return { id: "n:" + x.id, e: x.e, html: pic(x), n: x.n, sub: inn ? "✓ ใส่แล้ว (แตะเพื่อเอาออก)" : x.tip.length > 24 ? x.tip.slice(0, 23) + "…" : x.tip, cls: inn ? "in" : "", badge: inn ? "✓" : "" }; });
   if (pages > 1) items.push({ id: "ndpage", e: "🔄", n: "ดูอย่างอื่น", sub: `หน้า ${N.page + 1}/${pages}` });
-  if (st.n > 1 && N.step < ND_STEPS.length - 1) items.push({ id: "ndnext", e: "➡️", n: "ขั้นต่อไป", sub: have.length ? `เลือกแล้ว ${have.length}` : "ข้ามได้" });
-  if (N.step === ND_STEPS.length - 1) items.push({ id: "ndserve", e: "🛎️", n: "เสิร์ฟ!", big: true });
+  if (st.n > 1 && N.step < ndSteps().length - 1) items.push({ id: "ndnext", e: "➡️", n: "ขั้นต่อไป", sub: have.length ? `เลือกแล้ว ${have.length}` : "ข้ามได้" });
+  if (N.step === ndSteps().length - 1) items.push({ id: "ndserve", e: "🛎️", n: "เสิร์ฟ!", big: true });
   if (N.step > 0) items.unshift({ id: "ndback", e: "⬅️", n: "ย้อนกลับ" });
   return items;
 }
@@ -640,11 +689,11 @@ function noodleChoose(id, el) {
   const N = G.nd;
   if (id === "ndback") { N.step--; N.page = 0; ndBowl(); return layout(); }
   if (id === "ndnext") { N.step++; N.page = 0; return layout(); }
-  if (id === "ndpage") { N.page = ((N.page || 0) + 1) % Math.ceil(ND_STEPS[N.step].items.length / 6); return layout(); }
+  if (id === "ndpage") { N.page = ((N.page || 0) + 1) % Math.ceil(ndSteps()[N.step].items.length / 6); return layout(); }
   if (id === "ndserve") return ndServe();
   if (id === "ndagain") { ndNew(); ndBowl(); return layout(); }
   if (!id.startsWith("n:")) return;
-  const st = ND_STEPS[N.step], x = id.slice(2), arr = (N.picks[st.k] = N.picks[st.k] || []), k = arr.indexOf(x);
+  const st = ndSteps()[N.step], x = id.slice(2), arr = (N.picks[st.k] = N.picks[st.k] || []), k = arr.indexOf(x);
   if (k >= 0) arr.splice(k, 1);
   else if (st.n === 1) { arr.length = 0; arr.push(x); }
   else if (arr.length < st.n) arr.push(x); else { say(`เลือกได้สูงสุด ${st.n} อย่าง`); return; }
@@ -657,8 +706,8 @@ function noodleChoose(id, el) {
 // the bowl at the bottom of the screen updates as the order is built
 function ndBowl(seasoning) {
   const el = $("#hkBowl"); if (!el) return;
-  if (G.mode !== "noodle") { el.hidden = true; return; } el.hidden = false;
-  el.innerHTML = bowlSVG(ndPicked("noodle")[0], ndPicked("broth")[0], ndPicked("meat"), ndPicked("veg"), "live");
+  if (!isShop()) { el.hidden = true; return; } el.hidden = false;
+  el.innerHTML = G.mode === "shabu" ? potSVG(ndPicked("broth")[0], [...ndPicked("meat"), ...ndPicked("veg"), ...ndPicked("carb")], "live") : bowlSVG(ndPicked("noodle")[0], ndPicked("broth")[0], ndPicked("meat"), ndPicked("veg"), "live");
   if (seasoning) { const sp = document.createElement("div"); sp.className = "hk-sprinkle"; const src = picSrc(seasoning.e); sp.innerHTML = Array.from({ length: 5 }, (_, i) => `<img src="${src}" alt="" style="--dx:${(i - 2) * 26}px;--d:${i * 60}ms">`).join(""); el.appendChild(sp); setTimeout(() => sp.remove(), 900); }
 }
 function bowlSVG(noodle, broth, meats, vegs, cls) {
@@ -688,21 +737,24 @@ function topBowlSVG(noodle, broth) {
     <circle cx="60" cy="60" r="42" fill="${soup}"/>${broth === "tomyum" ? `<circle cx="60" cy="60" r="42" fill="#fff" opacity=".18"/>` : ""}${st}${greens}${broth === "tomyum" || broth === "tomyumclear" ? `<circle cx="48" cy="70" r="3" fill="#d22f22"/><circle cx="72" cy="44" r="3" fill="#d22f22"/>` : ""}</svg>`;
 }
 function ndServe() { // judge the bowl against this customer's needs
-  const N = G.nd, c = ndCur(), t = ndTotals(), good = [], tips = [];
-  if (!ndPicked("noodle").length || !ndPicked("broth").length) { say("ยังไม่ได้เลือกเส้นหรือน้ำซุปค่ะ"); N.step = ndPicked("noodle").length ? 1 : 0; return layout(); }
+  const N = G.nd, c = ndCur(), t = ndTotals(), good = [], tips = [], S = SH();
+  const miss = S.need.find((k) => !ndPicked(k).length);
+  if (miss) { say(S.needMsg); N.step = ndSteps().findIndex((x) => x.k === miss); N.page = 0; return layout(); }
   let pts = 5; const L = c.lim;
-  if (L.sug != null) { if (t.sug <= L.sug) { pts += 2; good.push(`หวานน้อย (${t.sug} ก.)`); } else { pts -= 2; tips.push(`ลูกค้า${c.cond} แต่ชามนี้มีน้ำตาล ${t.sug} ก. (${Math.round(t.sug / 4)} ช้อนชา)`); } }
-  if (L.carb != null) { if (t.carb <= L.carb) { pts += 1; good.push("แป้งพอดี"); } else { pts -= 1; tips.push(`แป้ง ${t.carb} ก. มากไปสำหรับ${c.cond} ลองสั่งเส้นครึ่งเดียวหรือเกาเหลา`); } }
-  if (L.na != null) { if (t.na <= L.na) { pts += 2; good.push(`เค็มพอดี (${t.na} มก.)`); } else { pts -= 2; tips.push(`โซเดียม ${t.na} มก. เกินที่${c.n}ควรได้ (${L.na} มก.) เลือกน้ำใสและไม่เติมน้ำปลา`); } }
+  if (L.sug != null) { if (t.sug <= L.sug) { pts += 2; good.push(`หวานน้อย (${t.sug} ก.)`); } else { pts -= 2; tips.push(`ลูกค้า${c.cond} แต่${S.unit}นี้มีน้ำตาล ${t.sug} ก. (${Math.round(t.sug / 4)} ช้อนชา)`); } }
+  if (L.carb != null) { if (t.carb <= L.carb) { pts += 1; good.push("แป้งพอดี"); } else { pts -= 1; tips.push(`แป้ง ${t.carb} ก. มากไปสำหรับ${c.cond} ${S.tipCarb}`); } }
+  if (L.na != null) { if (t.na <= L.na) { pts += 2; good.push(`เค็มพอดี (${t.na} มก.)`); } else { pts -= 2; tips.push(`โซเดียม ${t.na} มก. เกินที่${c.n}ควรได้ (${L.na} มก.) ${S.tipNa}`); } }
   if (L.kcal != null) { if (t.kcal <= L.kcal) { pts += 2; good.push(`${t.kcal} kcal ไม่อ้วน`); } else { pts -= 2; tips.push(`${t.kcal} kcal มากไปสำหรับคนลดน้ำหนัก`); } }
-  if (L.fat != null) { if (t.fat <= L.fat) { pts += 2; good.push(`ไขมันต่ำ (${t.fat} ก.)`); } else { pts -= 2; tips.push(`ไขมัน ${t.fat} ก. มากไป หลีกเลี่ยงกากหมู กระเทียมเจียว เส้นใหญ่`); } }
+  if (L.fat != null) { if (t.fat <= L.fat) { pts += 2; good.push(`ไขมันต่ำ (${t.fat} ก.)`); } else { pts -= 2; tips.push(`ไขมัน ${t.fat} ก. มากไป ${S.tipFat}`); } }
   if (L.pro != null) { if (t.pro >= L.pro) { pts += 2; good.push("โปรตีนจัดเต็ม"); } else { pts -= 1; tips.push("ลูกค้าอยากได้โปรตีนมากขึ้น เพิ่มไก่ ปลา ไข่ หรือเต้าหู้"); } }
-  if (t.veg >= 2) { pts += 1; good.push("ผักเยอะ"); } else tips.push("เพิ่มผักให้มากขึ้น เช่น ถั่วงอก ผักบุ้ง ผักเพิ่มสองเท่า");
-  if (t.na > 1500) tips.push("น้ำซุปก๋วยเตี๋ยวเค็มมาก ไม่ควรซดน้ำจนหมดชาม");
+  if (L.fat == null && t.fat > 25) { pts -= 2; tips.push(`ไขมัน ${t.fat} ก. สูงมากสำหรับมื้อเดียว ${S.tipFat}`); } // nobody leaves happy after a very fatty or very sweet meal
+  if (L.sug == null && t.sug > 20) { pts -= 2; tips.push(`น้ำตาล ${t.sug} ก. (${Math.round(t.sug / 4)} ช้อนชา) สูงมาก เลี่ยงเครื่องดื่มหวานและน้ำจิ้มหวาน`); }
+  if (t.veg >= 2) { pts += 1; good.push("ผักเยอะ"); } else tips.push(S.tipVeg);
+  if (t.na > 1500) tips.push(S.tipSoup);
   pts = Math.max(0, Math.min(10, pts)); const happy = pts >= 7, coins = happy ? 40 + pts * 2 : pts >= 5 ? 20 : 5;
   N.coins += coins; N.results.push({ c, pts, happy });
   window.PreDMMusic?.sfx(happy ? "win" : "bad"); window.PreDMVoice?.say(happy ? "nd_happy" : "nd_sad"); if (happy) confetti();
-  const bowl = bowlSVG(ndPicked("noodle")[0], ndPicked("broth")[0], ndPicked("meat"), ndPicked("veg"), "res");
+  const bowl = G.mode === "shabu" ? potSVG(ndPicked("broth")[0], [...ndPicked("meat"), ...ndPicked("veg"), ...ndPicked("carb")], "res") : bowlSVG(ndPicked("noodle")[0], ndPicked("broth")[0], ndPicked("meat"), ndPicked("veg"), "res");
   $("#hkBowl").hidden = true; $("#hkCust").hidden = true; G.cards = [];
   const last = N.ci >= ND_ROUND - 1;
   $("#hkCards").innerHTML = `<div class="hk-result nd-res"><div class="nd-res-top">${face(c, "nd-av")}${bowl}</div>
@@ -714,13 +766,13 @@ function ndServe() { // judge the bowl against this customer's needs
 }
 function ndSummary() {
   const N = G.nd, happy = N.results.filter((x) => x.happy).length, avg = Math.round(N.results.reduce((a, x) => a + x.pts, 0) / N.results.length);
-  const best = Math.max(N.coins, window.PreDM?.store.get("noodleBest", 0) || 0); window.PreDM?.store.set("noodleBest", best);
+  const S = SH(), best = Math.max(N.coins, window.PreDM?.store.get(S.best, 0) || 0); window.PreDM?.store.set(S.best, best);
   const st = happy === ND_ROUND ? 3 : happy >= 2 ? 2 : happy >= 1 ? 1 : 0; if (st >= 2) confetti();
   $("#hkCards").innerHTML = `<div class="hk-result"><span class="hk-rmasc">${window.PreDMMascot ? PreDMMascot.svg() : "💗"}</span><div class="fq-stars">${[0, 1, 2].map((k) => `<span class="${k < st ? "on" : ""}">★</span>`).join("")}</div>
-    <h2>${["ลองเปิดร้านใหม่นะคะ", "พอไปได้ค่ะ", "ร้านดีมาก ลูกค้าชอบ!", "เจ้าของร้านก๋วยเตี๋ยวสุขภาพ! 🍜"][st]}</h2>
+    <h2>${["ลองเปิดร้านใหม่นะคะ", "พอไปได้ค่ะ", "ร้านดีมาก ลูกค้าชอบ!", `เจ้าของ${S.name}สุขภาพ! ${S.ic}`][st]}</h2>
     <p>ลูกค้าพอใจ ${happy}/${ND_ROUND} คน · คะแนนเฉลี่ย ${avg}/10 · ทิปรวม 💰 ${N.coins} บาท · สถิติ ${best} บาท</p>
     <ul class="nd-sum">${N.results.map((x) => `<li>${face(x.c, "nd-mini")} ${esc(x.c.n)} (${esc(x.c.cond)}) · ${x.pts}/10 ${x.happy ? "😋" : "😕"}</li>`).join("")}</ul>
-    <p class="ok">💡 จำไว้: น้ำตาล 1 ช้อนชา = 4 กรัม · น้ำปลา 1 ช้อนชา ≈ 450 มก. โซเดียม · ทั้งวันไม่ควรเกิน 2,000 มก. · ไม่ซดน้ำซุปจนหมด</p>
+    <p class="ok">💡 จำไว้: ${S.remind}</p>
     <div class="hk-start-btns"><button type="button" class="btn primary" data-hk="ndagain">เปิดร้านอีกรอบ ↺</button><button type="button" class="btn" data-hkmode="market">ไปจ่ายตลาด</button></div></div>`;
 }
 
@@ -831,5 +883,5 @@ function onClick(e) {
   const c = t(".hk-card"); if (c) { window.PreDMMusic?.sfx("pick"); lockAll(); choose(c.dataset.id, c); } // tapping a card works with or without the camera // tap also works without camera
 }
 
-document.addEventListener("click", (e) => { const g = e.target.closest("[data-handgame]"); if (!g) return; e.preventDefault(); open(["somtam", "market", "noodle"].includes(g.dataset.handgame) ? g.dataset.handgame : "plate"); });
+document.addEventListener("click", (e) => { const g = e.target.closest("[data-handgame]"); if (!g) return; e.preventDefault(); open(["somtam", "market", "noodle", "shabu"].includes(g.dataset.handgame) ? g.dataset.handgame : "plate"); });
 window.PreDMHandKitchen = { open, close };
