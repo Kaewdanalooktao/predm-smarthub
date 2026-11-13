@@ -452,7 +452,7 @@
     const root = $("#foodRoot"); if (!root || !root.contains(e.target)) return;
     const t = (s) => e.target.closest(s);
     if (t("[data-day]")) { const n = addDays(F.date, +t("[data-day]").dataset.day); if (n <= todayISO()) { F.date = n; render(); } return; }
-    if (t("[data-add]")) { F.add = t("[data-add]").dataset.add; F.pick = null; F.portion = 1; F.q = ""; F.ai = null; clearPhoto(); render(); $("#fdQ")?.focus(); return; }
+    if (t("[data-add]")) { F.add = t("[data-add]").dataset.add; F.pick = null; F.portion = 1; F.q = ""; F.ai = null; clearPhoto(); render(); if (!window.matchMedia("(pointer: coarse)").matches) $("#fdQ")?.focus(); return; }
     if (t("[data-lbclose]") || e.target.classList.contains("fd-lightbox")) { F.view = null; return render(); }
     if (t("[data-picdel]")) { const id = t("[data-picdel]").dataset.picdel; PIC.del(id); saveLogs(logs().map((l) => { if (l.id !== id) return l; const { pic, ...rest } = l; return rest; })); F.view = null; A().toast("ลบรูปแล้ว"); return render(); }
     if (t("[data-snapfor]")) { F.snapFor = t("[data-snapfor]").dataset.snapfor; $("#fdSnapLater")?.click(); return; }

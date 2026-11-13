@@ -2334,3 +2334,15 @@ a.ar-cta { text-decoration: none; }
   .nav.open .nav-more::after { content: "ปิด"; color: #fff; }
   .nav.open .nav-more.on { background: none; box-shadow: none; }
 }
+
+/* v53: food picker on phones - nothing floats over the sheet, and no zoom when typing in the search box */
+body:has(.fd-modal) .chat-fab, body:has(.fd-modal) .sos, body:has(.fd-modal) .chat-fab-tip { display: none !important; }
+@media (max-width: 820px) {
+  body:has(.fd-modal) .nav { display: none !important; }
+  .fd-modal { padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .fd-sheet { max-height: 92vh; max-height: 92dvh; }
+  .fd-search { font-size: 16px; }
+  .cup-body { max-height: 46vh; max-height: 46dvh; }
+}
+/* v53: the page's entrance animation must not keep a transform afterwards, or full-screen sheets inside it stop being fixed to the screen */
+.view { animation-fill-mode: backwards; }
